@@ -16,14 +16,14 @@ library IndexedOrderedSetLib {
 
   /// @dev Returns the size of the set
   /// @param self The set
-  function size(IndexedOrderedSet storage self) constant returns (uint) {
+  function size(IndexedOrderedSet storage self) public constant returns (uint) {
     return self._values.length;
   }
 
   /// @dev Returns boolean if the key is in the set
   /// @param self The set
   /// @param value The value to check
-  function contains(IndexedOrderedSet storage self, bytes32 value) constant returns (bool) {
+  function contains(IndexedOrderedSet storage self, bytes32 value) public constant returns (bool) {
     return self._exists[value];
   }
 
@@ -31,6 +31,7 @@ library IndexedOrderedSetLib {
   /// @param self The set
   /// @param value The value to look up the index for.
   function indexOf(IndexedOrderedSet storage self, bytes32 value) requireValue(self, value)
+                                                                  public
                                                                   constant
                                                                   returns (uint) {
     return self._valueIndices[value];

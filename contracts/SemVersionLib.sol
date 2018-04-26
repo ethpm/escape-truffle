@@ -269,7 +269,7 @@ library SemVersionLib {
   /// @dev Concatenates the two strings together.
   /// @param _head The first string
   /// @param tail The second string
-  function concat(string storage _head, string tail) returns (bool) {
+  function concat(string storage _head, string tail) public returns (bool) {
     bytes head = bytes(_head);
 
     for (uint i = 0; i < bytes(tail).length; i++) {
@@ -284,7 +284,7 @@ library SemVersionLib {
   /// @dev Concatenates the provided byte to the end of the provided string.
   /// @param value The string to append the byte to.
   /// @param b The byte.
-  function concatByte(string storage value, bytes1 b) returns (bool) {
+  function concatByte(string storage value, bytes1 b) public returns (bool) {
     bytes memory _b = new bytes(1);
     _b[0] = b;
     return concat(value, string(_b));

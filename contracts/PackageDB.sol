@@ -109,24 +109,25 @@ contract PackageDB is Authorized {
 
   /// @dev Query the existence of a package with the given name.  Returns boolean indicating whether the package exists.
   /// @param nameHash The name hash of a package.
-  function packageExists(bytes32 nameHash) constant returns (bool) {
+  function packageExists(bytes32 nameHash) public constant returns (bool) {
     return _recordedPackages[nameHash].exists;
   }
 
   /// @dev Return the total number of packages
-  function getNumPackages() constant returns (uint) {
+  function getNumPackages() public constant returns (uint) {
     return _allPackageNameHashes.size();
   }
 
   /// @dev Returns package namehash at the provided index from the set of all known name hashes.
   /// @param idx The index of the package name hash to retrieve.
-  function getPackageNameHash(uint idx) constant returns (bytes32) {
+  function getPackageNameHash(uint idx) public constant returns (bytes32) {
     return _allPackageNameHashes.get(idx);
   }
 
   /// @dev Returns information about the package.
   /// @param nameHash The name hash to look up.
-  function getPackageData(bytes32 nameHash) constant
+  function getPackageData(bytes32 nameHash) public
+                                            constant
                                             onlyIfPackageExists(nameHash)
                                             returns (address packageOwner,
                                                      uint createdAt,
@@ -137,7 +138,8 @@ contract PackageDB is Authorized {
 
   /// @dev Returns the package name for the given namehash
   /// @param nameHash The name hash to look up.
-  function getPackageName(bytes32 nameHash) constant
+  function getPackageName(bytes32 nameHash) public
+                                            constant
                                             onlyIfPackageExists(nameHash)
                                             returns (string) {
     return _recordedPackages[nameHash].name;
@@ -148,7 +150,7 @@ contract PackageDB is Authorized {
    */
   /// @dev Returns name hash for a given package name.
   /// @param name Package name
-  function hashName(string name) constant returns (bytes32) {
+  function hashName(string name) public constant returns (bytes32) {
     return keccak256(name);
   }
 }

@@ -4,7 +4,7 @@ pragma solidity ^0.4.0;
 contract Authority {
     function canCall(address callerAddress,
                      address codeAddress,
-                     bytes4 sig) constant returns (bool);
+                     bytes4 sig) public constant returns (bool);
 }
 
 
@@ -29,7 +29,7 @@ contract AuthorizedInterface {
 
 
 contract Authorized is AuthorizedInterface {
-    function Authorized() {
+    function Authorized() public {
         owner = msg.sender;
         emit OwnerUpdate(0x0, owner);
     }
