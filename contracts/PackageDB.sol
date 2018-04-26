@@ -149,6 +149,6 @@ contract PackageDB is Authorized {
   /// @dev Returns name hash for a given package name.
   /// @param name Package name
   function hashName(string name) constant returns (bytes32) {
-    return sha3(name);
+    return keccak256(name);
   }
 }

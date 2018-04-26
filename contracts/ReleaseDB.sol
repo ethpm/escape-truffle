@@ -282,7 +282,7 @@ contract ReleaseDB is Authorized {
                        uint32 patch,
                        string preRelease,
                        string build) constant returns (bytes32) {
-    return sha3(major, minor, patch, preRelease, build);
+    return keccak256(major, minor, patch, preRelease, build);
   }
 
   /// @dev Returns release hash for the given release
@@ -290,7 +290,7 @@ contract ReleaseDB is Authorized {
   /// @param versionHash The version hash for the release version.
   function hashRelease(bytes32 nameHash,
                        bytes32 versionHash) constant returns (bytes32) {
-    return sha3(nameHash, versionHash);
+    return keccak256(nameHash, versionHash);
   }
 
   /*

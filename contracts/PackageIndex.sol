@@ -319,7 +319,7 @@ contract PackageIndex is Authorized, PackageIndexInterface {
     return (packageOwner != _address);
   }
 
-  bytes4 constant GET_PACKAGE_NAME_SIG = bytes4(sha3("getPackageName(bytes32)"));
+  bytes4 constant GET_PACKAGE_NAME_SIG = bytes4(keccak256("getPackageName(bytes32)"));
 
   /// @dev Retrieves the name for the given name hash.
   /// @param nameHash The name hash to lookup the name for.
@@ -327,7 +327,7 @@ contract PackageIndex is Authorized, PackageIndexInterface {
     return fetchString(address(packageDb), GET_PACKAGE_NAME_SIG, nameHash);
   }
 
-  bytes4 constant GET_RELEASE_LOCKFILE_URI_SIG = bytes4(sha3("getReleaseLockfileURI(bytes32)"));
+  bytes4 constant GET_RELEASE_LOCKFILE_URI_SIG = bytes4(keccak256("getReleaseLockfileURI(bytes32)"));
 
   /// @dev Retrieves the release lockfile URI from the package db.
   /// @param releaseHash The release hash to retrieve the URI from.
@@ -335,7 +335,7 @@ contract PackageIndex is Authorized, PackageIndexInterface {
     return fetchString(address(releaseDb), GET_RELEASE_LOCKFILE_URI_SIG, releaseHash);
   }
 
-  bytes4 constant GET_PRE_RELEASE_SIG = bytes4(sha3("getPreRelease(bytes32)"));
+  bytes4 constant GET_PRE_RELEASE_SIG = bytes4(keccak256("getPreRelease(bytes32)"));
 
   /// @dev Retrieves the pre-release string from the package db.
   /// @param releaseHash The release hash to retrieve the string from.
@@ -343,7 +343,7 @@ contract PackageIndex is Authorized, PackageIndexInterface {
     return fetchString(address(releaseDb), GET_PRE_RELEASE_SIG, releaseHash);
   }
 
-  bytes4 constant GET_BUILD_SIG = bytes4(sha3("getBuild(bytes32)"));
+  bytes4 constant GET_BUILD_SIG = bytes4(keccak256("getBuild(bytes32)"));
 
   /// @dev Retrieves the build string from the package db.
   /// @param releaseHash The release hash to retrieve the string from.

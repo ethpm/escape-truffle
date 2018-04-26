@@ -38,7 +38,7 @@ library SemVersionLib {
     self.preRelease = preRelease;
     self.preReleaseIdentifiers = splitIdentifiers(preRelease);
     self.build = build;
-    self.hash = sha3(major, minor, patch, preRelease);
+    self.hash = keccak256(major, minor, patch, preRelease);
     return true;
   }
 
