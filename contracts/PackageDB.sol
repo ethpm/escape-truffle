@@ -1,0 +1,157 @@
+pragma solidity ^0.4.0;
+
+import {SemVersionLib} from "./SemVersionLib.sol";
+import {IndexedOrderedSetLib} from "./IndexedOrderedSetLib.sol";
+import {Authorized} from "./Authority.sol";
+
+
+/// @title Database contract for a package index package data.
+/// @author Tim Coulter <tim.coulter@consensys.net>, Piper Merriam <pipermerriam@gmail.com>
+contract PackageDB is Authorized {
+  using SemVersionLib for SemVersionLib.SemVersion;
+  using IndexedOrderedSetLib for IndexedOrderedSetLib.IndexedOrderedSet;
+
+  struct Package {
+      bool exists;
+      uint createdAt;
+      uint updatedAt;
+      string name;
+      address owner;
+  }
+
+  // Package Data: (nameHash => value)
+  mapping (bytes32 => Package) _recordedPackages;
+  IndexedOrderedSetLib.IndexedOrderedSet _allPackageNameHashes;
+
+  // Events
+  event PackageReleaseAdd(bytes32 indexed nameHash, bytes32 indexed releaseHash);
+  event PackageReleaseRemove(bytes32 indexed nameHash, bytes32 indexed releaseHash);
+  event PackageCreate(bytes32 indexed nameHash);
+  event PackageDelete(bytes32 indexed nameHash, string reason);
+  event PackageOwnerUpdate(bytes32 indexed nameHash, address indexed oldOwner, address indexed newOwner);
+
+  /*
+   *  Modifiers
+   */
+  modifier onlyIfPackageExists(bytes32 nameHash) {
+    if (packageExists(nameHash)) {
+      _;
+    } else {
+      throw;
+    }
+  }
+
+  //
+  //  +-------------+
+  //  |  Write API  |
+  //  +-------------+
+  //
+
+  /// @dev Creates or updates a release for a package.  Returns success.
+  /// @param name Package name
+  function setPackage(string name) public auth returns (bool){
+    // Hash the name and the version for storing data
+    bytes32 nameHash = hashName(name);
+
+    var package = _recordedPackages[nameHash];
+
+    // Mark the package as existing if it isn't already tracked.
+    if (!packageExists(nameHash)) {
+
+      // Set package data
+      package.exists = true;
+      package.createdAt = now;
+      package.name = name;
+
+      // Add the nameHash to the list of all package nameHashes.
+      _allPackageNameHashes.add(nameHash);
+
+      PackageCreate(nameHash);
+    }
+
+    package.updatedAt = now;
+
+    return true;
+  }
+
+  /// @dev Removes a package from the package db.  Packages with existing releases may not be removed.  Returns success.
+  /// @param nameHash The name hash of a package.
+  function removePackage(bytes32 nameHash, string reason) public 
+                                                          auth 
+                                                          onlyIfPackageExists(nameHash) 
+                                                          returns (bool) {
+    PackageDelete(nameHash, reason);
+
+    delete _recordedPackages[nameHash];
+    _allPackageNameHashes.remove(nameHash);
+
+    return true;
+  }
+
+  /// @dev Sets the owner of a package to the provided address.  Returns success.
+  /// @param nameHash The name hash of a package.
+  /// @param newPackageOwner The address of the new owner.
+  function setPackageOwner(bytes32 nameHash,
+                           address newPackageOwner) public 
+                                                    auth 
+                                                    onlyIfPackageExists(nameHash)
+                                                    returns (bool) {
+    PackageOwnerUpdate(nameHash, _recordedPackages[nameHash].owner, newPackageOwner);
+
+    _recordedPackages[nameHash].owner = newPackageOwner;
+    _recordedPackages[nameHash].updatedAt = now;
+
+    return true;
+  }
+
+  //
+  //  +------------+
+  //  |  Read API  |
+  //  +------------+
+  //
+
+  /// @dev Query the existence of a package with the given name.  Returns boolean indicating whether the package exists.
+  /// @param nameHash The name hash of a package.
+  function packageExists(bytes32 nameHash) constant returns (bool) {
+    return _recordedPackages[nameHash].exists;
+  }
+
+  /// @dev Return the total number of packages
+  function getNumPackages() constant returns (uint) {
+    return _allPackageNameHashes.size();
+  }
+
+  /// @dev Returns package namehash at the provided index from the set of all known name hashes.
+  /// @param idx The index of the package name hash to retrieve.
+  function getPackageNameHash(uint idx) constant returns (bytes32) {
+    return _allPackageNameHashes.get(idx);
+  }
+
+  /// @dev Returns information about the package.
+  /// @param nameHash The name hash to look up.
+  function getPackageData(bytes32 nameHash) constant 
+                                            onlyIfPackageExists(nameHash) 
+                                            returns (address packageOwner,
+                                                     uint createdAt,
+                                                     uint updatedAt) {
+    var package = _recordedPackages[nameHash];
+    return (package.owner, package.createdAt, package.updatedAt);
+  }
+
+  /// @dev Returns the package name for the given namehash
+  /// @param nameHash The name hash to look up.
+  function getPackageName(bytes32 nameHash) constant 
+                                            onlyIfPackageExists(nameHash) 
+                                            returns (string) {
+    return _recordedPackages[nameHash].name;
+  }
+
+  /*
+   *  Hash Functions
+   */
+  /// @dev Returns name hash for a given package name.
+  /// @param name Package name
+  function hashName(string name) constant returns (bytes32) {
+    return sha3(name);
+  }
+}
