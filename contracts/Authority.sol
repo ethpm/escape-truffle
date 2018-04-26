@@ -29,7 +29,7 @@ contract AuthorizedInterface {
 
 
 contract Authorized is AuthorizedInterface {
-    function Authorized() public {
+    constructor() public {
         owner = msg.sender;
         emit OwnerUpdate(0x0, owner);
     }
