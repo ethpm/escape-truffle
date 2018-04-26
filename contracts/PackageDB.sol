@@ -63,7 +63,7 @@ contract PackageDB is Authorized {
       // Add the nameHash to the list of all package nameHashes.
       _allPackageNameHashes.add(nameHash);
 
-      PackageCreate(nameHash);
+      emit PackageCreate(nameHash);
     }
 
     package.updatedAt = now;
@@ -77,7 +77,7 @@ contract PackageDB is Authorized {
                                                           auth
                                                           onlyIfPackageExists(nameHash)
                                                           returns (bool) {
-    PackageDelete(nameHash, reason);
+    emit PackageDelete(nameHash, reason);
 
     delete _recordedPackages[nameHash];
     _allPackageNameHashes.remove(nameHash);
@@ -93,7 +93,7 @@ contract PackageDB is Authorized {
                                                     auth
                                                     onlyIfPackageExists(nameHash)
                                                     returns (bool) {
-    PackageOwnerUpdate(nameHash, _recordedPackages[nameHash].owner, newPackageOwner);
+    emit PackageOwnerUpdate(nameHash, _recordedPackages[nameHash].owner, newPackageOwner);
 
     _recordedPackages[nameHash].owner = newPackageOwner;
     _recordedPackages[nameHash].updatedAt = now;

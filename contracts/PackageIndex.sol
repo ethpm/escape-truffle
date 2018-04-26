@@ -110,7 +110,7 @@ contract PackageIndex is Authorized, PackageIndexInterface {
     releaseDb.setRelease(nameHash, versionHash, releaseLockfileURI);
 
     // Log the release.
-    PackageRelease(nameHash, releaseDb.hashRelease(nameHash, versionHash));
+    emit PackageRelease(nameHash, releaseDb.hashRelease(nameHash, versionHash));
 
     return true;
   }
@@ -130,7 +130,7 @@ contract PackageIndex is Authorized, PackageIndexInterface {
     var (packageOwner,) = getPackageData(name);
 
     // Log the transfer
-    PackageTransfer(packageOwner, newPackageOwner);
+    emit PackageTransfer(packageOwner, newPackageOwner);
 
     // Update the owner.
     packageDb.setPackageOwner(packageDb.hashName(name), newPackageOwner);

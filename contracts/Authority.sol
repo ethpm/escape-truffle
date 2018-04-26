@@ -31,17 +31,17 @@ contract AuthorizedInterface {
 contract Authorized is AuthorizedInterface {
     function Authorized() {
         owner = msg.sender;
-        OwnerUpdate(0x0, owner);
+        emit OwnerUpdate(0x0, owner);
     }
 
     function setOwner(address newOwner) public auth returns (bool) {
-        OwnerUpdate(owner, newOwner);
+        emit OwnerUpdate(owner, newOwner);
         owner = newOwner;
         return true;
     }
 
     function setAuthority(Authority newAuthority) public auth returns (bool) {
-        AuthorityUpdate(authority, newAuthority);
+        emit AuthorityUpdate(authority, newAuthority);
         authority = newAuthority;
         return true;
     }
@@ -100,7 +100,7 @@ contract WhitelistAuthority is WhitelistAuthorityInterface, Authorized {
                         bytes4 sig,
                         bool can) auth public returns (bool) {
         _canCall[callerAddress][codeAddress][sig] = can;
-        SetCanCall(callerAddress, codeAddress, sig, can);
+        emit SetCanCall(callerAddress, codeAddress, sig, can);
         return true;
     }
 
@@ -108,7 +108,7 @@ contract WhitelistAuthority is WhitelistAuthorityInterface, Authorized {
                               bytes4 sig,
                               bool can) auth public returns (bool) {
         _anyoneCanCall[codeAddress][sig] = can;
-        SetAnyoneCanCall(codeAddress, sig, can);
+        emit SetAnyoneCanCall(codeAddress, sig, can);
         return true;
     }
 }

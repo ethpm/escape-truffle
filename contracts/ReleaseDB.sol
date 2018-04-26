@@ -82,7 +82,7 @@ contract ReleaseDB is Authorized {
     // If this is a new version push it onto the array of version hashes for
     // this package.
     if (release.exists) {
-      ReleaseUpdate(releaseHash);
+      emit ReleaseUpdate(releaseHash);
     } else {
       // Populate the basic rlease data.
       release.exists = true;
@@ -94,7 +94,7 @@ contract ReleaseDB is Authorized {
       _allReleaseHashes.add(releaseHash);
       _releaseHashesByNameHash[nameHash].add(releaseHash);
 
-      ReleaseCreate(releaseHash);
+      emit ReleaseCreate(releaseHash);
     }
 
     // Record the last time the release was updated.
@@ -146,7 +146,7 @@ contract ReleaseDB is Authorized {
     _releaseHashesByNameHash[nameHash].remove(releaseHash);
 
     // Log the removal.
-    ReleaseDelete(releaseHash, reason);
+    emit ReleaseDelete(releaseHash, reason);
 
     return true;
   }
