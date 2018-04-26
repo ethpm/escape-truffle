@@ -13,7 +13,7 @@ contract AuthorizedInterface {
     Authority public authority;
 
     modifier auth {
-        if (!isAuthorized()) throw;
+        require(isAuthorized());
         _;
     }
 

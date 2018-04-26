@@ -10,11 +10,8 @@ library IndexedOrderedSetLib {
   }
 
   modifier requireValue(IndexedOrderedSet storage self, bytes32 value) {
-    if (contains(self, value)) {
-      _;
-    } else {
-      throw;
-    }
+    require(contains(self, value));
+    _;
   }
 
   /// @dev Returns the size of the set
@@ -33,8 +30,8 @@ library IndexedOrderedSetLib {
   /// @dev Returns the index of the value in the set.
   /// @param self The set
   /// @param value The value to look up the index for.
-  function indexOf(IndexedOrderedSet storage self, bytes32 value) requireValue(self, value) 
-                                                                  constant 
+  function indexOf(IndexedOrderedSet storage self, bytes32 value) requireValue(self, value)
+                                                                  constant
                                                                   returns (uint) {
     return self._valueIndices[value];
   }
@@ -62,7 +59,7 @@ library IndexedOrderedSetLib {
   /// @param self The set
   /// @param value The value to remove from the set.
   function remove(IndexedOrderedSet storage self, bytes32 value) requireValue(self, value)
-                                                                 public 
+                                                                 public
                                                                  returns (bool) {
     uint idx = indexOf(self, value);
     pop(self, idx);

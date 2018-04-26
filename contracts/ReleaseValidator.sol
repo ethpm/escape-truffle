@@ -23,7 +23,8 @@ contract ReleaseValidator {
                            string preRelease,
                            string build,
                            string releaseLockfileURI) constant returns (bool) {
-    if (address(packageDb) == 0x0 || address(releaseDb) == 0x0) throw;
+    require(address(packageDb) != 0x0);
+    require(address(releaseDb) != 0x0);
 
     if (!validateAuthorization(packageDb, callerAddress, name)) {
       // package exists and msg.sender is not the owner not the package owner.

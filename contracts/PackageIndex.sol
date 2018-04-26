@@ -60,7 +60,9 @@ contract PackageIndex is Authorized, PackageIndexInterface {
                    string preRelease,
                    string build,
                    string releaseLockfileURI) public auth returns (bool) {
-    if (address(packageDb) == 0x0 || address(releaseDb) == 0x0 || address(releaseValidator) == 0x0) throw;
+    require(address(packageDb) != 0x0);
+    require(address(releaseDb) != 0x0);
+    require(address(releaseValidator) != 0x0);
     return release(name, [major, minor, patch], preRelease, build, releaseLockfileURI);
   }
 
@@ -378,7 +380,7 @@ contract PackageIndex is Authorized, PackageIndexInterface {
       s := add(m, mload(m)) // First slot points to the start of the string (will almost always be m+0x20)
       mstore(0x40, add(m,add(l,0x40))) //Move free memory pointer so string doesn't get overwritten
     }
-    if(!success) throw;
+    require(success);
 
     return s;
   }

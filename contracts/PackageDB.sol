@@ -34,11 +34,8 @@ contract PackageDB is Authorized {
    *  Modifiers
    */
   modifier onlyIfPackageExists(bytes32 nameHash) {
-    if (packageExists(nameHash)) {
-      _;
-    } else {
-      throw;
-    }
+    require(packageExists(nameHash));
+    _;
   }
 
   //
@@ -76,9 +73,9 @@ contract PackageDB is Authorized {
 
   /// @dev Removes a package from the package db.  Packages with existing releases may not be removed.  Returns success.
   /// @param nameHash The name hash of a package.
-  function removePackage(bytes32 nameHash, string reason) public 
-                                                          auth 
-                                                          onlyIfPackageExists(nameHash) 
+  function removePackage(bytes32 nameHash, string reason) public
+                                                          auth
+                                                          onlyIfPackageExists(nameHash)
                                                           returns (bool) {
     PackageDelete(nameHash, reason);
 
@@ -92,8 +89,8 @@ contract PackageDB is Authorized {
   /// @param nameHash The name hash of a package.
   /// @param newPackageOwner The address of the new owner.
   function setPackageOwner(bytes32 nameHash,
-                           address newPackageOwner) public 
-                                                    auth 
+                           address newPackageOwner) public
+                                                    auth
                                                     onlyIfPackageExists(nameHash)
                                                     returns (bool) {
     PackageOwnerUpdate(nameHash, _recordedPackages[nameHash].owner, newPackageOwner);
@@ -129,8 +126,8 @@ contract PackageDB is Authorized {
 
   /// @dev Returns information about the package.
   /// @param nameHash The name hash to look up.
-  function getPackageData(bytes32 nameHash) constant 
-                                            onlyIfPackageExists(nameHash) 
+  function getPackageData(bytes32 nameHash) constant
+                                            onlyIfPackageExists(nameHash)
                                             returns (address packageOwner,
                                                      uint createdAt,
                                                      uint updatedAt) {
@@ -140,8 +137,8 @@ contract PackageDB is Authorized {
 
   /// @dev Returns the package name for the given namehash
   /// @param nameHash The name hash to look up.
-  function getPackageName(bytes32 nameHash) constant 
-                                            onlyIfPackageExists(nameHash) 
+  function getPackageName(bytes32 nameHash) constant
+                                            onlyIfPackageExists(nameHash)
                                             returns (string) {
     return _recordedPackages[nameHash].name;
   }

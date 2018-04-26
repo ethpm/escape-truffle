@@ -53,19 +53,13 @@ contract ReleaseDB is Authorized {
    *  Modifiers
    */
   modifier onlyIfVersionExists(bytes32 versionHash) {
-    if (versionExists(versionHash)) {
-      _;
-    } else {
-      throw;
-    }
+    require(versionExists(versionHash));
+    _;
   }
 
   modifier onlyIfReleaseExists(bytes32 releaseHash) {
-    if (releaseExists(releaseHash)) {
-      _;
-    } else {
-      throw;
-    }
+    require(releaseExists(releaseHash));
+    _;
   }
 
   //
@@ -120,7 +114,7 @@ contract ReleaseDB is Authorized {
   /// @param reason Explanation for why the removal happened.
   function removeRelease(bytes32 releaseHash, string reason) public
                                                              auth
-                                                             onlyIfReleaseExists(releaseHash) 
+                                                             onlyIfReleaseExists(releaseHash)
                                                              returns (bool) {
     var (nameHash, versionHash,) = getReleaseData(releaseHash);
     var (major, minor, patch) = getMajorMinorPatch(versionHash);
@@ -232,7 +226,7 @@ contract ReleaseDB is Authorized {
   /// @dev Returns the releaseHash at the given index for a package.
   /// @param releaseHash The release hash.
   function getReleaseData(bytes32 releaseHash) onlyIfReleaseExists(releaseHash)
-                                               constant 
+                                               constant
                                                returns (bytes32 nameHash,
                                                         bytes32 versionHash,
                                                         uint createdAt,
@@ -243,8 +237,8 @@ contract ReleaseDB is Authorized {
 
   /// @dev Returns a 3-tuple of the major, minor, and patch components from the version of the given release hash.
   /// @param versionHash the version hash
-  function getMajorMinorPatch(bytes32 versionHash) onlyIfVersionExists(versionHash) 
-                                                   constant 
+  function getMajorMinorPatch(bytes32 versionHash) onlyIfVersionExists(versionHash)
+                                                   constant
                                                    returns (uint32, uint32, uint32) {
     var version = _recordedVersions[versionHash];
     return (version.major, version.minor, version.patch);
@@ -252,16 +246,16 @@ contract ReleaseDB is Authorized {
 
   /// @dev Returns the pre-release string from the version of the given release hash.
   /// @param releaseHash Release hash
-  function getPreRelease(bytes32 releaseHash) onlyIfReleaseExists(releaseHash) 
-                                              constant 
+  function getPreRelease(bytes32 releaseHash) onlyIfReleaseExists(releaseHash)
+                                              constant
                                               returns (string) {
     return _recordedVersions[_recordedReleases[releaseHash].versionHash].preRelease;
   }
 
   /// @dev Returns the build string from the version of the given release hash.
   /// @param releaseHash Release hash
-  function getBuild(bytes32 releaseHash) onlyIfReleaseExists(releaseHash) 
-                                         constant 
+  function getBuild(bytes32 releaseHash) onlyIfReleaseExists(releaseHash)
+                                         constant
                                          returns (string) {
     return _recordedVersions[_recordedReleases[releaseHash].versionHash].build;
   }
@@ -269,7 +263,7 @@ contract ReleaseDB is Authorized {
   /// @dev Returns the URI of the release lockfile for the given release hash.
   /// @param releaseHash Release hash
   function getReleaseLockfileURI(bytes32 releaseHash) onlyIfReleaseExists(releaseHash)
-                                                      constant 
+                                                      constant
                                                       returns (string) {
     return _recordedReleases[releaseHash].releaseLockfileURI;
   }
@@ -342,8 +336,8 @@ contract ReleaseDB is Authorized {
   /// @param nameHash The nameHash of the package to check against.
   /// @param versionHash The versionHash of the version to check.
   function isLatestMajorTree(bytes32 nameHash,
-                             bytes32 versionHash) onlyIfVersionExists(versionHash) 
-                                                  constant 
+                             bytes32 versionHash) onlyIfVersionExists(versionHash)
+                                                  constant
                                                   returns (bool) {
     var version = _recordedVersions[versionHash];
     var latestMajor = _recordedVersions[_recordedReleases[getLatestMajorTree(nameHash)].versionHash];
@@ -354,8 +348,8 @@ contract ReleaseDB is Authorized {
   /// @param nameHash The nameHash of the package to check against.
   /// @param versionHash The versionHash of the version to check.
   function isLatestMinorTree(bytes32 nameHash,
-                             bytes32 versionHash) onlyIfVersionExists(versionHash) 
-                                                  constant 
+                             bytes32 versionHash) onlyIfVersionExists(versionHash)
+                                                  constant
                                                   returns (bool) {
     var version = _recordedVersions[versionHash];
     var latestMinor = _recordedVersions[_recordedReleases[getLatestMinorTree(nameHash, version.major)].versionHash];
@@ -366,8 +360,8 @@ contract ReleaseDB is Authorized {
   /// @param nameHash The nameHash of the package to check against.
   /// @param versionHash The versionHash of the version to check.
   function isLatestPatchTree(bytes32 nameHash,
-                             bytes32 versionHash) onlyIfVersionExists(versionHash) 
-                                                  constant 
+                             bytes32 versionHash) onlyIfVersionExists(versionHash)
+                                                  constant
                                                   returns (bool) {
     var version = _recordedVersions[versionHash];
     var latestPatch = _recordedVersions[_recordedReleases[getLatestPatchTree(nameHash, version.major, version.minor)].versionHash];
@@ -378,8 +372,8 @@ contract ReleaseDB is Authorized {
   /// @param nameHash The nameHash of the package to check against.
   /// @param versionHash The versionHash of the version to check.
   function isLatestPreReleaseTree(bytes32 nameHash,
-                                  bytes32 versionHash) onlyIfVersionExists(versionHash) 
-                                                       constant 
+                                  bytes32 versionHash) onlyIfVersionExists(versionHash)
+                                                       constant
                                                        returns (bool) {
     var version = _recordedVersions[versionHash];
     var latestPreRelease = _recordedVersions[_recordedReleases[getLatestPreReleaseTree(nameHash, version.major, version.minor, version.patch)].versionHash];
@@ -398,8 +392,8 @@ contract ReleaseDB is Authorized {
 
   /// @dev Sets the given release as the new leaf of the major branch of the release tree if it is greater or equal to the current leaf.
   /// @param releaseHash The release hash of the release to check.
-  function updateMajorTree(bytes32 releaseHash) onlyIfReleaseExists(releaseHash) 
-                                                internal 
+  function updateMajorTree(bytes32 releaseHash) onlyIfReleaseExists(releaseHash)
+                                                internal
                                                 returns (bool) {
     var (nameHash, versionHash,) = getReleaseData(releaseHash);
 
