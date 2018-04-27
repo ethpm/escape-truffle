@@ -264,7 +264,7 @@ contract PackageIndex is Authorized, PackageIndexInterface {
     return releaseHashes;
   }
 
-  function getNumReleases() constant returns (uint) {
+  function getNumReleases() public constant returns (uint) {
     return releaseDb.getNumReleases();
   }
 

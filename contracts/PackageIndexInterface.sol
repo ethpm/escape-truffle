@@ -119,7 +119,7 @@ contract PackageIndexInterface is AuthorizedInterface {
 
   /// @dev Returns the release hash at the provide index in the array of all release hashes.
   /// @param idx The index of the release to retrieve.
-  function getReleaseHash(uint idx) constant returns (bytes32);
+  function getReleaseHash(uint idx) public constant returns (bytes32);
 
   /// @dev Returns the release hash at the provide index in the array of release hashes for the given package.
   /// @param name Package name
@@ -139,10 +139,10 @@ contract PackageIndexInterface is AuthorizedInterface {
                                    uint offset,
                                    uint numReleases) public constant returns (bytes32[]);
 
-  function getNumReleases() constant returns (uint);
+  function getNumReleases() public constant returns (uint);
 
   /// @dev Returns an array of all release hashes for the named package.
-  function getAllReleaseHashes() constant returns (bytes32[]);
+  function getAllReleaseHashes() public constant returns (bytes32[]);
 
   /// @dev Returns a slice of the array of all release hashes for the named package.
   /// @param offset The starting index for the slice.

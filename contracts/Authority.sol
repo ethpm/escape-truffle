@@ -87,7 +87,7 @@ contract WhitelistAuthority is WhitelistAuthorityInterface, Authorized {
 
     function canCall(address callerAddress,
                      address codeAddress,
-                     bytes4 sig) constant returns (bool) {
+                     bytes4 sig) public constant returns (bool) {
         if (_anyoneCanCall[codeAddress][sig]) {
           return true;
         } else {
