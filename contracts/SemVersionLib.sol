@@ -270,7 +270,7 @@ library SemVersionLib {
   /// @param _head The first string
   /// @param tail The second string
   function concat(string storage _head, string tail) public returns (bool) {
-    bytes head = bytes(_head);
+    bytes storage head = bytes(_head);
 
     for (uint i = 0; i < bytes(tail).length; i++) {
       head.push(bytes(tail)[i]);
