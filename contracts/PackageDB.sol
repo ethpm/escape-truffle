@@ -150,7 +150,7 @@ contract PackageDB is Authorized {
    */
   /// @dev Returns name hash for a given package name.
   /// @param name Package name
-  function hashName(string name) public constant returns (bytes32) {
+  function hashName(string name) public pure returns (bytes32) {
     return keccak256(name);
   }
 }

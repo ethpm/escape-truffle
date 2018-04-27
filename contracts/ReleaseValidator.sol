@@ -122,7 +122,7 @@ contract ReleaseValidator {
 
   /// @dev Returns boolean whether the provided release lockfile URI is valid.
   /// @param releaseLockfileURI The URI for a release lockfile.
-  function validateReleaseLockfileURI(string releaseLockfileURI) public constant returns (bool) {
+  function validateReleaseLockfileURI(string releaseLockfileURI) public pure returns (bool) {
     if (bytes(releaseLockfileURI).length ==0) {
       return false;
     }
@@ -131,7 +131,7 @@ contract ReleaseValidator {
 
   /// @dev Validate that the version is not 0.0.0.
   /// @param majorMinorPatch The major/minor/patch portion of the version string.
-  function validateReleaseVersion(uint32[3] majorMinorPatch) public constant returns (bool) {
+  function validateReleaseVersion(uint32[3] majorMinorPatch) public pure returns (bool) {
     if (majorMinorPatch[0] > 0) {
       return true;
     } else if (majorMinorPatch[1] > 0) {

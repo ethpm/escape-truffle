@@ -286,7 +286,7 @@ contract ReleaseDB is Authorized {
                        uint32 minor,
                        uint32 patch,
                        string preRelease,
-                       string build) public constant returns (bytes32) {
+                       string build) public pure returns (bytes32) {
     return keccak256(major, minor, patch, preRelease, build);
   }
 
@@ -294,7 +294,7 @@ contract ReleaseDB is Authorized {
   /// @param nameHash The name hash of the package name.
   /// @param versionHash The version hash for the release version.
   function hashRelease(bytes32 nameHash,
-                       bytes32 versionHash) public constant returns (bytes32) {
+                       bytes32 versionHash) public pure returns (bytes32) {
     return keccak256(nameHash, versionHash);
   }
 

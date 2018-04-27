@@ -138,7 +138,7 @@ library SemVersionLib {
   /// @dev Return a comparison based on the ASCII ordering of the two strings
   /// @param left The first string
   /// @param right The second string
-  function compareStrings(string left, string right) internal returns (Comparison) {
+  function compareStrings(string left, string right) internal pure returns (Comparison) {
     for (uint i = 0; i < min(bytes(left).length, bytes(right).length); i++) {
       if (bytes(left)[i] == bytes(right)[i]) {
         continue;
@@ -161,7 +161,7 @@ library SemVersionLib {
   /// @dev Return a comparison based on the integer representation of the two string.
   /// @param left The first string
   /// @param right The second string
-  function compareNumericStrings(string left, string right) internal returns (Comparison) {
+  function compareNumericStrings(string left, string right) internal pure returns (Comparison) {
     uint leftAsNumber = castStringToUInt(left);
     uint rightAsNumber = castStringToUInt(right);
 
@@ -176,7 +176,7 @@ library SemVersionLib {
 
   /// @dev Splits a string on periods.
   /// @param preRelease The string to split.
-  function splitIdentifiers(string preRelease) internal returns (string[]) {
+  function splitIdentifiers(string preRelease) internal pure returns (string[]) {
     if (bytes(preRelease).length == 0) {
       return new string[](0);
     }
@@ -217,7 +217,7 @@ library SemVersionLib {
   /// @dev Returns the minimum of two unsigned integers
   /// @param a The first unsigned integer
   /// @param b The first unsigned integer
-  function min(uint a, uint b) internal returns (uint) {
+  function min(uint a, uint b) internal pure returns (uint) {
     if (a <= b) {
       return a;
     } else {
@@ -234,7 +234,7 @@ library SemVersionLib {
 
   /// @dev Returns boolean indicating if the provided character is a numeric digit.
   /// @param v The character to check.
-  function isDigit(bytes1 v) internal returns (bool) {
+  function isDigit(bytes1 v) internal pure returns (bool) {
     return (uint(v) >= DIGIT_0 && uint(v) <= DIGIT_9);
   }
 
@@ -243,7 +243,7 @@ library SemVersionLib {
   //
   /// @dev Returns boolean indicating if the provided string is all numeric.
   /// @param value The string to check.
-  function isNumericString(string value) internal returns (bool) {
+  function isNumericString(string value) internal pure returns (bool) {
     for (uint i = 0; i < bytes(value).length; i++) {
       if (!isDigit(bytes(value)[i])) {
         return false;
@@ -255,7 +255,7 @@ library SemVersionLib {
 
   /// @dev Returns the integer representation of a numeric string.
   /// @param numericString The string to convert.
-  function castStringToUInt(string numericString) internal returns (uint) {
+  function castStringToUInt(string numericString) internal pure returns (uint) {
     uint value = 0;
 
     for (uint i = 0; i < bytes(numericString).length; i++) {
