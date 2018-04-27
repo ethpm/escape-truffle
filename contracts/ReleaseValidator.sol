@@ -60,7 +60,10 @@ contract ReleaseValidator {
     if (!packageDb.packageExists(nameHash)) {
       return true;
     }
-    var (packageOwner,) = packageDb.getPackageData(nameHash);
+    address packageOwner;
+
+    (packageOwner,) = packageDb.getPackageData(nameHash);
+
     if (packageOwner == callerAddress) {
       return true;
     }
@@ -80,9 +83,9 @@ contract ReleaseValidator {
                                 uint32[3] majorMinorPatch,
                                 string preRelease,
                                 string build) public constant returns (bool) {
-    var nameHash = packageDb.hashName(name);
-    var versionHash = releaseDb.hashVersion(majorMinorPatch[0], majorMinorPatch[1], majorMinorPatch[2], preRelease, build);
-    var releaseHash = releaseDb.hashRelease(nameHash, versionHash);
+    bytes32 nameHash = packageDb.hashName(name);
+    bytes32 versionHash = releaseDb.hashVersion(majorMinorPatch[0], majorMinorPatch[1], majorMinorPatch[2], preRelease, build);
+    bytes32 releaseHash = releaseDb.hashRelease(nameHash, versionHash);
     return !releaseDb.releaseExists(releaseHash);
   }
 
@@ -96,7 +99,7 @@ contract ReleaseValidator {
   /// @param packageDb The address of the PackageDB
   /// @param name The name of the package.
   function validatePackageName(PackageDB packageDb, string name) public constant returns (bool) {
-    var nameHash = packageDb.hashName(name);
+    bytes32 nameHash = packageDb.hashName(name);
 
     if (packageDb.packageExists(nameHash)) {
       // existing names are always valid.
@@ -156,8 +159,8 @@ contract ReleaseValidator {
                                uint32[3] majorMinorPatch,
                                string preRelease,
                                string build) public constant returns (bool) {
-    var nameHash = packageDb.hashName(name);
-    var versionHash = releaseDb.hashVersion(majorMinorPatch[0], majorMinorPatch[1], majorMinorPatch[2], preRelease, build);
+    bytes32 nameHash = packageDb.hashName(name);
+    bytes32 versionHash = releaseDb.hashVersion(majorMinorPatch[0], majorMinorPatch[1], majorMinorPatch[2], preRelease, build);
     if (releaseDb.isLatestMajorTree(nameHash, versionHash)) {
       return true;
     } else if (hasLatestMinor(releaseDb, nameHash, versionHash) && releaseDb.isLatestMinorTree(nameHash, versionHash)) {
@@ -176,7 +179,8 @@ contract ReleaseValidator {
   /// @param nameHash The nameHash of the package to check against.
   /// @param versionHash The versionHash of the version to check.
   function hasLatestMinor(ReleaseDB releaseDb, bytes32 nameHash, bytes32 versionHash) public constant returns (bool) {
-    var (major,) = releaseDb.getMajorMinorPatch(versionHash);
+    uint32 major;
+    (major,) = releaseDb.getMajorMinorPatch(versionHash);
     return releaseDb.getLatestMinorTree(nameHash, major) != 0x0;
   }
 
@@ -185,7 +189,10 @@ contract ReleaseValidator {
   /// @param nameHash The nameHash of the package to check against.
   /// @param versionHash The versionHash of the version to check.
   function hasLatestPatch(ReleaseDB releaseDb, bytes32 nameHash, bytes32 versionHash) public constant returns (bool) {
-    var (major, minor,) = releaseDb.getMajorMinorPatch(versionHash);
+    uint32 major;
+    uint32 minor;
+
+    (major, minor,) = releaseDb.getMajorMinorPatch(versionHash);
     return releaseDb.getLatestPatchTree(nameHash, major, minor) != 0x0;
   }
 
@@ -194,7 +201,11 @@ contract ReleaseValidator {
   /// @param nameHash The nameHash of the package to check against.
   /// @param versionHash The versionHash of the version to check.
   function hasLatestPreRelease(ReleaseDB releaseDb, bytes32 nameHash, bytes32 versionHash) public constant returns (bool) {
-    var (major, minor, patch) = releaseDb.getMajorMinorPatch(versionHash);
+    uint32 major;
+    uint32 minor;
+    uint32 patch;
+
+    (major, minor, patch) = releaseDb.getMajorMinorPatch(versionHash);
     return releaseDb.getLatestPreReleaseTree(nameHash, major, minor, patch) != 0x0;
   }
 }

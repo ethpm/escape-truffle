@@ -126,8 +126,9 @@ contract PackageIndex is Authorized, PackageIndexInterface {
       return false;
     }
 
-    // Lookup the current owne
-    var (packageOwner,) = getPackageData(name);
+    // Lookup the current owner
+    address packageOwner;
+    (packageOwner,) = getPackageData(name);
 
     // Log the transfer
     emit PackageTransfer(packageOwner, newPackageOwner);
@@ -178,8 +179,9 @@ contract PackageIndex is Authorized, PackageIndexInterface {
                          uint32 patch,
                          string preRelease,
                          string build) public constant returns (bool) {
-    var nameHash = packageDb.hashName(name);
-    var versionHash = releaseDb.hashVersion(major, minor, patch, preRelease, build);
+
+    bytes32 nameHash = packageDb.hashName(name);
+    bytes32 versionHash = releaseDb.hashVersion(major, minor, patch, preRelease, build);
     return releaseDb.releaseExists(releaseDb.hashRelease(nameHash, versionHash));
   }
 
@@ -201,7 +203,7 @@ contract PackageIndex is Authorized, PackageIndexInterface {
                                                 uint createdAt,
                                                 uint numReleases,
                                                 uint updatedAt) {
-    var nameHash = packageDb.hashName(name);
+    bytes32 nameHash = packageDb.hashName(name);
     (packageOwner, createdAt, updatedAt) = packageDb.getPackageData(nameHash);
     numReleases = releaseDb.getNumReleasesForNameHash(nameHash);
     return (packageOwner, createdAt, numReleases, updatedAt);
@@ -245,7 +247,8 @@ contract PackageIndex is Authorized, PackageIndexInterface {
   /// @dev Returns an array of all release hashes for the named package.
   /// @param name Package name
   function getAllPackageReleaseHashes(string name) public constant returns (bytes32[]) {
-    var (,,numReleases,) = getPackageData(name);
+    uint numReleases;
+    (,,numReleases,) = getPackageData(name);
     return getPackageReleaseHashes(name, 0, numReleases);
   }
 
@@ -314,7 +317,8 @@ contract PackageIndex is Authorized, PackageIndexInterface {
   /// @param name The name of the package
   /// @param _address The address to check
   function isPackageOwner(string name, address _address) internal view returns (bool) {
-    var (packageOwner,) = getPackageData(name);
+    address packageOwner;
+    (packageOwner,) = getPackageData(name);
     return (packageOwner != _address);
   }
 

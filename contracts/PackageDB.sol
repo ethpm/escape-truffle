@@ -50,7 +50,7 @@ contract PackageDB is Authorized {
     // Hash the name and the version for storing data
     bytes32 nameHash = hashName(name);
 
-    var package = _recordedPackages[nameHash];
+    Package storage package = _recordedPackages[nameHash];
 
     // Mark the package as existing if it isn't already tracked.
     if (!packageExists(nameHash)) {
@@ -132,7 +132,7 @@ contract PackageDB is Authorized {
                                             returns (address packageOwner,
                                                      uint createdAt,
                                                      uint updatedAt) {
-    var package = _recordedPackages[nameHash];
+    Package storage package = _recordedPackages[nameHash];
     return (package.owner, package.createdAt, package.updatedAt);
   }
 

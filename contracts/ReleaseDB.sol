@@ -77,7 +77,7 @@ contract ReleaseDB is Authorized {
                       string releaseLockfileURI) public auth returns (bool) {
     bytes32 releaseHash = hashRelease(nameHash, versionHash);
 
-    var release = _recordedReleases[releaseHash];
+    Release storage release = _recordedReleases[releaseHash];
 
     // If this is a new version push it onto the array of version hashes for
     // this package.
@@ -116,8 +116,14 @@ contract ReleaseDB is Authorized {
                                                              auth
                                                              onlyIfReleaseExists(releaseHash)
                                                              returns (bool) {
-    var (nameHash, versionHash,) = getReleaseData(releaseHash);
-    var (major, minor, patch) = getMajorMinorPatch(versionHash);
+    bytes32 nameHash;
+    bytes32 versionHash;
+    uint32 major;
+    uint32 minor;
+    uint32 patch;
+
+    (nameHash, versionHash,) = getReleaseData(releaseHash);
+    (major, minor, patch) = getMajorMinorPatch(versionHash);
 
     // In any branch of the release tree in which this version is the latest we
     // remove it.  This will leave the release tree for this package in an
@@ -232,7 +238,7 @@ contract ReleaseDB is Authorized {
                                                         bytes32 versionHash,
                                                         uint createdAt,
                                                         uint updatedAt) {
-    var release = _recordedReleases[releaseHash];
+    Release storage release = _recordedReleases[releaseHash];
     return (release.nameHash, release.versionHash, release.createdAt, release.updatedAt);
   }
 
@@ -242,7 +248,7 @@ contract ReleaseDB is Authorized {
                                                    public
                                                    constant
                                                    returns (uint32, uint32, uint32) {
-    var version = _recordedVersions[versionHash];
+    SemVersionLib.SemVersion storage version = _recordedVersions[versionHash];
     return (version.major, version.minor, version.patch);
   }
 
@@ -345,8 +351,8 @@ contract ReleaseDB is Authorized {
                                                   public
                                                   constant
                                                   returns (bool) {
-    var version = _recordedVersions[versionHash];
-    var latestMajor = _recordedVersions[_recordedReleases[getLatestMajorTree(nameHash)].versionHash];
+    SemVersionLib.SemVersion storage version = _recordedVersions[versionHash];
+    SemVersionLib.SemVersion storage latestMajor = _recordedVersions[_recordedReleases[getLatestMajorTree(nameHash)].versionHash];
     return version.isGreaterOrEqual(latestMajor);
   }
 
@@ -358,8 +364,8 @@ contract ReleaseDB is Authorized {
                                                   public
                                                   constant
                                                   returns (bool) {
-    var version = _recordedVersions[versionHash];
-    var latestMinor = _recordedVersions[_recordedReleases[getLatestMinorTree(nameHash, version.major)].versionHash];
+    SemVersionLib.SemVersion storage version = _recordedVersions[versionHash];
+    SemVersionLib.SemVersion storage latestMinor = _recordedVersions[_recordedReleases[getLatestMinorTree(nameHash, version.major)].versionHash];
     return version.isGreaterOrEqual(latestMinor);
   }
 
@@ -371,8 +377,8 @@ contract ReleaseDB is Authorized {
                                                   public
                                                   constant
                                                   returns (bool) {
-    var version = _recordedVersions[versionHash];
-    var latestPatch = _recordedVersions[_recordedReleases[getLatestPatchTree(nameHash, version.major, version.minor)].versionHash];
+    SemVersionLib.SemVersion storage version = _recordedVersions[versionHash];
+    SemVersionLib.SemVersion storage latestPatch = _recordedVersions[_recordedReleases[getLatestPatchTree(nameHash, version.major, version.minor)].versionHash];
     return version.isGreaterOrEqual(latestPatch);
   }
 
@@ -384,8 +390,8 @@ contract ReleaseDB is Authorized {
                                                        public
                                                        constant
                                                        returns (bool) {
-    var version = _recordedVersions[versionHash];
-    var latestPreRelease = _recordedVersions[_recordedReleases[getLatestPreReleaseTree(nameHash, version.major, version.minor, version.patch)].versionHash];
+    SemVersionLib.SemVersion storage version = _recordedVersions[versionHash];
+    SemVersionLib.SemVersion storage latestPreRelease = _recordedVersions[_recordedReleases[getLatestPreReleaseTree(nameHash, version.major, version.minor, version.patch)].versionHash];
     return version.isGreaterOrEqual(latestPreRelease);
   }
 
@@ -404,7 +410,10 @@ contract ReleaseDB is Authorized {
   function updateMajorTree(bytes32 releaseHash) onlyIfReleaseExists(releaseHash)
                                                 internal
                                                 returns (bool) {
-    var (nameHash, versionHash,) = getReleaseData(releaseHash);
+    bytes32 nameHash;
+    bytes32 versionHash;
+
+    (nameHash, versionHash,) = getReleaseData(releaseHash);
 
     if (isLatestMajorTree(nameHash, versionHash)) {
       _latestMajor[nameHash] = releaseHash;
@@ -417,10 +426,14 @@ contract ReleaseDB is Authorized {
   /// @dev Sets the given release as the new leaf of the minor branch of the release tree if it is greater or equal to the current leaf.
   /// @param releaseHash The release hash of the release to check.
   function updateMinorTree(bytes32 releaseHash) internal returns (bool) {
-    var (nameHash, versionHash,) = getReleaseData(releaseHash);
+    bytes32 nameHash;
+    bytes32 versionHash;
+
+    (nameHash, versionHash,) = getReleaseData(releaseHash);
 
     if (isLatestMinorTree(nameHash, versionHash)) {
-      var (major,) = getMajorMinorPatch(versionHash);
+      uint32 major;
+      (major,) = getMajorMinorPatch(versionHash);
       _latestMinor[nameHash][major] = releaseHash;
       return true;
     } else {
@@ -431,10 +444,15 @@ contract ReleaseDB is Authorized {
   /// @dev Sets the given release as the new leaf of the patch branch of the release tree if it is greater or equal to the current leaf.
   /// @param releaseHash The release hash of the release to check.
   function updatePatchTree(bytes32 releaseHash) internal returns (bool) {
-    var (nameHash, versionHash,) = getReleaseData(releaseHash);
+    bytes32 nameHash;
+    bytes32 versionHash;
+
+    (nameHash, versionHash,) = getReleaseData(releaseHash);
 
     if (isLatestPatchTree(nameHash, versionHash)) {
-      var (major, minor,) = getMajorMinorPatch(versionHash);
+      uint32 major;
+      uint32 minor;
+      (major, minor,) = getMajorMinorPatch(versionHash);
       _latestPatch[nameHash][major][minor] = releaseHash;
       return true;
     } else {
@@ -445,10 +463,17 @@ contract ReleaseDB is Authorized {
   /// @dev Sets the given release as the new leaf of the pre-release branch of the release tree if it is greater or equal to the current leaf.
   /// @param releaseHash The release hash of the release to check.
   function updatePreReleaseTree(bytes32 releaseHash) internal returns (bool) {
-    var (nameHash, versionHash,) = getReleaseData(releaseHash);
+    bytes32 nameHash;
+    bytes32 versionHash;
+
+    (nameHash, versionHash,) = getReleaseData(releaseHash);
 
     if (isLatestPreReleaseTree(nameHash, versionHash)) {
-      var (major, minor, patch) = getMajorMinorPatch(versionHash);
+      uint32 major;
+      uint32 minor;
+      uint32 patch;
+
+      (major, minor, patch) = getMajorMinorPatch(versionHash);
       _latestPreRelease[nameHash][major][minor][patch] = releaseHash;
       return true;
     } else {
