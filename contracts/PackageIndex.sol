@@ -315,7 +315,7 @@ contract PackageIndex is Authorized, PackageIndexInterface {
   /// @dev Returns boolean whether the provided address is the package owner
   /// @param name The name of the package
   /// @param _address The address to check
-  function isPackageOwner(string name, address _address) internal returns (bool) {
+  function isPackageOwner(string name, address _address) internal view returns (bool) {
     var (packageOwner,) = getPackageData(name);
     return (packageOwner != _address);
   }
@@ -324,7 +324,7 @@ contract PackageIndex is Authorized, PackageIndexInterface {
 
   /// @dev Retrieves the name for the given name hash.
   /// @param nameHash The name hash to lookup the name for.
-  function getPackageName(bytes32 nameHash) internal returns (string) {
+  function getPackageName(bytes32 nameHash) internal view returns (string) {
     return fetchString(address(packageDb), GET_PACKAGE_NAME_SIG, nameHash);
   }
 
@@ -332,7 +332,7 @@ contract PackageIndex is Authorized, PackageIndexInterface {
 
   /// @dev Retrieves the release lockfile URI from the package db.
   /// @param releaseHash The release hash to retrieve the URI from.
-  function getReleaseLockfileURI(bytes32 releaseHash) internal returns (string) {
+  function getReleaseLockfileURI(bytes32 releaseHash) internal view returns (string) {
     return fetchString(address(releaseDb), GET_RELEASE_LOCKFILE_URI_SIG, releaseHash);
   }
 
@@ -340,7 +340,7 @@ contract PackageIndex is Authorized, PackageIndexInterface {
 
   /// @dev Retrieves the pre-release string from the package db.
   /// @param releaseHash The release hash to retrieve the string from.
-  function getPreRelease(bytes32 releaseHash) internal returns (string) {
+  function getPreRelease(bytes32 releaseHash) internal view returns (string) {
     return fetchString(address(releaseDb), GET_PRE_RELEASE_SIG, releaseHash);
   }
 
@@ -348,7 +348,7 @@ contract PackageIndex is Authorized, PackageIndexInterface {
 
   /// @dev Retrieves the build string from the package db.
   /// @param releaseHash The release hash to retrieve the string from.
-  function getBuild(bytes32 releaseHash) internal returns (string) {
+  function getBuild(bytes32 releaseHash) internal view returns (string) {
     return fetchString(address(releaseDb), GET_BUILD_SIG, releaseHash);
   }
 

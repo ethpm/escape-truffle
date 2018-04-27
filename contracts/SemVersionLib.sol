@@ -48,14 +48,14 @@ library SemVersionLib {
   /// @dev Return boolean indicating if the two SemVersion objects are considered equal
   /// @param self The first SemVersion
   /// @param other The second SemVersion
-  function isEqual(SemVersion storage self, SemVersion storage other) public returns (bool) {
+  function isEqual(SemVersion storage self, SemVersion storage other) public view returns (bool) {
     return self.hash == other.hash;
   }
 
   /// @dev Return boolean indicating if the first SemVersion object is considered strictly greater than the second.
   /// @param self The first SemVersion
   /// @param other The second SemVersion
-  function isGreater(SemVersion storage self, SemVersion storage other) public returns (bool) {
+  function isGreater(SemVersion storage self, SemVersion storage other) public view returns (bool) {
     if (self.hash == other.hash) {
       return false;
     } else if (self.major > other.major) {
@@ -84,7 +84,7 @@ library SemVersionLib {
   /// @dev Return boolean indicating if the first SemVersion object is considered greater than or equal to the second.
   /// @param self The first SemVersion
   /// @param other The second SemVersion
-  function isGreaterOrEqual(SemVersion storage self, SemVersion storage other) public returns (bool) {
+  function isGreaterOrEqual(SemVersion storage self, SemVersion storage other) public view returns (bool) {
     return isEqual(self, other) || isGreater(self, other);
   }
 
@@ -94,20 +94,20 @@ library SemVersionLib {
   /// @dev Return boolean indicating if the pre-release string from the first SemVersion object is considered greater than the pre-release string from the second SemVersion object.
   /// @param left The first SemVersion
   /// @param right The second SemVersion
-  function isPreReleaseGreater(SemVersion storage left, SemVersion storage right) internal returns (bool) {
+  function isPreReleaseGreater(SemVersion storage left, SemVersion storage right) internal view returns (bool) {
     return comparePreReleases(left, right) == Comparison.After;
   }
 
   /// @dev Return boolean indicating if the provided SemVersion is a pre-release.
   /// @param self The SemVersion
-  function isPreRelease(SemVersion storage self) internal returns (bool) {
+  function isPreRelease(SemVersion storage self) internal view returns (bool) {
     return self.preReleaseIdentifiers.length > 0;
   }
 
   /// @dev Return a comparison of the pre-release strings for the two provided SemVersion objects.
   /// @param left The first SemVersion
   /// @param right The second SemVersion
-  function comparePreReleases(SemVersion storage left, SemVersion storage right) internal returns (Comparison comparisonResult) {
+  function comparePreReleases(SemVersion storage left, SemVersion storage right) internal view returns (Comparison comparisonResult) {
     uint minLength = min(left.preReleaseIdentifiers.length,
                          right.preReleaseIdentifiers.length);
     for (uint i = 0; i < minLength; i++) {

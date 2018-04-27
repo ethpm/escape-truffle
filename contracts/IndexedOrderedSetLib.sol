@@ -70,7 +70,7 @@ library IndexedOrderedSetLib {
   /// @dev Retrieves the element at the provided index.
   /// @param self The set
   /// @param idx The index to retrieve.
-  function get(IndexedOrderedSet storage self, uint idx) public returns (bytes32) {
+  function get(IndexedOrderedSet storage self, uint idx) public view returns (bytes32) {
     return self._values[idx];
   }
 
