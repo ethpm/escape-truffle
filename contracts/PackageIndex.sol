@@ -146,23 +146,23 @@ contract PackageIndex is Authorized, PackageIndexInterface {
   //
 
   /// @dev Returns the address of the packageDb
-  function getPackageDb() public constant returns (address) {
+  function getPackageDb() public view returns (address) {
     return address(packageDb);
   }
 
   /// @dev Returns the address of the releaseDb
-  function getReleaseDb() public constant returns (address) {
+  function getReleaseDb() public view returns (address) {
     return address(releaseDb);
   }
 
   /// @dev Returns the address of the releaseValidator
-  function getReleaseValidator() public constant returns (address) {
+  function getReleaseValidator() public view returns (address) {
     return address(releaseValidator);
   }
 
   /// @dev Query the existence of a package with the given name.  Returns boolean indicating whether the package exists.
   /// @param name Package name
-  function packageExists(string name) public constant returns (bool) {
+  function packageExists(string name) public view returns (bool) {
     return packageDb.packageExists(packageDb.hashName(name));
   }
 
@@ -178,7 +178,7 @@ contract PackageIndex is Authorized, PackageIndexInterface {
                          uint32 minor,
                          uint32 patch,
                          string preRelease,
-                         string build) public constant returns (bool) {
+                         string build) public view returns (bool) {
 
     bytes32 nameHash = packageDb.hashName(name);
     bytes32 versionHash = releaseDb.hashVersion(major, minor, patch, preRelease, build);
@@ -186,19 +186,19 @@ contract PackageIndex is Authorized, PackageIndexInterface {
   }
 
   /// @dev Returns the number of packages in the index
-  function getNumPackages() public constant returns (uint) {
+  function getNumPackages() public view returns (uint) {
     return packageDb.getNumPackages();
   }
 
   /// @dev Returns the name of the package at the provided index
   /// @param idx The index of the name hash to lookup.
-  function getPackageName(uint idx) public constant returns (string) {
+  function getPackageName(uint idx) public view returns (string) {
     return getPackageName(packageDb.getPackageNameHash(idx));
   }
 
   /// @dev Returns the package data.
   /// @param name Package name
-  function getPackageData(string name) public constant
+  function getPackageData(string name) public view
                                        returns (address packageOwner,
                                                 uint createdAt,
                                                 uint numReleases,
@@ -212,7 +212,7 @@ contract PackageIndex is Authorized, PackageIndexInterface {
   /// @dev Returns the release data for the release associated with the given release hash.
   /// @param releaseHash The release hash.
   function getReleaseData(bytes32 releaseHash) public
-                                               constant returns (uint32 major,
+                                               view returns (uint32 major,
                                                                  uint32 minor,
                                                                  uint32 patch,
                                                                  string preRelease,
@@ -231,7 +231,7 @@ contract PackageIndex is Authorized, PackageIndexInterface {
 
   /// @dev Returns the release hash at the provide index in the array of all release hashes.
   /// @param idx The index of the release to retrieve.
-  function getReleaseHash(uint idx) public constant returns (bytes32) {
+  function getReleaseHash(uint idx) public view returns (bytes32) {
     return releaseDb.getReleaseHash(idx);
   }
 
@@ -239,14 +239,14 @@ contract PackageIndex is Authorized, PackageIndexInterface {
   /// @param name Package name
   /// @param releaseIdx The index of the release to retrieve.
   function getReleaseHashForPackage(string name,
-                                    uint releaseIdx) public constant returns (bytes32) {
+                                    uint releaseIdx) public view returns (bytes32) {
     bytes32 nameHash = packageDb.hashName(name);
     return releaseDb.getReleaseHashForNameHash(nameHash, releaseIdx);
   }
 
   /// @dev Returns an array of all release hashes for the named package.
   /// @param name Package name
-  function getAllPackageReleaseHashes(string name) public constant returns (bytes32[]) {
+  function getAllPackageReleaseHashes(string name) public view returns (bytes32[]) {
     uint numReleases;
     (,,numReleases,) = getPackageData(name);
     return getPackageReleaseHashes(name, 0, numReleases);
@@ -256,7 +256,7 @@ contract PackageIndex is Authorized, PackageIndexInterface {
   /// @param name Package name
   /// @param offset The starting index for the slice.
   /// @param numReleases The length of the slice
-  function getPackageReleaseHashes(string name, uint offset, uint numReleases) public constant returns (bytes32[]) {
+  function getPackageReleaseHashes(string name, uint offset, uint numReleases) public view returns (bytes32[]) {
     bytes32 nameHash = packageDb.hashName(name);
     bytes32[] memory releaseHashes = new bytes32[](numReleases);
 
@@ -267,19 +267,19 @@ contract PackageIndex is Authorized, PackageIndexInterface {
     return releaseHashes;
   }
 
-  function getNumReleases() public constant returns (uint) {
+  function getNumReleases() public view returns (uint) {
     return releaseDb.getNumReleases();
   }
 
   /// @dev Returns an array of all release hashes for the named package.
-  function getAllReleaseHashes() public constant returns (bytes32[]) {
+  function getAllReleaseHashes() public view returns (bytes32[]) {
     return getReleaseHashes(0, getNumReleases());
   }
 
   /// @dev Returns a slice of the array of all release hashes for the named package.
   /// @param offset The starting index for the slice.
   /// @param numReleases The length of the slice
-  function getReleaseHashes(uint offset, uint numReleases) public constant returns (bytes32[]) {
+  function getReleaseHashes(uint offset, uint numReleases) public view returns (bytes32[]) {
     bytes32[] memory releaseHashes = new bytes32[](numReleases);
 
     for (uint i = offset; i < offset + numReleases; i++) {
@@ -301,7 +301,7 @@ contract PackageIndex is Authorized, PackageIndexInterface {
                                  uint32 minor,
                                  uint32 patch,
                                  string preRelease,
-                                 string build) public constant returns (string) {
+                                 string build) public view returns (string) {
     bytes32 versionHash = releaseDb.hashVersion(major, minor, patch, preRelease, build);
     bytes32 releaseHash = releaseDb.hashRelease(packageDb.hashName(name), versionHash);
     return getReleaseLockfileURI(releaseHash);
@@ -357,7 +357,7 @@ contract PackageIndex is Authorized, PackageIndexInterface {
   /// @dev Retrieves a string from a function on the package db indicated by the provide function selector
   /// @param sig The 4-byte function selector to retrieve the signature from.
   /// @param arg The bytes32 argument that should be passed into the function.
-  function fetchString(address codeAddress, bytes4 sig, bytes32 arg) internal constant returns (string s) {
+  function fetchString(address codeAddress, bytes4 sig, bytes32 arg) internal view returns (string s) {
     bool success;
 
     assembly {

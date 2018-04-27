@@ -22,7 +22,7 @@ contract ReleaseValidator {
                            uint32[3] majorMinorPatch,
                            string preRelease,
                            string build,
-                           string releaseLockfileURI) public constant returns (bool) {
+                           string releaseLockfileURI) public view returns (bool) {
     require(address(packageDb) != 0x0);
     require(address(releaseDb) != 0x0);
 
@@ -55,7 +55,7 @@ contract ReleaseValidator {
   /// @param name The name of the package.
   function validateAuthorization(PackageDB packageDb,
                                  address callerAddress,
-                                 string name) public constant returns (bool) {
+                                 string name) public view returns (bool) {
     bytes32 nameHash = packageDb.hashName(name);
     if (!packageDb.packageExists(nameHash)) {
       return true;
@@ -82,7 +82,7 @@ contract ReleaseValidator {
                                 string name,
                                 uint32[3] majorMinorPatch,
                                 string preRelease,
-                                string build) public constant returns (bool) {
+                                string build) public view returns (bool) {
     bytes32 nameHash = packageDb.hashName(name);
     bytes32 versionHash = releaseDb.hashVersion(majorMinorPatch[0], majorMinorPatch[1], majorMinorPatch[2], preRelease, build);
     bytes32 releaseHash = releaseDb.hashRelease(nameHash, versionHash);
@@ -98,7 +98,7 @@ contract ReleaseValidator {
   /// @dev Returns boolean whether the provided package name is valid.
   /// @param packageDb The address of the PackageDB
   /// @param name The name of the package.
-  function validatePackageName(PackageDB packageDb, string name) public constant returns (bool) {
+  function validatePackageName(PackageDB packageDb, string name) public view returns (bool) {
     bytes32 nameHash = packageDb.hashName(name);
 
     if (packageDb.packageExists(nameHash)) {
@@ -158,7 +158,7 @@ contract ReleaseValidator {
                                string name,
                                uint32[3] majorMinorPatch,
                                string preRelease,
-                               string build) public constant returns (bool) {
+                               string build) public view returns (bool) {
     bytes32 nameHash = packageDb.hashName(name);
     bytes32 versionHash = releaseDb.hashVersion(majorMinorPatch[0], majorMinorPatch[1], majorMinorPatch[2], preRelease, build);
     if (releaseDb.isLatestMajorTree(nameHash, versionHash)) {
@@ -178,7 +178,7 @@ contract ReleaseValidator {
   /// @param releaseDb The address of the ReleaseDB
   /// @param nameHash The nameHash of the package to check against.
   /// @param versionHash The versionHash of the version to check.
-  function hasLatestMinor(ReleaseDB releaseDb, bytes32 nameHash, bytes32 versionHash) public constant returns (bool) {
+  function hasLatestMinor(ReleaseDB releaseDb, bytes32 nameHash, bytes32 versionHash) public view returns (bool) {
     uint32 major;
     (major,) = releaseDb.getMajorMinorPatch(versionHash);
     return releaseDb.getLatestMinorTree(nameHash, major) != 0x0;
@@ -188,7 +188,7 @@ contract ReleaseValidator {
   /// @param releaseDb The address of the ReleaseDB
   /// @param nameHash The nameHash of the package to check against.
   /// @param versionHash The versionHash of the version to check.
-  function hasLatestPatch(ReleaseDB releaseDb, bytes32 nameHash, bytes32 versionHash) public constant returns (bool) {
+  function hasLatestPatch(ReleaseDB releaseDb, bytes32 nameHash, bytes32 versionHash) public view returns (bool) {
     uint32 major;
     uint32 minor;
 
@@ -200,7 +200,7 @@ contract ReleaseValidator {
   /// @param releaseDb The address of the ReleaseDB
   /// @param nameHash The nameHash of the package to check against.
   /// @param versionHash The versionHash of the version to check.
-  function hasLatestPreRelease(ReleaseDB releaseDb, bytes32 nameHash, bytes32 versionHash) public constant returns (bool) {
+  function hasLatestPreRelease(ReleaseDB releaseDb, bytes32 nameHash, bytes32 versionHash) public view returns (bool) {
     uint32 major;
     uint32 minor;
     uint32 patch;
