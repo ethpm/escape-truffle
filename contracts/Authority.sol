@@ -20,9 +20,9 @@ contract AuthorizedInterface {
     event OwnerUpdate(address indexed oldOwner, address indexed newOwner);
     event AuthorityUpdate(address indexed oldAuthority, address indexed newAuthority);
 
-    function setOwner(address newOwner) public auth returns (bool);
+    function setOwner(address newOwner) public returns (bool);
 
-    function setAuthority(Authority newAuthority) public auth returns (bool);
+    function setAuthority(Authority newAuthority) public returns (bool);
 
     function isAuthorized() internal returns (bool);
 }
@@ -71,11 +71,11 @@ contract WhitelistAuthorityInterface is Authority, AuthorizedInterface {
     function setCanCall(address callerAddress,
                         address codeAddress,
                         bytes4 sig,
-                        bool can) auth public returns (bool);
+                        bool can) public returns (bool);
 
     function setAnyoneCanCall(address codeAddress,
                               bytes4 sig,
-                              bool can) auth public returns (bool);
+                              bool can) public returns (bool);
 }
 
 

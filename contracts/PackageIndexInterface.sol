@@ -18,15 +18,15 @@ contract PackageIndexInterface is AuthorizedInterface {
   //
   /// @dev Sets the address of the PackageDb contract.
   /// @param newPackageDb The address to set for the PackageDb.
-  function setPackageDb(address newPackageDb) public auth returns (bool);
+  function setPackageDb(address newPackageDb) public returns (bool);
 
   /// @dev Sets the address of the ReleaseDb contract.
   /// @param newReleaseDb The address to set for the ReleaseDb.
-  function setReleaseDb(address newReleaseDb) public auth returns (bool);
+  function setReleaseDb(address newReleaseDb) public returns (bool);
 
   /// @dev Sets the address of the ReleaseValidator contract.
   /// @param newReleaseValidator The address to set for the ReleaseValidator.
-  function setReleaseValidator(address newReleaseValidator) public auth returns (bool);
+  function setReleaseValidator(address newReleaseValidator) public returns (bool);
 
   //
   // +-------------+
@@ -48,14 +48,14 @@ contract PackageIndexInterface is AuthorizedInterface {
                    uint32 patch,
                    string preRelease,
                    string build,
-                   string releaseLockfileURI) public auth returns (bool);
+                   string releaseLockfileURI) public returns (bool);
 
   /// @dev Transfers package ownership to the provider new owner address.
   /// @notice Will transfer ownership of this package to the provided new owner address.
   /// @param name Package name
   /// @param newPackageOwner The address of the new owner.
   function transferPackageOwner(string name,
-                                address newPackageOwner) public auth returns (bool);
+                                address newPackageOwner) public returns (bool);
 
   //
   // +------------+
