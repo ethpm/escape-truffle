@@ -245,7 +245,6 @@ contract PackageIndex is Authorized, PackageIndexInterface {
   /// @dev Returns an array of all release hashes for the named package.
   /// @param name Package name
   function getAllPackageReleaseHashes(string name) public constant returns (bytes32[]) {
-    bytes32 nameHash = packageDb.hashName(name);
     var (,,numReleases,) = getPackageData(name);
     return getPackageReleaseHashes(name, 0, numReleases);
   }
@@ -279,7 +278,6 @@ contract PackageIndex is Authorized, PackageIndexInterface {
   /// @param numReleases The length of the slice
   function getReleaseHashes(uint offset, uint numReleases) public constant returns (bytes32[]) {
     bytes32[] memory releaseHashes = new bytes32[](numReleases);
-    bytes32 buffer;
 
     for (uint i = offset; i < offset + numReleases; i++) {
       releaseHashes[i] = releaseDb.getReleaseHash(i);
