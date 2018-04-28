@@ -57,7 +57,7 @@ contract PackageDB is Authorized {
 
       // Set package data
       package.exists = true;
-      package.createdAt = now;
+      package.createdAt = block.timestamp;
       package.name = name;
 
       // Add the nameHash to the list of all package nameHashes.
@@ -66,7 +66,7 @@ contract PackageDB is Authorized {
       emit PackageCreate(nameHash);
     }
 
-    package.updatedAt = now;
+    package.updatedAt = block.timestamp;
 
     return true;
   }
@@ -96,7 +96,7 @@ contract PackageDB is Authorized {
     emit PackageOwnerUpdate(nameHash, _recordedPackages[nameHash].owner, newPackageOwner);
 
     _recordedPackages[nameHash].owner = newPackageOwner;
-    _recordedPackages[nameHash].updatedAt = now;
+    _recordedPackages[nameHash].updatedAt = block.timestamp;
 
     return true;
   }

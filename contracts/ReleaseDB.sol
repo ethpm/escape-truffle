@@ -86,7 +86,7 @@ contract ReleaseDB is Authorized {
     } else {
       // Populate the basic rlease data.
       release.exists = true;
-      release.createdAt = now;
+      release.createdAt = block.timestamp;
       release.nameHash = nameHash;
       release.versionHash = versionHash;
 
@@ -98,7 +98,7 @@ contract ReleaseDB is Authorized {
     }
 
     // Record the last time the release was updated.
-    release.updatedAt = now;
+    release.updatedAt = block.timestamp;
 
     // Save the release lockfile URI
     release.releaseLockfileURI = releaseLockfileURI;
