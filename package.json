@@ -7,8 +7,10 @@
     "test": "test"
   },
   "scripts": {
-    "test": "./node_modules/.bin/truffle test",
-    "test:geth": "./node_modules/.bin/truffle test --network geth"
+    "test": "NETWORK=GANACHE ./scripts/test.sh",
+    "test:geth": "NETWORK=GETH ./scripts/test.sh",
+    "coverage": "./node_modules/.bin/solidity-coverage",
+    "ci": "./scripts/ci.sh"
   },
   "repository": {
     "type": "git",
@@ -25,6 +27,8 @@
   },
   "homepage": "https://github.com/ethpm/escape-truffle#readme",
   "devDependencies": {
+    "coveralls": "^3.0.0",
+    "ganache-cli": "^6.1.0",
     "solidity-coverage": "^0.5.0",
     "solium": "^1.1.6",
     "truffle": "^4.1.7"
