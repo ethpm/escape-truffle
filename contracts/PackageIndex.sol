@@ -53,13 +53,19 @@ contract PackageIndex is Authorized, PackageIndexInterface {
   /// @param preRelease The pre-release portion of the semver version string.  Use empty string if the version string has no pre-release portion.
   /// @param build The build portion of the semver version string.  Use empty string if the version string has no build portion.
   /// @param releaseLockfileURI The URI for the release lockfile for this release.
-  function release(string name,
-                   uint32 major,
-                   uint32 minor,
-                   uint32 patch,
-                   string preRelease,
-                   string build,
-                   string releaseLockfileURI) public auth returns (bool) {
+  function release(
+    string name,
+    uint32 major,
+    uint32 minor,
+    uint32 patch,
+    string preRelease,
+    string build,
+    string releaseLockfileURI
+  )
+    public
+    auth
+    returns (bool)
+  {
     require(address(packageDb) != 0x0);
     require(address(releaseDb) != 0x0);
     require(address(releaseValidator) != 0x0);
@@ -73,11 +79,16 @@ contract PackageIndex is Authorized, PackageIndexInterface {
   /// @param preRelease The pre-release portion of the semver version string.  Use empty string if the version string has no pre-release portion.
   /// @param build The build portion of the semver version string.  Use empty string if the version string has no build portion.
   /// @param releaseLockfileURI The URI for the release lockfile for this release.
-  function release(string name,
-                   uint32[3] majorMinorPatch,
-                   string preRelease,
-                   string build,
-                   string releaseLockfileURI) internal returns (bool) {
+  function release(
+    string name,
+    uint32[3] majorMinorPatch,
+    string preRelease,
+    string build,
+    string releaseLockfileURI
+  )
+    internal
+    returns (bool)
+  {
     bytes32 versionHash = releaseDb.hashVersion(majorMinorPatch[0], majorMinorPatch[1], majorMinorPatch[2], preRelease, build);
 
     // If the version for this release is not in the version database, populate
@@ -119,8 +130,7 @@ contract PackageIndex is Authorized, PackageIndexInterface {
   /// @notice Will transfer ownership of this package to the provided new owner address.
   /// @param name Package name
   /// @param newPackageOwner The address of the new owner.
-  function transferPackageOwner(string name,
-                                address newPackageOwner) public auth returns (bool) {
+  function transferPackageOwner(string name, address newPackageOwner) public auth returns (bool) {
     if (isPackageOwner(name, msg.sender)) {
       // Only the package owner may transfer package ownership.
       return false;
@@ -173,13 +183,18 @@ contract PackageIndex is Authorized, PackageIndexInterface {
   /// @param patch The patch portion of the semver version string.
   /// @param preRelease The pre-release portion of the semver version string.  Use empty string if the version string has no pre-release portion.
   /// @param build The build portion of the semver version string.  Use empty string if the version string has no build portion.
-  function releaseExists(string name,
-                         uint32 major,
-                         uint32 minor,
-                         uint32 patch,
-                         string preRelease,
-                         string build) public view returns (bool) {
-
+  function releaseExists(
+    string name,
+    uint32 major,
+    uint32 minor,
+    uint32 patch,
+    string preRelease,
+    string build
+  )
+    public
+    view
+    returns (bool)
+  {
     bytes32 nameHash = packageDb.hashName(name);
     bytes32 versionHash = releaseDb.hashVersion(major, minor, patch, preRelease, build);
     return releaseDb.releaseExists(releaseDb.hashRelease(nameHash, versionHash));
@@ -198,11 +213,16 @@ contract PackageIndex is Authorized, PackageIndexInterface {
 
   /// @dev Returns the package data.
   /// @param name Package name
-  function getPackageData(string name) public view
-                                       returns (address packageOwner,
-                                                uint createdAt,
-                                                uint numReleases,
-                                                uint updatedAt) {
+  function getPackageData(string name)
+    public
+    view
+    returns (
+      address packageOwner,
+      uint createdAt,
+      uint numReleases,
+      uint updatedAt
+    )
+  {
     bytes32 nameHash = packageDb.hashName(name);
     (packageOwner, createdAt, updatedAt) = packageDb.getPackageData(nameHash);
     numReleases = releaseDb.getNumReleasesForNameHash(nameHash);
@@ -211,15 +231,20 @@ contract PackageIndex is Authorized, PackageIndexInterface {
 
   /// @dev Returns the release data for the release associated with the given release hash.
   /// @param releaseHash The release hash.
-  function getReleaseData(bytes32 releaseHash) public
-                                               view returns (uint32 major,
-                                                                 uint32 minor,
-                                                                 uint32 patch,
-                                                                 string preRelease,
-                                                                 string build,
-                                                                 string releaseLockfileURI,
-                                                                 uint createdAt,
-                                                                 uint updatedAt) {
+  function getReleaseData(bytes32 releaseHash)
+    public
+    view
+    returns (
+      uint32 major,
+      uint32 minor,
+      uint32 patch,
+      string preRelease,
+      string build,
+      string releaseLockfileURI,
+      uint createdAt,
+      uint updatedAt
+    )
+  {
     bytes32 versionHash;
     (,versionHash, createdAt, updatedAt) = releaseDb.getReleaseData(releaseHash);
     (major, minor, patch) = releaseDb.getMajorMinorPatch(versionHash);
@@ -238,8 +263,7 @@ contract PackageIndex is Authorized, PackageIndexInterface {
   /// @dev Returns the release hash at the provide index in the array of release hashes for the given package.
   /// @param name Package name
   /// @param releaseIdx The index of the release to retrieve.
-  function getReleaseHashForPackage(string name,
-                                    uint releaseIdx) public view returns (bytes32) {
+  function getReleaseHashForPackage(string name, uint releaseIdx) public view returns (bytes32) {
     bytes32 nameHash = packageDb.hashName(name);
     return releaseDb.getReleaseHashForNameHash(nameHash, releaseIdx);
   }
@@ -256,7 +280,15 @@ contract PackageIndex is Authorized, PackageIndexInterface {
   /// @param name Package name
   /// @param offset The starting index for the slice.
   /// @param numReleases The length of the slice
-  function getPackageReleaseHashes(string name, uint offset, uint numReleases) public view returns (bytes32[]) {
+  function getPackageReleaseHashes(
+    string name,
+    uint offset,
+    uint numReleases
+  )
+    public
+    view
+    returns (bytes32[])
+  {
     bytes32 nameHash = packageDb.hashName(name);
     bytes32[] memory releaseHashes = new bytes32[](numReleases);
 
@@ -296,12 +328,18 @@ contract PackageIndex is Authorized, PackageIndexInterface {
   /// @param patch The patch portion of the semver version string.
   /// @param preRelease The pre-release portion of the semver version string.  Use empty string if the version string has no pre-release portion.
   /// @param build The build portion of the semver version string.  Use empty string if the version string has no build portion.
-  function getReleaseLockfileURI(string name,
-                                 uint32 major,
-                                 uint32 minor,
-                                 uint32 patch,
-                                 string preRelease,
-                                 string build) public view returns (string) {
+  function getReleaseLockfileURI(
+    string name,
+    uint32 major,
+    uint32 minor,
+    uint32 patch,
+    string preRelease,
+    string build
+  )
+    public
+    view
+    returns (string)
+  {
     bytes32 versionHash = releaseDb.hashVersion(major, minor, patch, preRelease, build);
     bytes32 releaseHash = releaseDb.hashRelease(packageDb.hashName(name), versionHash);
     return getReleaseLockfileURI(releaseHash);

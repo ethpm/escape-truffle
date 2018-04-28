@@ -26,12 +26,14 @@ library SemVersionLib {
   /// @param patch The patch portion of the semver version string.
   /// @param preRelease The pre-release portion of the semver version string.  Use empty string if the version string has no pre-release portion.
   /// @param build The build portion of the semver version string.  Use empty string if the version string has no build portion.
-  function init(SemVersion storage self,
-                uint32 major,
-                uint32 minor,
-                uint32 patch,
-                string preRelease,
-                string build) public returns (bool) {
+  function init(
+    SemVersion storage self,
+    uint32 major,
+    uint32 minor,
+    uint32 patch,
+    string preRelease,
+    string build) public returns (bool)
+  {
     self.major = major;
     self.minor = minor;
     self.patch = patch;
@@ -108,8 +110,8 @@ library SemVersionLib {
   /// @param left The first SemVersion
   /// @param right The second SemVersion
   function comparePreReleases(SemVersion storage left, SemVersion storage right) internal view returns (Comparison comparisonResult) {
-    uint minLength = min(left.preReleaseIdentifiers.length,
-                         right.preReleaseIdentifiers.length);
+    uint minLength = min(left.preReleaseIdentifiers.length, right.preReleaseIdentifiers.length);
+
     for (uint i = 0; i < minLength; i++) {
       if (isNumericString(left.preReleaseIdentifiers[i]) && isNumericString(right.preReleaseIdentifiers[i])) {
         comparisonResult = compareNumericStrings(left.preReleaseIdentifiers[i], right.preReleaseIdentifiers[i]);

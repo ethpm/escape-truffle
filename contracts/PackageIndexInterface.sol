@@ -42,20 +42,20 @@ contract PackageIndexInterface is AuthorizedInterface {
   /// @param preRelease The pre-release portion of the semver version string.  Use empty string if the version string has no pre-release portion.
   /// @param build The build portion of the semver version string.  Use empty string if the version string has no build portion.
   /// @param releaseLockfileURI The URI for the release lockfile for this release.
-  function release(string name,
-                   uint32 major,
-                   uint32 minor,
-                   uint32 patch,
-                   string preRelease,
-                   string build,
-                   string releaseLockfileURI) public returns (bool);
+  function release(
+    string name,
+    uint32 major,
+    uint32 minor,
+    uint32 patch,
+    string preRelease,
+    string build,
+    string releaseLockfileURI) public returns (bool);
 
   /// @dev Transfers package ownership to the provider new owner address.
   /// @notice Will transfer ownership of this package to the provided new owner address.
   /// @param name Package name
   /// @param newPackageOwner The address of the new owner.
-  function transferPackageOwner(string name,
-                                address newPackageOwner) public returns (bool);
+  function transferPackageOwner(string name, address newPackageOwner) public returns (bool);
 
   //
   // +------------+
@@ -83,12 +83,13 @@ contract PackageIndexInterface is AuthorizedInterface {
   /// @param patch The patch portion of the semver version string.
   /// @param preRelease The pre-release portion of the semver version string.  Use empty string if the version string has no pre-release portion.
   /// @param build The build portion of the semver version string.  Use empty string if the version string has no build portion.
-  function releaseExists(string name,
-                         uint32 major,
-                         uint32 minor,
-                         uint32 patch,
-                         string preRelease,
-                         string build) public view returns (bool);
+  function releaseExists(
+    string name,
+    uint32 major,
+    uint32 minor,
+    uint32 patch,
+    string preRelease,
+    string build) public view returns (bool);
 
   /// @dev Returns the number of packages in the index
   function getNumPackages() public view returns (uint);
@@ -99,23 +100,31 @@ contract PackageIndexInterface is AuthorizedInterface {
 
   /// @dev Returns the package data.
   /// @param name Package name
-  function getPackageData(string name) public view
-                                       returns (address packageOwner,
-                                                uint createdAt,
-                                                uint numReleases,
-                                                uint updatedAt);
+  function getPackageData(string name)
+    public
+    view
+    returns (
+      address packageOwner,
+      uint createdAt,
+      uint numReleases,
+      uint updatedAt
+    );
 
   /// @dev Returns the release data for the release associated with the given release hash.
   /// @param releaseHash The release hash.
-  function getReleaseData(bytes32 releaseHash) public
-                                               view returns (uint32 major,
-                                                                 uint32 minor,
-                                                                 uint32 patch,
-                                                                 string preRelease,
-                                                                 string build,
-                                                                 string releaseLockfileURI,
-                                                                 uint createdAt,
-                                                                 uint updatedAt);
+  function getReleaseData(bytes32 releaseHash)
+    public
+    view
+    returns (
+      uint32 major,
+      uint32 minor,
+      uint32 patch,
+      string preRelease,
+      string build,
+      string releaseLockfileURI,
+      uint createdAt,
+      uint updatedAt
+    );
 
   /// @dev Returns the release hash at the provide index in the array of all release hashes.
   /// @param idx The index of the release to retrieve.
@@ -124,8 +133,7 @@ contract PackageIndexInterface is AuthorizedInterface {
   /// @dev Returns the release hash at the provide index in the array of release hashes for the given package.
   /// @param name Package name
   /// @param releaseIdx The index of the release to retrieve.
-  function getReleaseHashForPackage(string name,
-                                    uint releaseIdx) public view returns (bytes32);
+  function getReleaseHashForPackage(string name, uint releaseIdx) public view returns (bytes32);
 
   /// @dev Returns an array of all release hashes for the named package.
   /// @param name Package name
@@ -135,9 +143,10 @@ contract PackageIndexInterface is AuthorizedInterface {
   /// @param name Package name
   /// @param offset The starting index for the slice.
   /// @param numReleases The length of the slice
-  function getPackageReleaseHashes(string name,
-                                   uint offset,
-                                   uint numReleases) public view returns (bytes32[]);
+  function getPackageReleaseHashes(
+    string name,
+    uint offset,
+    uint numReleases) public view returns (bytes32[]);
 
   function getNumReleases() public view returns (uint);
 
@@ -156,10 +165,11 @@ contract PackageIndexInterface is AuthorizedInterface {
   /// @param patch The patch portion of the semver version string.
   /// @param preRelease The pre-release portion of the semver version string.  Use empty string if the version string has no pre-release portion.
   /// @param build The build portion of the semver version string.  Use empty string if the version string has no build portion.
-  function getReleaseLockfileURI(string name,
-                                uint32 major,
-                                uint32 minor,
-                                uint32 patch,
-                                string preRelease,
-                                string build) public view returns (string);
+  function getReleaseLockfileURI(
+    string name,
+    uint32 major,
+    uint32 minor,
+    uint32 patch,
+    string preRelease,
+    string build) public view returns (string);
 }
