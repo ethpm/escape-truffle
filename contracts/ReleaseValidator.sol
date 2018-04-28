@@ -109,7 +109,7 @@ contract ReleaseValidator {
     if (bytes(name).length < 2 || bytes(name).length > 214) {
       return false;
     }
-    for (uint i=0; i < bytes(name).length; i++) {
+    for (uint i = 0; i < bytes(name).length; i++) {
       if (bytes(name)[i] == DASH && i > 0) {
         continue;
       } else if (i > 0 && uint(bytes(name)[i]) >= DIGIT_0 && uint(bytes(name)[i]) <= DIGIT_9) {
@@ -126,7 +126,7 @@ contract ReleaseValidator {
   /// @dev Returns boolean whether the provided release lockfile URI is valid.
   /// @param releaseLockfileURI The URI for a release lockfile.
   function validateReleaseLockfileURI(string releaseLockfileURI) public pure returns (bool) {
-    if (bytes(releaseLockfileURI).length ==0) {
+    if (bytes(releaseLockfileURI).length == 0) {
       return false;
     }
     return true;
