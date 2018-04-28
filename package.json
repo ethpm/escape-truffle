@@ -10,6 +10,7 @@
     "test": "NETWORK=GANACHE ./scripts/test.sh",
     "test:geth": "NETWORK=GETH ./scripts/test.sh",
     "coverage": "./node_modules/.bin/solidity-coverage",
+    "lint": "./node_modules/.bin/solium -d contracts/",
     "ci": "./scripts/ci.sh"
   },
   "repository": {

@@ -21,3 +21,9 @@ $ npm test:geth   # vs. geth
 $ npm run coverage
 ```
 
+### Lint
+
+For help, see the [Solium documentation](https://github.com/duaraghav8/Solium)
+```
+$ npm run lint
+
