@@ -228,9 +228,9 @@ library SemVersionLib {
   //
   // Char Utils
   //
-  uint constant DIGIT_0 = uint(bytes1('0'));
-  uint constant DIGIT_9 = uint(bytes1('9'));
-  bytes1 constant PERIOD = bytes1('.');
+  uint constant DIGIT_0 = uint(bytes1("0"));
+  uint constant DIGIT_9 = uint(bytes1("9"));
+  bytes1 constant PERIOD = bytes1(".");
 
   /// @dev Returns boolean indicating if the provided character is a numeric digit.
   /// @param v The character to check.

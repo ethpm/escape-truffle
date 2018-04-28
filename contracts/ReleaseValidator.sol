@@ -89,11 +89,11 @@ contract ReleaseValidator {
     return !releaseDb.releaseExists(releaseHash);
   }
 
-  uint constant DIGIT_0 = uint(bytes1('0'));
-  uint constant DIGIT_9 = uint(bytes1('9'));
-  uint constant LETTER_a = uint(bytes1('a'));
-  uint constant LETTER_z = uint(bytes1('z'));
-  bytes1 constant DASH = bytes1('-');
+  uint constant DIGIT_0 = uint(bytes1("0"));
+  uint constant DIGIT_9 = uint(bytes1("9"));
+  uint constant LETTER_a = uint(bytes1("a"));
+  uint constant LETTER_z = uint(bytes1("z"));
+  bytes1 constant DASH = bytes1("-");
 
   /// @dev Returns boolean whether the provided package name is valid.
   /// @param packageDb The address of the PackageDB
