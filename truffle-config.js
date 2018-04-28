@@ -1,7 +1,6 @@
 module.exports = {
   networks: {
     ganache: {
-      geth: {
       host: "127.0.0.1",
       port: 8547,
       network_id: "*",
@@ -14,12 +13,11 @@ module.exports = {
       gas: 8000000
     },
     coverage: {
-      coverage: {
       host: "127.0.0.1",
       network_id: "*",
       port: 8555,
       gas: 0xfffffffffff,
       gasPrice: 0x01
-    },
+    }
   }
-};
+}

@@ -24,7 +24,7 @@ if [ "$NETWORK" = "GETH" ]; then
   PORT=8545
 fi
 
-if [ "$NETWORK" = "GANACHE"]; then
+if [ "$NETWORK" = "GANACHE" ]; then
   PORT=8547
 fi
 
@@ -57,8 +57,6 @@ start_client() {
       sleep 30
   else
     node_modules/.bin/ganache-cli --noVMErrorsOnRPCResponse > /dev/null &
-    echo "Pausing for 5s to complete client launch"
-    sleep 5
   fi
 
   CLIENT_PID=$!
