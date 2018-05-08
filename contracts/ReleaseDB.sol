@@ -167,7 +167,11 @@ contract ReleaseDB is Authorized {
 
   /// @dev Updates each branch of the tree, replacing the current leaf node with this release hash if this release hash should be the new leaf.  Returns success.
   /// @param releaseHash The releaseHash to check.
-  function updateLatestTree(bytes32 releaseHash) public auth returns (bool) {
+  function updateLatestTree(bytes32 releaseHash)
+    public
+    auth
+    returns (bool)
+  {
     updateMajorTree(releaseHash);
     updateMinorTree(releaseHash);
     updatePatchTree(releaseHash);
@@ -208,38 +212,62 @@ contract ReleaseDB is Authorized {
   //
 
   /// @dev Get the total number of releases
-  function getNumReleases() public view returns (uint) {
+  function getNumReleases()
+    public
+    view
+    returns (uint)
+  {
     return _allReleaseHashes.size();
   }
 
   /// @dev Get the total number of releases
   /// @param idx The index of the release hash to retrieve.
-  function getReleaseHash(uint idx) public view returns (bytes32) {
+  function getReleaseHash(uint idx)
+    public
+    view
+    returns (bytes32)
+  {
     return _allReleaseHashes.get(idx);
   }
 
   /// @dev Get the total number of releases
   /// @param nameHash the name hash to lookup.
-  function getNumReleasesForNameHash(bytes32 nameHash) public view returns (uint) {
+  function getNumReleasesForNameHash(bytes32 nameHash)
+    public
+    view
+    returns (uint)
+  {
     return _releaseHashesByNameHash[nameHash].size();
   }
 
   /// @dev Get the total number of releases
   /// @param nameHash the name hash to lookup.
   /// @param idx The index of the release hash to retrieve.
-  function getReleaseHashForNameHash(bytes32 nameHash, uint idx) public view returns (bytes32) {
+  function getReleaseHashForNameHash(bytes32 nameHash, uint idx)
+    public
+    view
+    returns (bytes32)
+  {
     return _releaseHashesByNameHash[nameHash].get(idx);
   }
 
   /// @dev Query the existence of a release at the provided version for a package.  Returns boolean indicating whether such a release exists.
   /// @param releaseHash The release hash to query.
-  function releaseExists(bytes32 releaseHash) public view returns (bool) {
+  function releaseExists(bytes32 releaseHash)
+    public
+    view
+    returns (bool)
+  {
     return _recordedReleases[releaseHash].exists;
   }
 
   /// @dev Query the existence of the provided version in the recorded versions.  Returns boolean indicating whether such a version exists.
   /// @param versionHash the version hash to check.
-  function versionExists(bytes32 versionHash) public view returns (bool) {
+  function versionExists(bytes32 versionHash)
+    public
+    view
+    returns (bool)
+  {
     return _versionExists[versionHash];
   }
 
@@ -319,7 +347,11 @@ contract ReleaseDB is Authorized {
     uint32 minor,
     uint32 patch,
     string preRelease,
-    string build) public pure returns (bytes32)
+    string build
+  )
+    public
+    pure
+    returns (bytes32)
   {
     return keccak256(major, minor, patch, preRelease, build);
   }
@@ -327,7 +359,11 @@ contract ReleaseDB is Authorized {
   /// @dev Returns release hash for the given release
   /// @param nameHash The name hash of the package name.
   /// @param versionHash The version hash for the release version.
-  function hashRelease(bytes32 nameHash, bytes32 versionHash) public pure returns (bytes32) {
+  function hashRelease(bytes32 nameHash, bytes32 versionHash)
+    public
+    pure
+    returns (bytes32)
+  {
     return keccak256(nameHash, versionHash);
   }
 
@@ -337,14 +373,22 @@ contract ReleaseDB is Authorized {
 
   /// @dev Returns the release hash of the latest release in the major branch of the package release tree.
   /// @param nameHash The nameHash of the package
-  function getLatestMajorTree(bytes32 nameHash) public view returns (bytes32) {
+  function getLatestMajorTree(bytes32 nameHash)
+    public
+    view
+    returns (bytes32)
+  {
     return _latestMajor[nameHash];
   }
 
   /// @dev Returns the release hash of the latest release in the minor branch of the package release tree.
   /// @param nameHash The nameHash of the package
   /// @param major The branch of the major portion of the release tree to check.
-  function getLatestMinorTree(bytes32 nameHash, uint32 major) public view returns (bytes32) {
+  function getLatestMinorTree(bytes32 nameHash, uint32 major)
+    public
+    view
+    returns (bytes32)
+  {
     return _latestMinor[nameHash][major];
   }
 
@@ -355,7 +399,11 @@ contract ReleaseDB is Authorized {
   function getLatestPatchTree(
     bytes32 nameHash,
     uint32 major,
-    uint32 minor) public view returns (bytes32)
+    uint32 minor
+  )
+    public
+    view
+    returns (bytes32)
   {
     return _latestPatch[nameHash][major][minor];
   }
@@ -369,7 +417,11 @@ contract ReleaseDB is Authorized {
     bytes32 nameHash,
     uint32 major,
     uint32 minor,
-    uint32 patch) public view returns (bytes32)
+    uint32 patch
+  )
+    public
+    view
+    returns (bytes32)
   {
     return _latestPreRelease[nameHash][major][minor][patch];
   }
@@ -384,7 +436,14 @@ contract ReleaseDB is Authorized {
     returns (bool)
   {
     SemVersionLib.SemVersion storage version = _recordedVersions[versionHash];
-    SemVersionLib.SemVersion storage latestMajor = _recordedVersions[_recordedReleases[getLatestMajorTree(nameHash)].versionHash];
+
+    SemVersionLib.SemVersion storage latestMajor =
+      _recordedVersions[
+        _recordedReleases[
+          getLatestMajorTree(nameHash)
+        ].versionHash
+      ];
+
     return version.isGreaterOrEqual(latestMajor);
   }
 
@@ -398,7 +457,14 @@ contract ReleaseDB is Authorized {
     returns (bool)
   {
     SemVersionLib.SemVersion storage version = _recordedVersions[versionHash];
-    SemVersionLib.SemVersion storage latestMinor = _recordedVersions[_recordedReleases[getLatestMinorTree(nameHash, version.major)].versionHash];
+
+    SemVersionLib.SemVersion storage latestMinor =
+      _recordedVersions[
+        _recordedReleases[
+          getLatestMinorTree(nameHash, version.major)
+        ].versionHash
+      ];
+
     return version.isGreaterOrEqual(latestMinor);
   }
 
@@ -412,7 +478,18 @@ contract ReleaseDB is Authorized {
     returns (bool)
   {
     SemVersionLib.SemVersion storage version = _recordedVersions[versionHash];
-    SemVersionLib.SemVersion storage latestPatch = _recordedVersions[_recordedReleases[getLatestPatchTree(nameHash, version.major, version.minor)].versionHash];
+
+    SemVersionLib.SemVersion storage latestPatch =
+      _recordedVersions[
+        _recordedReleases[
+          getLatestPatchTree(
+            nameHash,
+            version.major,
+            version.minor
+          )
+        ].versionHash
+      ];
+
     return version.isGreaterOrEqual(latestPatch);
   }
 
@@ -426,7 +503,19 @@ contract ReleaseDB is Authorized {
     returns (bool)
   {
     SemVersionLib.SemVersion storage version = _recordedVersions[versionHash];
-    SemVersionLib.SemVersion storage latestPreRelease = _recordedVersions[_recordedReleases[getLatestPreReleaseTree(nameHash, version.major, version.minor, version.patch)].versionHash];
+
+    SemVersionLib.SemVersion storage latestPreRelease =
+      _recordedVersions[
+        _recordedReleases[
+          getLatestPreReleaseTree(
+            nameHash,
+            version.major,
+            version.minor,
+            version.patch
+          )
+        ].versionHash
+      ];
+
     return version.isGreaterOrEqual(latestPreRelease);
   }
 

@@ -50,14 +50,22 @@ library SemVersionLib {
   /// @dev Return boolean indicating if the two SemVersion objects are considered equal
   /// @param self The first SemVersion
   /// @param other The second SemVersion
-  function isEqual(SemVersion storage self, SemVersion storage other) public view returns (bool) {
+  function isEqual(SemVersion storage self, SemVersion storage other)
+    public
+    view
+    returns (bool)
+  {
     return self.hash == other.hash;
   }
 
   /// @dev Return boolean indicating if the first SemVersion object is considered strictly greater than the second.
   /// @param self The first SemVersion
   /// @param other The second SemVersion
-  function isGreater(SemVersion storage self, SemVersion storage other) public view returns (bool) {
+  function isGreater(SemVersion storage self, SemVersion storage other)
+    public
+    view
+    returns (bool)
+  {
     if (self.hash == other.hash) {
       return false;
     } else if (self.major > other.major) {
@@ -86,7 +94,11 @@ library SemVersionLib {
   /// @dev Return boolean indicating if the first SemVersion object is considered greater than or equal to the second.
   /// @param self The first SemVersion
   /// @param other The second SemVersion
-  function isGreaterOrEqual(SemVersion storage self, SemVersion storage other) public view returns (bool) {
+  function isGreaterOrEqual(SemVersion storage self, SemVersion storage other)
+    public
+    view
+    returns (bool)
+  {
     return isEqual(self, other) || isGreater(self, other);
   }
 
@@ -96,20 +108,32 @@ library SemVersionLib {
   /// @dev Return boolean indicating if the pre-release string from the first SemVersion object is considered greater than the pre-release string from the second SemVersion object.
   /// @param left The first SemVersion
   /// @param right The second SemVersion
-  function isPreReleaseGreater(SemVersion storage left, SemVersion storage right) internal view returns (bool) {
+  function isPreReleaseGreater(SemVersion storage left, SemVersion storage right)
+    internal
+    view
+    returns (bool)
+  {
     return comparePreReleases(left, right) == Comparison.After;
   }
 
   /// @dev Return boolean indicating if the provided SemVersion is a pre-release.
   /// @param self The SemVersion
-  function isPreRelease(SemVersion storage self) internal view returns (bool) {
+  function isPreRelease(SemVersion storage self)
+    internal
+    view
+    returns (bool)
+  {
     return self.preReleaseIdentifiers.length > 0;
   }
 
   /// @dev Return a comparison of the pre-release strings for the two provided SemVersion objects.
   /// @param left The first SemVersion
   /// @param right The second SemVersion
-  function comparePreReleases(SemVersion storage left, SemVersion storage right) internal view returns (Comparison comparisonResult) {
+  function comparePreReleases(SemVersion storage left, SemVersion storage right)
+    internal
+    view
+    returns (Comparison comparisonResult)
+  {
     uint minLength = min(left.preReleaseIdentifiers.length, right.preReleaseIdentifiers.length);
 
     for (uint i = 0; i < minLength; i++) {
@@ -140,7 +164,11 @@ library SemVersionLib {
   /// @dev Return a comparison based on the ASCII ordering of the two strings
   /// @param left The first string
   /// @param right The second string
-  function compareStrings(string left, string right) internal pure returns (Comparison) {
+  function compareStrings(string left, string right)
+    internal
+    pure
+    returns (Comparison)
+  {
     for (uint i = 0; i < min(bytes(left).length, bytes(right).length); i++) {
       if (bytes(left)[i] == bytes(right)[i]) {
         continue;
@@ -163,7 +191,11 @@ library SemVersionLib {
   /// @dev Return a comparison based on the integer representation of the two string.
   /// @param left The first string
   /// @param right The second string
-  function compareNumericStrings(string left, string right) internal pure returns (Comparison) {
+  function compareNumericStrings(string left, string right)
+    internal
+    pure
+    returns (Comparison)
+  {
     uint leftAsNumber = castStringToUInt(left);
     uint rightAsNumber = castStringToUInt(right);
 
@@ -178,7 +210,11 @@ library SemVersionLib {
 
   /// @dev Splits a string on periods.
   /// @param preRelease The string to split.
-  function splitIdentifiers(string preRelease) internal pure returns (string[]) {
+  function splitIdentifiers(string preRelease)
+    internal
+    pure
+    returns (string[])
+  {
     if (bytes(preRelease).length == 0) {
       return new string[](0);
     }
@@ -219,7 +255,11 @@ library SemVersionLib {
   /// @dev Returns the minimum of two unsigned integers
   /// @param a The first unsigned integer
   /// @param b The first unsigned integer
-  function min(uint a, uint b) internal pure returns (uint) {
+  function min(uint a, uint b)
+    internal
+    pure
+    returns (uint)
+  {
     if (a <= b) {
       return a;
     } else {
@@ -236,7 +276,11 @@ library SemVersionLib {
 
   /// @dev Returns boolean indicating if the provided character is a numeric digit.
   /// @param v The character to check.
-  function isDigit(bytes1 v) internal pure returns (bool) {
+  function isDigit(bytes1 v)
+    internal
+    pure
+    returns (bool)
+  {
     return (uint(v) >= DIGIT_0 && uint(v) <= DIGIT_9);
   }
 
@@ -245,7 +289,11 @@ library SemVersionLib {
   //
   /// @dev Returns boolean indicating if the provided string is all numeric.
   /// @param value The string to check.
-  function isNumericString(string value) internal pure returns (bool) {
+  function isNumericString(string value)
+    internal
+    pure
+    returns (bool)
+  {
     for (uint i = 0; i < bytes(value).length; i++) {
       if (!isDigit(bytes(value)[i])) {
         return false;
@@ -257,7 +305,11 @@ library SemVersionLib {
 
   /// @dev Returns the integer representation of a numeric string.
   /// @param numericString The string to convert.
-  function castStringToUInt(string numericString) internal pure returns (uint) {
+  function castStringToUInt(string numericString)
+    internal
+    pure
+    returns (uint)
+  {
     uint value = 0;
 
     for (uint i = 0; i < bytes(numericString).length; i++) {

@@ -46,7 +46,11 @@ contract PackageDB is Authorized {
 
   /// @dev Creates or updates a release for a package.  Returns success.
   /// @param name Package name
-  function setPackage(string name) public auth returns (bool){
+  function setPackage(string name)
+    public
+    auth
+    returns (bool)
+  {
     // Hash the name and the version for storing data
     bytes32 nameHash = hashName(name);
 
@@ -112,18 +116,30 @@ contract PackageDB is Authorized {
 
   /// @dev Query the existence of a package with the given name.  Returns boolean indicating whether the package exists.
   /// @param nameHash The name hash of a package.
-  function packageExists(bytes32 nameHash) public view returns (bool) {
+  function packageExists(bytes32 nameHash)
+    public
+    view
+    returns (bool)
+  {
     return _recordedPackages[nameHash].exists;
   }
 
   /// @dev Return the total number of packages
-  function getNumPackages() public view returns (uint) {
+  function getNumPackages()
+    public
+    view
+    returns (uint)
+  {
     return _allPackageNameHashes.size();
   }
 
   /// @dev Returns package namehash at the provided index from the set of all known name hashes.
   /// @param idx The index of the package name hash to retrieve.
-  function getPackageNameHash(uint idx) public view returns (bytes32) {
+  function getPackageNameHash(uint idx)
+    public
+    view
+    returns (bytes32)
+  {
     return _allPackageNameHashes.get(idx);
   }
 
@@ -159,7 +175,11 @@ contract PackageDB is Authorized {
    */
   /// @dev Returns name hash for a given package name.
   /// @param name Package name
-  function hashName(string name) public pure returns (bytes32) {
+  function hashName(string name)
+    public
+    pure
+    returns (bytes32)
+  {
     return keccak256(name);
   }
 }

@@ -20,21 +20,33 @@ contract PackageIndex is Authorized, PackageIndexInterface {
   //
   /// @dev Sets the address of the PackageDb contract.
   /// @param newPackageDb The address to set for the PackageDb.
-  function setPackageDb(address newPackageDb) public auth returns (bool) {
+  function setPackageDb(address newPackageDb)
+    public
+    auth
+    returns (bool)
+  {
     packageDb = PackageDB(newPackageDb);
     return true;
   }
 
   /// @dev Sets the address of the ReleaseDb contract.
   /// @param newReleaseDb The address to set for the ReleaseDb.
-  function setReleaseDb(address newReleaseDb) public auth returns (bool) {
+  function setReleaseDb(address newReleaseDb)
+    public
+    auth
+    returns (bool)
+  {
     releaseDb = ReleaseDB(newReleaseDb);
     return true;
   }
 
   /// @dev Sets the address of the ReleaseValidator contract.
   /// @param newReleaseValidator The address to set for the ReleaseValidator.
-  function setReleaseValidator(address newReleaseValidator) public auth returns (bool) {
+  function setReleaseValidator(address newReleaseValidator)
+    public
+    auth
+    returns (bool)
+  {
     releaseValidator = ReleaseValidator(newReleaseValidator);
     return true;
   }
@@ -89,16 +101,38 @@ contract PackageIndex is Authorized, PackageIndexInterface {
     internal
     returns (bool)
   {
-    bytes32 versionHash = releaseDb.hashVersion(majorMinorPatch[0], majorMinorPatch[1], majorMinorPatch[2], preRelease, build);
+    bytes32 versionHash = releaseDb.hashVersion(
+      majorMinorPatch[0],
+      majorMinorPatch[1],
+      majorMinorPatch[2],
+      preRelease,
+      build
+    );
 
     // If the version for this release is not in the version database, populate
     // it.  This must happen prior to validation to ensure that the version is
     // present in the releaseDb.
     if (!releaseDb.versionExists(versionHash)) {
-      releaseDb.setVersion(majorMinorPatch[0], majorMinorPatch[1], majorMinorPatch[2], preRelease, build);
+      releaseDb.setVersion(
+        majorMinorPatch[0],
+        majorMinorPatch[1],
+        majorMinorPatch[2],
+        preRelease,
+        build
+      );
     }
 
-    if (!releaseValidator.validateRelease(packageDb, releaseDb, msg.sender, name, majorMinorPatch, preRelease, build, releaseLockfileURI)) {
+    if (!releaseValidator.validateRelease(
+          packageDb,
+          releaseDb,
+          msg.sender,
+          name,
+          majorMinorPatch,
+          preRelease,
+          build,
+          releaseLockfileURI)
+       )
+    {
       // Release is invalid
       return false;
     }
@@ -130,7 +164,11 @@ contract PackageIndex is Authorized, PackageIndexInterface {
   /// @notice Will transfer ownership of this package to the provided new owner address.
   /// @param name Package name
   /// @param newPackageOwner The address of the new owner.
-  function transferPackageOwner(string name, address newPackageOwner) public auth returns (bool) {
+  function transferPackageOwner(string name, address newPackageOwner)
+    public
+    auth
+    returns (bool)
+  {
     if (isPackageOwner(name, msg.sender)) {
       // Only the package owner may transfer package ownership.
       return false;
@@ -156,23 +194,39 @@ contract PackageIndex is Authorized, PackageIndexInterface {
   //
 
   /// @dev Returns the address of the packageDb
-  function getPackageDb() public view returns (address) {
+  function getPackageDb()
+    public
+    view
+    returns (address)
+  {
     return address(packageDb);
   }
 
   /// @dev Returns the address of the releaseDb
-  function getReleaseDb() public view returns (address) {
+  function getReleaseDb()
+    public
+    view
+    returns (address)
+  {
     return address(releaseDb);
   }
 
   /// @dev Returns the address of the releaseValidator
-  function getReleaseValidator() public view returns (address) {
+  function getReleaseValidator()
+    public
+    view
+    returns (address)
+  {
     return address(releaseValidator);
   }
 
   /// @dev Query the existence of a package with the given name.  Returns boolean indicating whether the package exists.
   /// @param name Package name
-  function packageExists(string name) public view returns (bool) {
+  function packageExists(string name)
+    public
+    view
+    returns (bool)
+  {
     return packageDb.packageExists(packageDb.hashName(name));
   }
 
@@ -201,13 +255,21 @@ contract PackageIndex is Authorized, PackageIndexInterface {
   }
 
   /// @dev Returns the number of packages in the index
-  function getNumPackages() public view returns (uint) {
+  function getNumPackages()
+    public
+    view
+    returns (uint)
+  {
     return packageDb.getNumPackages();
   }
 
   /// @dev Returns the name of the package at the provided index
   /// @param idx The index of the name hash to lookup.
-  function getPackageName(uint idx) public view returns (string) {
+  function getPackageName(uint idx)
+    public
+    view
+    returns (string)
+  {
     return getPackageName(packageDb.getPackageNameHash(idx));
   }
 
@@ -256,21 +318,33 @@ contract PackageIndex is Authorized, PackageIndexInterface {
 
   /// @dev Returns the release hash at the provide index in the array of all release hashes.
   /// @param idx The index of the release to retrieve.
-  function getReleaseHash(uint idx) public view returns (bytes32) {
+  function getReleaseHash(uint idx)
+    public
+    view
+    returns (bytes32)
+  {
     return releaseDb.getReleaseHash(idx);
   }
 
   /// @dev Returns the release hash at the provide index in the array of release hashes for the given package.
   /// @param name Package name
   /// @param releaseIdx The index of the release to retrieve.
-  function getReleaseHashForPackage(string name, uint releaseIdx) public view returns (bytes32) {
+  function getReleaseHashForPackage(string name, uint releaseIdx)
+    public
+    view
+    returns (bytes32)
+  {
     bytes32 nameHash = packageDb.hashName(name);
     return releaseDb.getReleaseHashForNameHash(nameHash, releaseIdx);
   }
 
   /// @dev Returns an array of all release hashes for the named package.
   /// @param name Package name
-  function getAllPackageReleaseHashes(string name) public view returns (bytes32[]) {
+  function getAllPackageReleaseHashes(string name)
+    public
+    view
+    returns (bytes32[])
+  {
     uint numReleases;
     (,,numReleases,) = getPackageData(name);
     return getPackageReleaseHashes(name, 0, numReleases);
@@ -299,19 +373,31 @@ contract PackageIndex is Authorized, PackageIndexInterface {
     return releaseHashes;
   }
 
-  function getNumReleases() public view returns (uint) {
+  function getNumReleases()
+    public
+    view
+    returns (uint)
+  {
     return releaseDb.getNumReleases();
   }
 
   /// @dev Returns an array of all release hashes for the named package.
-  function getAllReleaseHashes() public view returns (bytes32[]) {
+  function getAllReleaseHashes()
+    public
+    view
+    returns (bytes32[])
+  {
     return getReleaseHashes(0, getNumReleases());
   }
 
   /// @dev Returns a slice of the array of all release hashes for the named package.
   /// @param offset The starting index for the slice.
   /// @param numReleases The length of the slice
-  function getReleaseHashes(uint offset, uint numReleases) public view returns (bytes32[]) {
+  function getReleaseHashes(uint offset, uint numReleases)
+    public
+    view
+    returns (bytes32[])
+  {
     bytes32[] memory releaseHashes = new bytes32[](numReleases);
 
     for (uint i = offset; i < offset + numReleases; i++) {
@@ -354,7 +440,11 @@ contract PackageIndex is Authorized, PackageIndexInterface {
   /// @dev Returns boolean whether the provided address is the package owner
   /// @param name The name of the package
   /// @param _address The address to check
-  function isPackageOwner(string name, address _address) internal view returns (bool) {
+  function isPackageOwner(string name, address _address)
+    internal
+    view
+    returns (bool)
+  {
     address packageOwner;
     (packageOwner,) = getPackageData(name);
     return (packageOwner != _address);
@@ -364,7 +454,11 @@ contract PackageIndex is Authorized, PackageIndexInterface {
 
   /// @dev Retrieves the name for the given name hash.
   /// @param nameHash The name hash to lookup the name for.
-  function getPackageName(bytes32 nameHash) internal view returns (string) {
+  function getPackageName(bytes32 nameHash)
+    internal
+    view
+    returns (string)
+  {
     return fetchString(address(packageDb), GET_PACKAGE_NAME_SIG, nameHash);
   }
 
@@ -372,7 +466,11 @@ contract PackageIndex is Authorized, PackageIndexInterface {
 
   /// @dev Retrieves the release lockfile URI from the package db.
   /// @param releaseHash The release hash to retrieve the URI from.
-  function getReleaseLockfileURI(bytes32 releaseHash) internal view returns (string) {
+  function getReleaseLockfileURI(bytes32 releaseHash)
+    internal
+    view
+    returns (string)
+  {
     return fetchString(address(releaseDb), GET_RELEASE_LOCKFILE_URI_SIG, releaseHash);
   }
 
@@ -380,7 +478,11 @@ contract PackageIndex is Authorized, PackageIndexInterface {
 
   /// @dev Retrieves the pre-release string from the package db.
   /// @param releaseHash The release hash to retrieve the string from.
-  function getPreRelease(bytes32 releaseHash) internal view returns (string) {
+  function getPreRelease(bytes32 releaseHash)
+    internal
+    view
+    returns (string)
+  {
     return fetchString(address(releaseDb), GET_PRE_RELEASE_SIG, releaseHash);
   }
 
@@ -388,14 +490,26 @@ contract PackageIndex is Authorized, PackageIndexInterface {
 
   /// @dev Retrieves the build string from the package db.
   /// @param releaseHash The release hash to retrieve the string from.
-  function getBuild(bytes32 releaseHash) internal view returns (string) {
+  function getBuild(bytes32 releaseHash)
+    internal
+    view
+    returns (string)
+  {
     return fetchString(address(releaseDb), GET_BUILD_SIG, releaseHash);
   }
 
   /// @dev Retrieves a string from a function on the package db indicated by the provide function selector
   /// @param sig The 4-byte function selector to retrieve the signature from.
   /// @param arg The bytes32 argument that should be passed into the function.
-  function fetchString(address codeAddress, bytes4 sig, bytes32 arg) internal view returns (string s) {
+  function fetchString(
+    address codeAddress,
+    bytes4 sig,
+    bytes32 arg
+  )
+    internal
+    view
+    returns (string s)
+  {
     bool success;
 
     assembly {

@@ -49,7 +49,10 @@ contract PackageIndexInterface is AuthorizedInterface {
     uint32 patch,
     string preRelease,
     string build,
-    string releaseLockfileURI) public returns (bool);
+    string releaseLockfileURI
+  )
+    public
+    returns (bool);
 
   /// @dev Transfers package ownership to the provider new owner address.
   /// @notice Will transfer ownership of this package to the provided new owner address.
@@ -89,7 +92,11 @@ contract PackageIndexInterface is AuthorizedInterface {
     uint32 minor,
     uint32 patch,
     string preRelease,
-    string build) public view returns (bool);
+    string build
+  )
+    public
+    view
+    returns (bool);
 
   /// @dev Returns the number of packages in the index
   function getNumPackages() public view returns (uint);
@@ -146,7 +153,11 @@ contract PackageIndexInterface is AuthorizedInterface {
   function getPackageReleaseHashes(
     string name,
     uint offset,
-    uint numReleases) public view returns (bytes32[]);
+    uint numReleases
+  )
+    public
+    view
+    returns (bytes32[]);
 
   function getNumReleases() public view returns (uint);
 
@@ -171,5 +182,9 @@ contract PackageIndexInterface is AuthorizedInterface {
     uint32 minor,
     uint32 patch,
     string preRelease,
-    string build) public view returns (string);
+    string build
+  )
+    public
+    view
+    returns (string);
 }

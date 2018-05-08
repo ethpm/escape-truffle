@@ -2,113 +2,154 @@ pragma solidity ^0.4.0;
 
 
 contract Authority {
-    function canCall(address callerAddress,
-                     address codeAddress,
-                     bytes4 sig) public view returns (bool);
+  function canCall(
+    address callerAddress,
+    address codeAddress,
+    bytes4 sig
+  )
+    public
+    view
+    returns (bool);
 }
 
 
 contract AuthorizedInterface {
-    address public owner;
-    Authority public authority;
+  address public owner;
+  Authority public authority;
 
-    modifier auth {
-        require(isAuthorized());
-        _;
-    }
+  modifier auth {
+    require(isAuthorized());
+    _;
+  }
 
-    event OwnerUpdate(address indexed oldOwner, address indexed newOwner);
-    event AuthorityUpdate(address indexed oldAuthority, address indexed newAuthority);
+  event OwnerUpdate(address indexed oldOwner, address indexed newOwner);
+  event AuthorityUpdate(address indexed oldAuthority, address indexed newAuthority);
 
-    function setOwner(address newOwner) public returns (bool);
+  function setOwner(address newOwner) public returns (bool);
 
-    function setAuthority(Authority newAuthority) public returns (bool);
+  function setAuthority(Authority newAuthority) public returns (bool);
 
-    function isAuthorized() internal returns (bool);
+  function isAuthorized() internal returns (bool);
 }
 
 
 contract Authorized is AuthorizedInterface {
-    constructor() public {
-        owner = msg.sender;
-        emit OwnerUpdate(0x0, owner);
-    }
+  constructor() public {
+    owner = msg.sender;
+    emit OwnerUpdate(0x0, owner);
+  }
 
-    function setOwner(address newOwner) public auth returns (bool) {
-        emit OwnerUpdate(owner, newOwner);
-        owner = newOwner;
-        return true;
-    }
+  function setOwner(address newOwner)
+    public
+    auth
+    returns (bool)
+  {
+    emit OwnerUpdate(owner, newOwner);
+    owner = newOwner;
+    return true;
+  }
 
-    function setAuthority(Authority newAuthority) public auth returns (bool) {
-        emit AuthorityUpdate(authority, newAuthority);
-        authority = newAuthority;
-        return true;
-    }
+  function setAuthority(Authority newAuthority)
+    public
+    auth
+    returns (bool)
+  {
+    emit AuthorityUpdate(authority, newAuthority);
+    authority = newAuthority;
+    return true;
+  }
 
-    function isAuthorized() internal returns (bool) {
-        if (msg.sender == owner) {
-            return true;
-        } else if (address(authority) == (0)) {
-            return false;
-        } else {
-            return authority.canCall(msg.sender, this, msg.sig);
-        }
+  function isAuthorized() internal returns (bool) {
+    if (msg.sender == owner) {
+      return true;
+    } else if (address(authority) == (0)) {
+      return false;
+    } else {
+      return authority.canCall(msg.sender, this, msg.sig);
     }
+  }
 }
 
 
 contract WhitelistAuthorityInterface is Authority, AuthorizedInterface {
-    event SetCanCall(address indexed callerAddress,
-                     address indexed codeAddress,
-                     bytes4 indexed sig,
-                     bool can);
+  event SetCanCall(
+    address indexed callerAddress,
+    address indexed codeAddress,
+    bytes4 indexed sig,
+    bool can
+  );
 
-    event SetAnyoneCanCall(address indexed codeAddress,
-                           bytes4 indexed sig,
-                           bool can);
+  event SetAnyoneCanCall(
+    address indexed codeAddress,
+    bytes4 indexed sig,
+    bool can
+  );
 
-    function setCanCall(address callerAddress,
-                        address codeAddress,
-                        bytes4 sig,
-                        bool can) public returns (bool);
+  function setCanCall(
+    address callerAddress,
+    address codeAddress,
+    bytes4 sig,
+    bool can
+  )
+    public
+    returns (bool);
 
-    function setAnyoneCanCall(address codeAddress,
-                              bytes4 sig,
-                              bool can) public returns (bool);
+  function setAnyoneCanCall(
+    address codeAddress,
+    bytes4 sig,
+    bool can
+  )
+    public
+    returns (bool);
 }
 
 
 contract WhitelistAuthority is WhitelistAuthorityInterface, Authorized {
-    mapping (address =>
-             mapping (address =>
-                      mapping (bytes4 => bool))) _canCall;
-    mapping (address => mapping (bytes4 => bool)) _anyoneCanCall;
+  mapping (address => mapping (address => mapping (bytes4 => bool))) _canCall;
+  mapping (address => mapping (bytes4 => bool)) _anyoneCanCall;
 
-    function canCall(address callerAddress,
-                     address codeAddress,
-                     bytes4 sig) public view returns (bool) {
-        if (_anyoneCanCall[codeAddress][sig]) {
-          return true;
-        } else {
-          return _canCall[callerAddress][codeAddress][sig];
-        }
+  function canCall(
+    address callerAddress,
+    address codeAddress,
+    bytes4 sig
+  )
+    public
+    view
+    returns (bool)
+  {
+    if (_anyoneCanCall[codeAddress][sig]) {
+      return true;
+    } else {
+      return _canCall[callerAddress][codeAddress][sig];
     }
+  }
 
-    function setCanCall(address callerAddress,
-                        address codeAddress,
-                        bytes4 sig,
-                        bool can) auth public returns (bool) {
-        _canCall[callerAddress][codeAddress][sig] = can;
-        emit SetCanCall(callerAddress, codeAddress, sig, can);
-        return true;
-    }
+  function setCanCall(
+    address callerAddress,
+    address codeAddress,
+    bytes4 sig,
+    bool can
+  )
+    public
+    auth
+    returns (bool)
+  {
+    _canCall[callerAddress][codeAddress][sig] = can;
+    emit SetCanCall(callerAddress, codeAddress, sig, can);
+    return true;
+  }
 
-    function setAnyoneCanCall(address codeAddress,
-                              bytes4 sig,
-                              bool can) auth public returns (bool) {
-        _anyoneCanCall[codeAddress][sig] = can;
-        emit SetAnyoneCanCall(codeAddress, sig, can);
-        return true;
-    }
+  function setAnyoneCanCall(
+    address codeAddress,
+    bytes4 sig,
+    bool can
+  )
+    public
+    auth
+    returns (bool)
+  {
+    _anyoneCanCall[codeAddress][sig] = can;
+    emit SetAnyoneCanCall(codeAddress, sig, can);
+    return true;
+  }
 }

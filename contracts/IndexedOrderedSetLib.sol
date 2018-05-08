@@ -16,24 +16,34 @@ library IndexedOrderedSetLib {
 
   /// @dev Returns the size of the set
   /// @param self The set
-  function size(IndexedOrderedSet storage self) public view returns (uint) {
+  function size(IndexedOrderedSet storage self)
+    public
+    view
+    returns (uint)
+  {
     return self._values.length;
   }
 
   /// @dev Returns boolean if the key is in the set
   /// @param self The set
   /// @param value The value to check
-  function contains(IndexedOrderedSet storage self, bytes32 value) public view returns (bool) {
+  function contains(IndexedOrderedSet storage self, bytes32 value)
+    public
+    view
+    returns (bool)
+  {
     return self._exists[value];
   }
 
   /// @dev Returns the index of the value in the set.
   /// @param self The set
   /// @param value The value to look up the index for.
-  function indexOf(IndexedOrderedSet storage self, bytes32 value) requireValue(self, value)
-                                                                  public
-                                                                  view
-                                                                  returns (uint) {
+  function indexOf(IndexedOrderedSet storage self, bytes32 value)
+    requireValue(self, value)
+    public
+    view
+    returns (uint)
+  {
     return self._valueIndices[value];
   }
 
@@ -59,9 +69,11 @@ library IndexedOrderedSetLib {
   /// @dev Removes the element at index idx from the set
   /// @param self The set
   /// @param value The value to remove from the set.
-  function remove(IndexedOrderedSet storage self, bytes32 value) requireValue(self, value)
-                                                                 public
-                                                                 returns (bool) {
+  function remove(IndexedOrderedSet storage self, bytes32 value)
+    requireValue(self, value)
+    public
+    returns (bool)
+  {
     uint idx = indexOf(self, value);
     pop(self, idx);
     return true;
@@ -70,7 +82,11 @@ library IndexedOrderedSetLib {
   /// @dev Retrieves the element at the provided index.
   /// @param self The set
   /// @param idx The index to retrieve.
-  function get(IndexedOrderedSet storage self, uint idx) public view returns (bytes32) {
+  function get(IndexedOrderedSet storage self, uint idx)
+    public
+    view
+    returns (bytes32)
+  {
     return self._values[idx];
   }
 
