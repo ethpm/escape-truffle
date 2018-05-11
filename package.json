@@ -7,10 +7,12 @@
     "test": "test"
   },
   "scripts": {
-    "test": "NETWORK=GANACHE ./scripts/test.sh",
-    "test:geth": "NETWORK=GETH ./scripts/test.sh",
+    "test": "NETWORK=ganache ./scripts/test.sh",
+    "test:geth": "NETWORK=geth ./scripts/test.sh",
     "coverage": "./node_modules/.bin/solidity-coverage",
     "lint": "./node_modules/.bin/solium -d contracts/",
+    "compile": "./node_modules/.bin/darq-truffle compile",
+    "ganache": "./node_modules/.bin/ganache-cli --noVMErrorsOnRPCResponse --port 8547",
     "ci": "./scripts/ci.sh"
   },
   "repository": {
@@ -29,11 +31,11 @@
   "homepage": "https://github.com/ethpm/escape-truffle#readme",
   "devDependencies": {
     "coveralls": "^3.0.0",
+    "darq-truffle": "^4.1.7-web3-one.5",
     "ganache-cli": "^6.1.0",
     "shelljs": "^0.8.1",
     "solidity-coverage": "^0.5.0",
     "solium": "^1.1.7",
-    "solmd": "^0.2.3",
-    "truffle": "^4.1.7"
+    "solmd": "^0.2.3"
   }
 }
