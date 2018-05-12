@@ -9,12 +9,26 @@ module.exports = {
   },
 
   // Methods
+  now: () => Math.floor(Date.now() / 1000),
+  waitSecond: async() => new Promise(a => setTimeout(() => a(), 1000)),
+
+  // Status check: transactions
   assertFailure: async (promise) => {
     try {
       await promise;
       assert.fail();
     } catch(err){
       assert(err.receipt && parseInt(err.receipt.status) === 0);
+    }
+  },
+
+  // Revert string check: calls
+  assertRevert: async (promise) => {
+    try {
+      await promise;
+      assert.fail();
+    } catch(err){
+      assert(err.message.includes('revert'));
     }
   },
 }
