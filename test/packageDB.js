@@ -57,7 +57,6 @@ contract('PackageDB', function(accounts){
     const owner = accounts[1];
 
     it('should set the package owner', async function(){
-
       await helpers.waitSecond();
       const now = helpers.now();
 
