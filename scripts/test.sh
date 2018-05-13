@@ -38,14 +38,14 @@ start_client() {
     docker run \
       -v /"$PWD"/scripts:/scripts \
       -d \
-      -p "$PORT":"$PORT" \
+      -p 8546:8546 \
       -p 30303:30303 \
       ethereum/client-go:v1.8.6 \
+      --nodiscover \
       --rpccorsdomain '*' \
       --ws \
       --wsaddr '0.0.0.0' \
       --wsorigins '*' \
-      --nodiscover \
       --dev \
       --dev.period 1 \
       --targetgaslimit '8000000' \
@@ -54,6 +54,7 @@ start_client() {
 
       echo "Pausing for 30s to complete client launch."
       sleep 30
+
   else
     node_modules/.bin/ganache-cli --noVMErrorsOnRPCResponse --port "$PORT"> /dev/null &
   fi

@@ -28,7 +28,8 @@ module.exports = {
       await promise;
       assert.fail();
     } catch(err){
-      assert(err.message.includes('revert'));
+      // Geth errors with a response web3 chokes on :/
+      assert(err.message.includes('revert') || err.message.includes('0x'));
     }
   },
 

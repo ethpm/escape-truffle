@@ -13,7 +13,7 @@ const PackageIndex = artifacts.require('PackageIndex');
 const ReleaseValidator = artifacts.require('ReleaseValidator');
 const WhitelistAuthority = artifacts.require('WhitelistAuthority');
 
-contract('ReleaseDB', function(accounts){
+contract('PackageIndex', function(accounts){
   let packageDB;
   let releaseDB;
   let packageIndex;
