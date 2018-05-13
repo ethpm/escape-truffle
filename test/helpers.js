@@ -31,4 +31,101 @@ module.exports = {
       assert(err.message.includes('revert'));
     }
   },
+
+  setPermissions: async function(authority, packageIndex, packageDB, releaseDB, releaseValidator){
+    await packageIndex.setAuthority(authority.address);
+    await packageDB.setAuthority(authority.address);
+    await releaseDB.setAuthority(authority.address);
+
+    await packageIndex.setPackageDb(packageDB.address);
+    await packageIndex.setReleaseDb(releaseDB.address);
+    await packageIndex.setReleaseValidator(releaseValidator.address);
+
+    // ReleaseDB
+    const setVersion = releaseDB
+      .abi
+      .find(item => item.name === 'setVersion')
+      .signature;
+
+    const setRelease = releaseDB
+      .abi
+      .find(item => item.name === 'setRelease')
+      .signature;
+
+    const updateLatestTree = releaseDB
+      .abi
+      .find(item => item.name === 'updateLatestTree')
+      .signature;
+
+    // PackageDB
+    const setPackage = packageDB
+      .abi
+      .find(item => item.name === 'setPackage')
+      .signature;
+
+    const setPackageOwner = packageDB
+      .abi
+      .find(item => item.name === 'setPackageOwner')
+      .signature;
+
+    // PackageIndex
+    const release = packageIndex
+      .abi
+      .find(item => item.name === 'release')
+      .signature;
+
+
+    const transferPackageOwner = packageIndex
+      .abi
+      .find(item => item.name === 'transferPackageOwner')
+      .signature;
+
+    // ReleaseDB
+    await authority.setCanCall(
+      packageIndex.address,
+      releaseDB.address,
+      setRelease,
+      true
+    );
+
+    await authority.setAnyoneCanCall(
+      releaseDB.address,
+      setVersion,
+      true
+    );
+
+    await authority.setAnyoneCanCall(
+      releaseDB.address,
+      updateLatestTree,
+      true
+    );
+
+    // PackageDB
+    await authority.setCanCall(
+      packageIndex.address,
+      packageDB.address,
+      setPackage,
+      true
+    );
+
+    await authority.setCanCall(
+      packageIndex.address,
+      packageDB.address,
+      setPackageOwner,
+      true
+    );
+
+    // PackageIndex
+    await authority.setAnyoneCanCall(
+      packageIndex.address,
+      release,
+      true
+    );
+
+    await authority.setAnyoneCanCall(
+      packageIndex.address,
+      transferPackageOwner,
+      true
+    );
+  },
 }

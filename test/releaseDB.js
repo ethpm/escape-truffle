@@ -1,6 +1,6 @@
 /**
  * @author              Piper Merriam  - originally written in Python for ethpm/escape
- * @translation-to-js   cgewecke
+ * @js-translation.     cgewecke
  */
 
 const helpers = require('./helpers');
@@ -106,7 +106,7 @@ contract('ReleaseDB', function(accounts){
     v124h = await releaseDB.hashRelease(nameHash, v124vh)
   });
 
-  describe('Releases: Version Tracking', function(){
+  describe('Releases: Version Tracking Cases', function(){
     it('v100vh', async function(){
       await releaseDB.setRelease(
         nameHash,
