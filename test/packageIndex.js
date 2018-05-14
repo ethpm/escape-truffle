@@ -13,7 +13,7 @@ const PackageIndex = artifacts.require('PackageIndex');
 const ReleaseValidator = artifacts.require('ReleaseValidator');
 const WhitelistAuthority = artifacts.require('WhitelistAuthority');
 
-contract.only('PackageIndex', function(accounts){
+contract('PackageIndex', function(accounts){
   let packageDB;
   let releaseDB;
   let packageIndex;
@@ -226,6 +226,50 @@ contract.only('PackageIndex', function(accounts){
 
       const packageNameAtZero = await packageIndex.getPackageName(0);
       assert(packageNameAtZero === 'test-a');
+    });
+  });
+
+  describe('Ownership', function(){
+    const info = ['test-a', 1, 2, 3, '', '', 'ipfs://some-ipfs-uri'];
+    const owner = accounts[0];
+    const newOwner = accounts[1];
+    const notOwner = accounts[2];
+    const name = info[0];
+
+    beforeEach(async () => {
+      assert( await packageIndex.packageExists(name) === false );
     })
+
+    it('should transfer ownership', async function(){
+      await packageIndex.release(...info, {from: owner});
+
+      let packageData = await packageIndex.getPackageData(name);
+      assert(packageData.packageOwner === owner);
+
+      await packageIndex.transferPackageOwner(name, newOwner);
+
+      packageData = await packageIndex.getPackageData(name);
+      assert(packageData.packageOwner === newOwner);
+    });
+
+    it('should not transfer package owned by null address', async function(){
+      assert( await packageIndex.packageExists(name) === false );
+
+      await assertFailure(
+        packageIndex.transferPackageOwner(name, newOwner)
+      )
+    });
+
+    it('should not transfer package which is not owned by sender', async function(){
+      await packageIndex.release(...info, {from: owner});
+
+      let packageData = await packageIndex.getPackageData(name);
+      assert(packageData.packageOwner === owner);
+
+      await packageIndex.transferPackageOwner(name, newOwner, {from: notOwner});
+
+      packageData = await packageIndex.getPackageData(name);
+      assert(packageData.packageOwner === owner);
+    });
   });
 });
