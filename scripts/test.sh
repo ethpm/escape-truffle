@@ -19,12 +19,11 @@ cleanup() {
 }
 
 # Set client port
-# NB: change geth's port to 8546 when we start using web3 1.0:
-if [ "$NETWORK" = "GETH" ]; then
-  PORT=8545
+if [ "$NETWORK" = "geth" ]; then
+  PORT=8546 # websockets
 fi
 
-if [ "$NETWORK" = "GANACHE" ]; then
+if [ "$NETWORK" = "ganache" ]; then
   PORT=8547
 fi
 
@@ -35,18 +34,18 @@ client_running() {
 
 # Client runner
 start_client() {
-  if [ "$NETWORK" = "GETH" ]; then
+  if [ "$NETWORK" = "geth" ]; then
     docker run \
       -v /"$PWD"/scripts:/scripts \
       -d \
-      -p "$PORT":"$PORT" \
+      -p 8546:8546 \
       -p 30303:30303 \
       ethereum/client-go:v1.8.6 \
-      --rpc \
-      --rpcaddr '0.0.0.0' \
-      --rpcport "$PORT" \
-      --rpccorsdomain '*' \
       --nodiscover \
+      --rpccorsdomain '*' \
+      --ws \
+      --wsaddr '0.0.0.0' \
+      --wsorigins '*' \
       --dev \
       --dev.period 1 \
       --targetgaslimit '8000000' \
@@ -55,8 +54,9 @@ start_client() {
 
       echo "Pausing for 30s to complete client launch."
       sleep 30
+
   else
-    node_modules/.bin/ganache-cli --noVMErrorsOnRPCResponse > /dev/null &
+    node_modules/.bin/ganache-cli --noVMErrorsOnRPCResponse --port "$PORT"> /dev/null &
   fi
 
   CLIENT_PID=$!
@@ -69,4 +69,4 @@ else
   start_client
 fi
 
-node_modules/.bin/truffle test --network "$NETWORK"
+node_modules/.bin/darq-truffle test --network "$NETWORK"

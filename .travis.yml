@@ -11,13 +11,14 @@ before_install:
   - docker pull ethereum/client-go:v1.8.6
 
 env:
-  - NETWORK=GANACHE
-  - NETWORK=GETH
-  - NETWORK=COVERAGE
+  - NETWORK=ganache
+  - NETWORK=geth
+  - NETWORK=coverage
 
 matrix:
   allow_failures:
-    - env: NETWORK=COVERAGE
+    - env: NETWORK=coverage
+    - env: NETWORK=geth
 
 install:
   - npm install
