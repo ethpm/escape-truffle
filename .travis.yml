@@ -14,11 +14,13 @@ env:
   - NETWORK=ganache
   - NETWORK=geth
   - NETWORK=coverage
+  - NETWORK=ganache GAS_REPORTER=true
 
 matrix:
   allow_failures:
     - env: NETWORK=coverage
     - env: NETWORK=geth
+    - env: NETWORK=ganache GAS_REPORTER=true
 
 install:
   - npm install
