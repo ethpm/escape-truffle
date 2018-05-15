@@ -9,6 +9,7 @@
   "scripts": {
     "test": "NETWORK=ganache ./scripts/test.sh",
     "test:geth": "NETWORK=geth ./scripts/test.sh",
+    "test:gas": "NETWORK=ganache GAS_REPORTER=true ./scripts/test.sh",
     "coverage": "./node_modules/.bin/solidity-coverage",
     "lint": "./node_modules/.bin/solium -d contracts/",
     "compile": "./node_modules/.bin/darq-truffle compile",
@@ -31,7 +32,8 @@
   "homepage": "https://github.com/ethpm/escape-truffle#readme",
   "devDependencies": {
     "coveralls": "^3.0.0",
-    "darq-truffle": "^4.1.7-web3-one.5",
+    "darq-truffle": "4.1.4-next.7",
+    "eth-gas-reporter": "^0.1.4",
     "ganache-cli": "^6.1.0",
     "shelljs": "^0.8.1",
     "solidity-coverage": "^0.5.0",

@@ -1,3 +1,14 @@
+
+// Thanks AragonOS for this conditional reporter logic.
+const mochaGasSettings = {
+  reporter: 'eth-gas-reporter',
+  reporterOptions : {
+    onlyCalledMethods: true,
+  }
+}
+
+const mocha = process.env.GAS_REPORTER ? mochaGasSettings : {}
+
 module.exports = {
   networks: {
     ganache: {
@@ -10,7 +21,6 @@ module.exports = {
       host: "127.0.0.1",
       port: 8546,
       network_id: "*",
-      gas: 4000000,
       websockets: true
     },
     coverage: {
@@ -21,5 +31,6 @@ module.exports = {
       gasPrice: 0x01,
       websockets: true
     }
-  }
+  },
+  mocha,
 }
