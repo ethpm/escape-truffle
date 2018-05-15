@@ -32,7 +32,7 @@
   "homepage": "https://github.com/ethpm/escape-truffle#readme",
   "devDependencies": {
     "coveralls": "^3.0.0",
-    "darq-truffle": "^4.1.4-next.7",
+    "darq-truffle": "4.1.4-next.7",
     "eth-gas-reporter": "^0.1.4",
     "ganache-cli": "^6.1.0",
     "shelljs": "^0.8.1",
