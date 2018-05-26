@@ -5,6 +5,8 @@
 
 const helpers = require('./helpers');
 const constants = helpers.constants;
+const assertFailure = helpers.assertFailure;
+const assertRevert = helpers.assertRevert;
 
 const PackageDB = artifacts.require('PackageDB');
 const ReleaseDB = artifacts.require('ReleaseDB');
@@ -352,23 +354,33 @@ contract('ReleaseDB', function(accounts){
       assert( await releaseDB.getLatestPreReleaseTree(nameHash, 1, 2, 4) === v124h )
       assert( await releaseDB.getLatestPreReleaseTree(nameHash, 2, 0, 0) === v200h )
     });
+
+    it('v124vh (update)', async function(){
+      const newUri = 'ipfs://updated-ipfs-uri-h';
+
+      await releaseDB.setRelease(
+        nameHash,
+        v124vh,
+        'ipfs://updated-ipfs-uri-h'
+      );
+
+      assert( await releaseDB.getNumReleasesForNameHash(nameHash) === '12' );
+      assert( await releaseDB.getReleaseLockfileURI(v124h) === newUri );
+
+      const events = await releaseDB.getPastEvents('ReleaseUpdate', {fromBlock: 0, toBlock: 'latest'});
+      assert(events.length === 1);
+      assert(events[0].returnValues.releaseHash === v124h);
+    })
   });
 
   describe('Removals', function(){
-    it('removes a release', async function(){
+    it('removes a pre-release and updates correctly', async function(){
       assert( await releaseDB.getNumReleasesForNameHash(nameHash) === '12' )
-      assert( await releaseDB.getLatestPatchTree(nameHash, 1, 1) === v110h )
-      assert( await releaseDB.getLatestPreReleaseTree(nameHash, 1, 1, 0) === v110h )
+      assert( await releaseDB.getLatestPatchTree(nameHash, 1, 2) === v124h )
+      assert( await releaseDB.getLatestPreReleaseTree(nameHash, 1, 2, 4) === v124h );
 
-      await releaseDB.removeRelease(v110h, 'testing');
+      await releaseDB.removeRelease(v124b1bah, 'testing');
 
-      assert( await releaseDB.getNumReleasesForNameHash(nameHash) === '11' )
-      assert( await releaseDB.releaseExists(v110h) === false )
-      assert( await releaseDB.getLatestPatchTree(nameHash, 1, 1) === constants.zeroBytes32 )
-      assert( await releaseDB.getLatestPreReleaseTree(nameHash, 1, 1, 0) === constants.zeroBytes32 )
-    });
-
-    it('updates the tree', async function(){
       const numReleases = await releaseDB.getNumReleasesForNameHash(nameHash);
 
       for (let i = 0; i < numReleases; i++){
@@ -377,10 +389,87 @@ contract('ReleaseDB', function(accounts){
         await releaseDB.updateLatestTree(rh);
       }
 
-      const val = await releaseDB.getLatestPatchTree(nameHash, 1, 1);
-      assert( await releaseDB.getLatestPatchTree(nameHash, 1, 1) === v110b1h );
-      assert( await releaseDB.getLatestPreReleaseTree(nameHash, 1, 1, 0) === v110b1h );
+      assert( await releaseDB.getNumReleasesForNameHash(nameHash) === '11' )
+      assert( await releaseDB.releaseExists(v124b1bah) === false )
+      assert( await releaseDB.getLatestPatchTree(nameHash, 1, 2) === v124h)
+      assert( await releaseDB.getLatestPreReleaseTree(nameHash, 1, 2, 4) === v124h)
     });
+
+    it('removes a patch release and updates correctly', async function(){
+      assert( await releaseDB.getNumReleasesForNameHash(nameHash) === '11' )
+      assert( await releaseDB.getLatestPatchTree(nameHash, 1, 2) === v124h )
+      assert( await releaseDB.getLatestPreReleaseTree(nameHash, 1, 2, 4) === v124h )
+
+      await releaseDB.removeRelease(v124h, 'testing');
+
+      assert( await releaseDB.getNumReleasesForNameHash(nameHash) === '10' )
+      assert( await releaseDB.releaseExists(v124h) === false )
+
+      const numReleases = await releaseDB.getNumReleasesForNameHash(nameHash);
+
+      for (let i = 0; i < numReleases; i++){
+        const rh = await releaseDB.getReleaseHashForNameHash(nameHash, i)
+        assert( await releaseDB.releaseExists(rh) );
+        await releaseDB.updateLatestTree(rh);
+      }
+
+      assert( await releaseDB.getLatestPatchTree(nameHash, 1, 2) === v124a10bah )
+      assert( await releaseDB.getLatestPreReleaseTree(nameHash, 1, 2, 4) === v124a10bah )
+    });
+
+    it('removes a minor release and updates correctly', async function(){
+      assert( await releaseDB.getNumReleasesForNameHash(nameHash) === '10' )
+      assert( await releaseDB.getLatestPatchTree(nameHash, 1, 2) === v124a10bah )
+      assert( await releaseDB.getLatestPreReleaseTree(nameHash, 1, 2, 3) === v123h )
+
+      await releaseDB.removeRelease(v123h, 'testing');
+
+      assert( await releaseDB.getNumReleasesForNameHash(nameHash) === '9' )
+      assert( await releaseDB.releaseExists(v123h) === false )
+
+      const numReleases = await releaseDB.getNumReleasesForNameHash(nameHash);
+
+      for (let i = 0; i < numReleases; i++){
+        const rh = await releaseDB.getReleaseHashForNameHash(nameHash, i)
+        assert( await releaseDB.releaseExists(rh) );
+        await releaseDB.updateLatestTree(rh);
+      }
+
+      assert( await releaseDB.getLatestPatchTree(nameHash, 1, 2) === v124a10bah )
+      assert( await releaseDB.getLatestPreReleaseTree(nameHash, 1, 2, 3) === constants.zeroBytes32 )
+    });
+
+
+    it('removes a major release and updates correctly', async function(){
+      assert( await releaseDB.getNumReleasesForNameHash(nameHash) === '9' )
+      assert( await releaseDB.getLatestPatchTree(nameHash, 1, 0) === v101h )
+      assert( await releaseDB.getLatestPreReleaseTree(nameHash, 1, 0, 0) === v100h )
+
+      await releaseDB.removeRelease(v100h, 'testing');
+
+      assert( await releaseDB.getNumReleasesForNameHash(nameHash) === '8' )
+      assert( await releaseDB.releaseExists(v100h) === false )
+
+      const numReleases = await releaseDB.getNumReleasesForNameHash(nameHash);
+
+      for (let i = 0; i < numReleases; i++){
+        const rh = await releaseDB.getReleaseHashForNameHash(nameHash, i)
+        assert( await releaseDB.releaseExists(rh) );
+        await releaseDB.updateLatestTree(rh);
+      }
+
+      assert( await releaseDB.getLatestPatchTree(nameHash, 1, 0) === v101h )
+      assert( await releaseDB.getLatestPreReleaseTree(nameHash, 1, 0, 0) === constants.zeroBytes32 )
+    });
+
+    it('throws when removing a release that does not exit', async function(){
+      assert( await releaseDB.releaseExists(v100h) === false );
+
+      await assertFailure(
+        releaseDB.removeRelease(v100h, 'testing')
+      );
+    });
+
   });
 
   describe('Getters', function(){
@@ -428,5 +517,19 @@ contract('ReleaseDB', function(accounts){
       assert( majorMinorPatch['1'] === (2).toString());
       assert( majorMinorPatch['2'] === (3).toString());
     });
-  })
+
+    it('throws when querying a version that does not exist', async function(){
+      const nameHash = await packageDB.hashName('test');
+      const trueVersionHash = await releaseDB.hashVersion(2, 0, 0, '', '');
+      const falseVersionHash = await releaseDB.hashVersion(0, 0, 0, '', '');
+
+      assert( await releaseDB.isLatestMajorTree(nameHash, trueVersionHash) );
+
+      await assertRevert(
+        releaseDB.isLatestMajorTree(nameHash, falseVersionHash)
+      );
+    })
+  });
+
+
 });
