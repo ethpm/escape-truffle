@@ -3,6 +3,7 @@
 
 [![Build Status](https://travis-ci.org/ethpm/escape-truffle.svg?branch=master)](https://travis-ci.org/ethpm/escape-truffle)
 [![Coverage Status](https://coveralls.io/repos/github/ethpm/escape-truffle/badge.svg?branch=master)](https://coveralls.io/github/ethpm/escape-truffle?branch=master)
+[![Documentation Status](https://readthedocs.org/projects/ethpm-package-registry/badge/?version=latest)](https://ethpm-package-registry.readthedocs.io/en/latest/?badge=latest)
 
 ### Install
 ```

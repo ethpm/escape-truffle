@@ -1,39 +1,44 @@
-escape-truffle
-==============
 
 Ethereum Package Registry (V2)
-------------------------------
+==============================
 
 Install
 -------
-``
-$ npm install
-$ docker pull ethereum/client-go:v1.8.6
-``
+
+.. code-block:: shell
+
+   $ npm install
+   $ docker pull ethereum/client-go:v1.8.6
+
 
 Test
 ----
-``
-$ npm test        # vs. ganache-cli
-$ npm test:geth   # vs. geth
-``
+.. code-block:: shell
+
+   $ npm test        # vs. ganache-cli
+   $ npm test:geth   # vs. geth
+
 
 Coverage
 --------
-``
-$ npm run coverage
-``
+
+.. code-block:: shell
+
+   $ npm run coverage
+
 
 Lint
 ----
-For help, see the [Solium documentation](https://github.com/duaraghav8/Solium)
-``
-$ npm run lint
-``
+For help, see the `Solium documentation <https://github.com/duaraghav8/Solium>`.
+
+.. code-block:: shell
+
+   $ npm run lint
+
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Contracts:
 
    Authority
    IndexedOrderedSetLib
