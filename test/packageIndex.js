@@ -160,7 +160,31 @@ contract('PackageIndex', function(accounts){
       );
 
       assert( await packageIndex.packageExists('test') === false );
-    })
+    });
+
+    it('should not release if the PackageDB has deauthorized the index', async function(){
+      packageDB = await PackageDB.new();
+      releaseDB = await ReleaseDB.new();
+      releaseValidator = await ReleaseValidator.new();
+      nameHash = await packageDB.hashName('test');
+
+      await helpers.setPermissions(
+        authority,
+        packageIndex,
+        packageDB,
+        releaseDB,
+        releaseValidator
+      );
+
+      await packageDB.setAuthority(constants.zeroAddress);
+      const releaseInfo = ['test', 1, 2, 3, 'a', 'b', 'ipfs://some-ipfs-uri']
+
+      await assertFailure(
+        packageIndex.release(...releaseInfo)
+      );
+
+      assert( await packageIndex.packageExists('test') === false );
+    });
   });
 
   describe('Methods', function(){
