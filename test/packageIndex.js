@@ -336,6 +336,20 @@ contract('PackageIndex', function(accounts){
         const packageNameAtZero = await packageIndex.getPackageName(0);
         assert(packageNameAtZero === 'test-a');
       });
+
+      it('checks latest releases (prerelease)', async function(){
+        const releaseInfoA = ['test', 0, 0, 1, 'alpha.0', '', 'ipfs://a']
+        const releaseInfoB = ['test', 0, 0, 2, '', '', 'ipfs://a']
+        const releaseInfoC = ['test', 0, 0, 1, 'alpha.1', '', 'ipfs://a']
+
+        await packageIndex.release(...releaseInfoA)
+        await packageIndex.release(...releaseInfoB)
+        await packageIndex.release(...releaseInfoC)
+
+        assert( await packageIndex.releaseExists(...releaseInfoA.slice(0, -1)))
+        assert( await packageIndex.releaseExists(...releaseInfoB.slice(0, -1)))
+        assert( await packageIndex.releaseExists(...releaseInfoC.slice(0, -1)))
+      })
     });
 
     describe('Ownership', function(){
