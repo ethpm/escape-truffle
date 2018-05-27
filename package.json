@@ -37,7 +37,6 @@
     "ganache-cli": "^6.1.0",
     "shelljs": "^0.8.1",
     "solidity-coverage": "^0.5.0",
-    "solium": "^1.1.7",
-    "solmd": "^0.2.3"
+    "solium": "^1.1.7"
   }
 }
