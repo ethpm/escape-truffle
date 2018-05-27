@@ -76,13 +76,15 @@ contract('ReleaseValidator', function(accounts){
 
     const releases = {
       zero:       ['test', 0, 0, 0, '', '', uri],
+      zeroMinor:  ['test', 0, 1, 0, '', '', uri],
+      zeroPatch:  ['test', 0, 0, 1, '', '', uri],
       major:      ['test', 1, 0, 0, '', '', uri ],
       minor:      ['test', 1, 1, 0, '', '', uri ],
       patch:      ['test', 1, 1, 1, '', '', uri ],
       prerelease: ['test', 1, 1, 1, 'beta.1', '', uri ]
     };
 
-    it('should not release version 0', async function(){
+    it('should not release 0, 0, 0', async function(){
       const info = releases.zero;
       assert( await packageIndex.packageExists(info[0]) === false );
 
@@ -90,6 +92,24 @@ contract('ReleaseValidator', function(accounts){
 
       assert( await packageIndex.packageExists(info[0]) === false );
       assert( await packageIndex.releaseExists(...info.slice(0,-1)) === false);
+    });
+
+    it('should not re-release: 0, 1, 0,', async function(){
+      await assertNotReRelease(
+        releases.zeroMinor,
+        packageIndex,
+        packageDB,
+        releaseDB
+      );
+    });
+
+    it('should not re-release: 0, 0, 1', async function(){
+      await assertNotReRelease(
+        releases.zeroPatch,
+        packageIndex,
+        packageDB,
+        releaseDB
+      );
     });
 
     it('should not re-release: 1, 0, 0,', async function(){
@@ -170,14 +190,18 @@ contract('ReleaseValidator', function(accounts){
       major:      ['test', 2, 0, 0, '', '', uri ],
       minor:      ['test', 1, 2, 0, '', '', uri ],
       patch:      ['test', 1, 0, 2, '', '', uri ],
-      prerelease: ['test', 1, 0, 0, 'alpha.10', '', uri ]
+      alpha:      ['test', 1, 0, 0, 'alpha.10', '', uri ],
+      beta:       ['test', 1, 0, 0, 'beta.10', '', uri ],
     }
 
     const backfiles = {
       major:      ['test', 1, 0, 0, '', '', uri ],
       minor:      ['test', 1, 1, 0, '', '', uri ],
       patch:      ['test', 1, 0, 1, '', '', uri ],
-      prerelease: ['test', 1, 0, 0, 'alpha.2', '', uri ]
+      alpha:      ['test', 1, 0, 0, 'alpha', '', uri ],
+      alpha1:     ['test', 1, 0, 0, 'alpha.1', '', uri ],
+      alpha2:     ['test', 1, 0, 0, 'alpha.2', '', uri ],
+      alpha11:    ['test', 1, 0, 0, 'alpha.11', '', uri ],
     }
 
     it('should not backfile: major: 2.0.0 --> 1.0.0', async function(){
@@ -210,10 +234,40 @@ contract('ReleaseValidator', function(accounts){
       );
     });
 
+    it('should not backfile: prerelease: 1.0.0.alpha.10 --> 1.0.0.alpha', async function(){
+      await assertNotBackfiled(
+        originals.alpha,
+        backfiles.alpha,
+        packageIndex,
+        packageDB,
+        releaseDB
+      );
+    });
+
+    it('should not backfile: prerelease: 1.0.0.alpha.10 --> 1.0.0.alpha.1', async function(){
+      await assertNotBackfiled(
+        originals.alpha,
+        backfiles.alpha1,
+        packageIndex,
+        packageDB,
+        releaseDB
+      );
+    });
+
     it('should not backfile: prerelease: 1.0.0.alpha.10 --> 1.0.0.alpha.2', async function(){
       await assertNotBackfiled(
-        originals.prerelease,
-        backfiles.prerelease,
+        originals.alpha,
+        backfiles.alpha2,
+        packageIndex,
+        packageDB,
+        releaseDB
+      );
+    });
+
+    it('should not backfile: prerelease: 1.0.0.beta.10 --> 1.0.0.alpha.11', async function(){
+      await assertNotBackfiled(
+        originals.beta,
+        backfiles.alpha11,
         packageIndex,
         packageDB,
         releaseDB
@@ -227,13 +281,13 @@ contract('ReleaseValidator', function(accounts){
     const cases = {
       // Good
       aa: 'aa',
-      a214: 'lllll',
+      a214: 'a'.repeat(214),
       dashes: 'contains-dashes',
       numbers: 'contains-1234567890-numbers',
       allAllowed: 'contains-abcdefghijklmnopqrstuvwxyz-1234567890-all-allowed-chars',
       // Bad
       a: 'a',
-      a215: 'llll',
+      a215: 'a'.repeat(215),
       startsDash: '-starts-with-dash',        // starts with a dash
       startsNumber: '9starts-with-number',    // starts with a number
       hasCaps: 'hasCapitals',                // capital letters.
@@ -267,7 +321,8 @@ contract('ReleaseValidator', function(accounts){
       })
 
       it('a * 214', async function(){
-
+        info[0] = cases.a214;
+        await assertReleases(packageIndex, info);
       })
 
       it('contains-dashes', async function(){
@@ -293,7 +348,7 @@ contract('ReleaseValidator', function(accounts){
       });
 
       it('a * 215', async function(){
-        info[0] = cases.a;
+        info[0] = cases.a215;
         await assertDoesNotRelease(packageIndex, info);
       })
 
@@ -348,5 +403,57 @@ contract('ReleaseValidator', function(accounts){
       await packageIndex.release(...info);
       assert( await packageIndex.packageExists('test') === false );
     })
+  });
+
+  describe('Existence of dependent DB', function(){
+    it('throws on release if the PackageDB has been unset', async function(){
+      const infoA = ['test', 1, 0, 0, '', '', 'ipfs://some-ipfs-uri'];
+      const infoB = ['test', 1, 1, 0, '', '', 'ipfs://some-ipfs-uri'];
+
+      assert( await packageIndex.packageExists('test') === false );
+      await packageIndex.release(...infoA);
+      assert( await packageIndex.packageExists('test') === true );
+
+      await packageIndex.setPackageDb(helpers.zeroAddress);
+      await assertFailure(
+        packageIndex.release(...infoB)
+      );
+    });
+
+    it('throws on release if the ReleaseDB has been unset', async function(){
+      const infoA = ['test', 1, 0, 0, '', '', 'ipfs://some-ipfs-uri'];
+      const infoB = ['test', 1, 1, 0, '', '', 'ipfs://some-ipfs-uri'];
+
+      assert( await packageIndex.packageExists('test') === false );
+      await packageIndex.release(...infoA);
+      assert( await packageIndex.packageExists('test') === true );
+
+      await packageIndex.setReleaseDb(helpers.zeroAddress);
+      await assertFailure(
+        packageIndex.release(...infoB)
+      );
+    });
+  });
+
+  describe('Ownership', function(){
+    it('only releases for the package owner', async function(){
+      const newOwner = accounts[1];
+      const nonOwner = accounts[2];
+
+      const infoA = ['test', 1, 0, 0, '', '', 'ipfs://some-ipfs-uri'];
+      const infoB = ['test', 1, 1, 0, '', '', 'ipfs://some-ipfs-uri'];
+
+      assert( await packageIndex.releaseExists(...infoA.slice(0, -1)) === false );
+      await packageIndex.release(...infoA);
+      assert( await packageIndex.releaseExists(...infoA.slice(0, -1)) === true );
+
+      await packageIndex.transferPackageOwner('test', newOwner);
+      const data = await packageIndex.getPackageData('test');
+      assert(data.packageOwner === newOwner);
+
+      assert( await packageIndex.releaseExists(...infoB.slice(0, -1)) === false );
+      await packageIndex.release(...infoB, {from: nonOwner})
+      assert( await packageIndex.releaseExists(...infoB.slice(0, -1)) === false );
+    });
   })
 });
