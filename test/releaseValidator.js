@@ -281,13 +281,13 @@ contract('ReleaseValidator', function(accounts){
     const cases = {
       // Good
       aa: 'aa',
-      a214: 'lllll',
+      a214: 'a'.repeat(214),
       dashes: 'contains-dashes',
       numbers: 'contains-1234567890-numbers',
       allAllowed: 'contains-abcdefghijklmnopqrstuvwxyz-1234567890-all-allowed-chars',
       // Bad
       a: 'a',
-      a215: 'llll',
+      a215: 'a'.repeat(215),
       startsDash: '-starts-with-dash',        // starts with a dash
       startsNumber: '9starts-with-number',    // starts with a number
       hasCaps: 'hasCapitals',                // capital letters.
@@ -321,7 +321,8 @@ contract('ReleaseValidator', function(accounts){
       })
 
       it('a * 214', async function(){
-
+        info[0] = cases.a214;
+        await assertReleases(packageIndex, info);
       })
 
       it('contains-dashes', async function(){
@@ -347,7 +348,7 @@ contract('ReleaseValidator', function(accounts){
       });
 
       it('a * 215', async function(){
-        info[0] = cases.a;
+        info[0] = cases.a215;
         await assertDoesNotRelease(packageIndex, info);
       })
 
