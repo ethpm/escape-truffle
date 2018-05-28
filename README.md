@@ -31,7 +31,7 @@ $ npm run lint
 
 ### Docs
 
-Docs are automatically built to ReadTheDocs (via GH webhook) and current visible as
+Docs are automatically built & published to ReadTheDocs on merge at
 [EthPM Package Registry](https://ethpm-package-registry.readthedocs.io/en/latest/).
 To build them locally, run:
 ```shell
