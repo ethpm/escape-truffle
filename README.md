@@ -29,3 +29,13 @@ For help, see the [Solium documentation](https://github.com/duaraghav8/Solium)
 $ npm run lint
 ```
 
+### Docs
+
+Docs are automatically built to ReadTheDocs (via GH webhook) and current visible as
+[EthPM Package Registry](https://ethpm-package-registry.readthedocs.io/en/latest/).
+To build them locally, run:
+```shell
+$ cd docs
+$ pip install -r requirements.txt
+$ make html
+```
