@@ -37,8 +37,8 @@ For help, see the `Solium documentation <https://github.com/duaraghav8/Solium>`.
 
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contracts:
+   :maxdepth: 3
+   :caption: Registry:
 
    Authority
    IndexedOrderedSetLib
@@ -48,6 +48,7 @@ For help, see the `Solium documentation <https://github.com/duaraghav8/Solium>`.
    ReleaseDB
    ReleaseValidator
    SemVersionLib
+   Gas
 
 Indices and tables
 ==================

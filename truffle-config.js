@@ -1,13 +1,29 @@
 
 // Thanks AragonOS for this conditional reporter logic.
-const mochaGasSettings = {
+const mochaGasSettingsShell = {
   reporter: 'eth-gas-reporter',
   reporterOptions : {
     onlyCalledMethods: true,
   }
 }
 
-const mocha = process.env.GAS_REPORTER ? mochaGasSettings : {}
+const mochaGasSettingsDocs = {
+  reporter: 'eth-gas-reporter',
+  reporterOptions : {
+    onlyCalledMethods: true,
+    rst: true,
+    rstTitle: 'Appendix: Gas Usage',
+    outputFile: 'docs/Gas.rst',
+    noColors: true
+  }
+}
+
+let mocha = {};
+if (process.env.GAS_REPORTER){
+  mocha = mochaGasSettingsShell
+} else if (process.env.GAS_DOCS){
+  mocha = mochaGasSettingsDocs
+}
 
 module.exports = {
   networks: {
