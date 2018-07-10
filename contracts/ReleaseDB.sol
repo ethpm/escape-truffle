@@ -353,8 +353,7 @@ contract ReleaseDB is Authorized {
     pure
     returns (bytes32)
   {
-    bytes memory hashArgs = abi.encodePacked(major, minor, patch, preRelease, build);
-    return keccak256(hashArgs);
+    return keccak256(abi.encodePacked(major, minor, patch, preRelease, build));
   }
 
   /// @dev Returns release hash for the given release
@@ -365,8 +364,7 @@ contract ReleaseDB is Authorized {
     pure
     returns (bytes32)
   {
-    bytes memory hashArgs = abi.encodePacked(nameHash, versionHash);
-    return keccak256(hashArgs);
+    return keccak256(abi.encodePacked(nameHash, versionHash));
   }
 
   /*

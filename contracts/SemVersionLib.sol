@@ -41,8 +41,7 @@ library SemVersionLib {
     self.preReleaseIdentifiers = splitIdentifiers(preRelease);
     self.build = build;
 
-    bytes memory hashArgs = abi.encodePacked(major, minor, patch, preRelease);
-    self.hash = keccak256(hashArgs);
+    self.hash = keccak256(abi.encodePacked(major, minor, patch, preRelease));
     return true;
   }
 
