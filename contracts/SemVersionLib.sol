@@ -1,4 +1,4 @@
-pragma solidity ^0.4.0;
+pragma solidity ^0.4.24;
 
 /// @title Library which implements a semver datatype and comparisons.
 /// @author Piper Merriam <pipermerriam@gmail.com>

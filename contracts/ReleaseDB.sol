@@ -1,4 +1,4 @@
-pragma solidity ^0.4.0;
+pragma solidity ^0.4.24;
 
 import {SemVersionLib} from "./SemVersionLib.sol";
 import {IndexedOrderedSetLib} from "./IndexedOrderedSetLib.sol";
