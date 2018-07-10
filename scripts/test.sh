@@ -69,4 +69,4 @@ else
   start_client
 fi
 
-node_modules/.bin/darq-truffle test --network "$NETWORK"
+node_modules/.bin/truffle test --network "$NETWORK"
