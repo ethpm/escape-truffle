@@ -180,6 +180,7 @@ contract PackageDB is Authorized {
     pure
     returns (bytes32)
   {
-    return keccak256(name);
+    bytes memory hashArg = abi.encodePacked(name);
+    return keccak256(hashArg);
   }
 }
