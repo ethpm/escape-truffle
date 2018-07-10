@@ -176,7 +176,7 @@ contract PackageIndex is Authorized, PackageIndexInterface {
 
     // Lookup the current owner
     address packageOwner;
-    (packageOwner,) = getPackageData(name);
+    (packageOwner,,,) = getPackageData(name);
 
     // Log the transfer
     emit PackageTransfer(packageOwner, newPackageOwner);
@@ -446,7 +446,7 @@ contract PackageIndex is Authorized, PackageIndexInterface {
     returns (bool)
   {
     address packageOwner;
-    (packageOwner,) = getPackageData(name);
+    (packageOwner,,,) = getPackageData(name);
     return (packageOwner != _address);
   }
 

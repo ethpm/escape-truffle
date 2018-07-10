@@ -13,7 +13,7 @@
     "docs:gas": "NETWORK=ganache GAS_DOCS=true ./scripts/test.sh",
     "coverage": "./node_modules/.bin/solidity-coverage",
     "lint": "./node_modules/.bin/solium -d contracts/",
-    "compile": "./node_modules/.bin/darq-truffle compile",
+    "compile": "./node_modules/.bin/truffle compile",
     "ganache": "./node_modules/.bin/ganache-cli --noVMErrorsOnRPCResponse --port 8547",
     "ci": "./scripts/ci.sh"
   },
