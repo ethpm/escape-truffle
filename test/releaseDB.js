@@ -530,6 +530,4 @@ contract('ReleaseDB', function(accounts){
       );
     })
   });
-
-
 });
