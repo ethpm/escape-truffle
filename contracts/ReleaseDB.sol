@@ -130,7 +130,7 @@ contract ReleaseDB is Authorized {
     uint32 minor;
     uint32 patch;
 
-    (nameHash, versionHash,) = getReleaseData(releaseHash);
+    (nameHash, versionHash,,) = getReleaseData(releaseHash);
     (major, minor, patch) = getMajorMinorPatch(versionHash);
 
     // In any branch of the release tree in which this version is the latest we
@@ -541,7 +541,7 @@ contract ReleaseDB is Authorized {
     bytes32 nameHash;
     bytes32 versionHash;
 
-    (nameHash, versionHash,) = getReleaseData(releaseHash);
+    (nameHash, versionHash,,) = getReleaseData(releaseHash);
 
     if (isLatestMajorTree(nameHash, versionHash)) {
       _latestMajor[nameHash] = releaseHash;
@@ -557,11 +557,11 @@ contract ReleaseDB is Authorized {
     bytes32 nameHash;
     bytes32 versionHash;
 
-    (nameHash, versionHash,) = getReleaseData(releaseHash);
+    (nameHash, versionHash,,) = getReleaseData(releaseHash);
 
     if (isLatestMinorTree(nameHash, versionHash)) {
       uint32 major;
-      (major,) = getMajorMinorPatch(versionHash);
+      (major,,) = getMajorMinorPatch(versionHash);
       _latestMinor[nameHash][major] = releaseHash;
       return true;
     } else {
@@ -575,7 +575,7 @@ contract ReleaseDB is Authorized {
     bytes32 nameHash;
     bytes32 versionHash;
 
-    (nameHash, versionHash,) = getReleaseData(releaseHash);
+    (nameHash, versionHash,,) = getReleaseData(releaseHash);
 
     if (isLatestPatchTree(nameHash, versionHash)) {
       uint32 major;
@@ -594,7 +594,7 @@ contract ReleaseDB is Authorized {
     bytes32 nameHash;
     bytes32 versionHash;
 
-    (nameHash, versionHash,) = getReleaseData(releaseHash);
+    (nameHash, versionHash,,) = getReleaseData(releaseHash);
 
     if (isLatestPreReleaseTree(nameHash, versionHash)) {
       uint32 major;

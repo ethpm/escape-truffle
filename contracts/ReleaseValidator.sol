@@ -74,7 +74,7 @@ contract ReleaseValidator {
     }
     address packageOwner;
 
-    (packageOwner,) = packageDb.getPackageData(nameHash);
+    (packageOwner,,) = packageDb.getPackageData(nameHash);
 
     if (packageOwner == callerAddress) {
       return true;
@@ -224,7 +224,7 @@ contract ReleaseValidator {
     returns (bool)
   {
     uint32 major;
-    (major,) = releaseDb.getMajorMinorPatch(versionHash);
+    (major,,) = releaseDb.getMajorMinorPatch(versionHash);
     return releaseDb.getLatestMinorTree(nameHash, major) != 0x0;
   }
 
