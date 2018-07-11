@@ -1,4 +1,5 @@
 pragma solidity ^0.4.24;
+pragma experimental "v0.5.0";
 
 /// @title Library which implements a semver datatype and comparisons.
 /// @author Piper Merriam <pipermerriam@gmail.com>

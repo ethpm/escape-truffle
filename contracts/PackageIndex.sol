@@ -1,4 +1,5 @@
 pragma solidity ^0.4.24;
+pragma experimental "v0.5.0";
 
 
 import {PackageDB} from "./PackageDB.sol";
@@ -450,8 +451,6 @@ contract PackageIndex is Authorized, PackageIndexInterface {
     return (packageOwner != _address);
   }
 
-  bytes4 constant GET_PACKAGE_NAME_SIG = bytes4(keccak256("getPackageName(bytes32)"));
-
   /// @dev Retrieves the name for the given name hash.
   /// @param nameHash The name hash to lookup the name for.
   function getPackageName(bytes32 nameHash)
@@ -459,10 +458,8 @@ contract PackageIndex is Authorized, PackageIndexInterface {
     view
     returns (string)
   {
-    return fetchString(address(packageDb), GET_PACKAGE_NAME_SIG, nameHash);
+    return PackageDB(packageDb).getPackageName(nameHash);
   }
-
-  bytes4 constant GET_RELEASE_LOCKFILE_URI_SIG = bytes4(keccak256("getReleaseLockfileURI(bytes32)"));
 
   /// @dev Retrieves the release lockfile URI from the package db.
   /// @param releaseHash The release hash to retrieve the URI from.
@@ -471,10 +468,8 @@ contract PackageIndex is Authorized, PackageIndexInterface {
     view
     returns (string)
   {
-    return fetchString(address(releaseDb), GET_RELEASE_LOCKFILE_URI_SIG, releaseHash);
+    return ReleaseDB(releaseDb).getReleaseLockfileURI(releaseHash);
   }
-
-  bytes4 constant GET_PRE_RELEASE_SIG = bytes4(keccak256("getPreRelease(bytes32)"));
 
   /// @dev Retrieves the pre-release string from the package db.
   /// @param releaseHash The release hash to retrieve the string from.
@@ -483,10 +478,8 @@ contract PackageIndex is Authorized, PackageIndexInterface {
     view
     returns (string)
   {
-    return fetchString(address(releaseDb), GET_PRE_RELEASE_SIG, releaseHash);
+    return ReleaseDB(releaseDb).getPreRelease(releaseHash);
   }
-
-  bytes4 constant GET_BUILD_SIG = bytes4(keccak256("getBuild(bytes32)"));
 
   /// @dev Retrieves the build string from the package db.
   /// @param releaseHash The release hash to retrieve the string from.
@@ -495,48 +488,6 @@ contract PackageIndex is Authorized, PackageIndexInterface {
     view
     returns (string)
   {
-    return fetchString(address(releaseDb), GET_BUILD_SIG, releaseHash);
-  }
-
-  /// @dev Retrieves a string from a function on the package db indicated by the provide function selector
-  /// @param sig The 4-byte function selector to retrieve the signature from.
-  /// @param arg The bytes32 argument that should be passed into the function.
-  function fetchString(
-    address codeAddress,
-    bytes4 sig,
-    bytes32 arg
-  )
-    internal
-    view
-    returns (string s)
-  {
-    bool success;
-
-    assembly {
-      let m := mload(0x40) //Free memory pointer
-      mstore(m,sig)
-      mstore(add(m,4), arg) // Write arguments to memory- align directly after function sig.
-      success := call( //Fetch string size
-        sub(gas,8000), // g
-        codeAddress,   // a
-        0,             // v
-        m,             // in
-        0x24,          // insize: 4 byte sig + 32 byte uint
-        add(m,0x24),   // Out pointer: don't overwrite the call data, we need it again
-        0x40           // Only fetch the first 64 bytes of the string data.
-      )
-      let l := mload(add(m,0x44)) // returned data stats at 0x24, length is stored in the second 32-byte slot
-      success :=  and(success,call(sub(gas,4000),codeAddress, 0,
-        m, // Reuse the same argument data
-        0x24,
-        m,  // We can overwrite the calldata now to save space
-        add(l, 0x40) // The length of the returned data will be 64 bytes of metadata + string length
-      ))
-      s := add(m, mload(m)) // First slot points to the start of the string (will almost always be m+0x20)
-      mstore(0x40, add(m,add(l,0x40))) //Move free memory pointer so string doesn't get overwritten
-    }
-    require(success);
-
-    return s;
+    return ReleaseDB(releaseDb).getBuild(releaseHash);
   }
 }
