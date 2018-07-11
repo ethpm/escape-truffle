@@ -1,4 +1,5 @@
 pragma solidity ^0.4.24;
+pragma experimental "v0.5.0";
 
 /// @title Library implementing an array type which allows O(1) lookups on values.
 /// @author Piper Merriam <pipermerriam@gmail.com>
