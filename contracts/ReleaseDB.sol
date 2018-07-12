@@ -93,7 +93,7 @@ contract ReleaseDB is Authorized {
     } else {
       // Populate the basic rlease data.
       release.exists = true;
-      release.createdAt = block.timestamp;
+      release.createdAt = block.timestamp; // solium-disable-line security/no-block-members
       release.nameHash = nameHash;
       release.versionHash = versionHash;
 
@@ -105,7 +105,7 @@ contract ReleaseDB is Authorized {
     }
 
     // Record the last time the release was updated.
-    release.updatedAt = block.timestamp;
+    release.updatedAt = block.timestamp; // solium-disable-line security/no-block-members
 
     // Save the release lockfile URI
     release.releaseLockfileURI = releaseLockfileURI;
@@ -275,9 +275,9 @@ contract ReleaseDB is Authorized {
   /// @dev Returns the releaseHash at the given index for a package.
   /// @param releaseHash The release hash.
   function getReleaseData(bytes32 releaseHash)
-    onlyIfReleaseExists(releaseHash)
     public
     view
+    onlyIfReleaseExists(releaseHash)
     returns (
       bytes32 nameHash,
       bytes32 versionHash,
@@ -292,9 +292,9 @@ contract ReleaseDB is Authorized {
   /// @dev Returns a 3-tuple of the major, minor, and patch components from the version of the given release hash.
   /// @param versionHash the version hash
   function getMajorMinorPatch(bytes32 versionHash)
-    onlyIfVersionExists(versionHash)
     public
     view
+    onlyIfVersionExists(versionHash)
     returns (uint32, uint32, uint32)
   {
     SemVersionLib.SemVersion storage version = _recordedVersions[versionHash];
@@ -304,9 +304,9 @@ contract ReleaseDB is Authorized {
   /// @dev Returns the pre-release string from the version of the given release hash.
   /// @param releaseHash Release hash
   function getPreRelease(bytes32 releaseHash)
-    onlyIfReleaseExists(releaseHash)
     public
     view
+    onlyIfReleaseExists(releaseHash)
     returns (string)
   {
     return _recordedVersions[_recordedReleases[releaseHash].versionHash].preRelease;
@@ -315,9 +315,9 @@ contract ReleaseDB is Authorized {
   /// @dev Returns the build string from the version of the given release hash.
   /// @param releaseHash Release hash
   function getBuild(bytes32 releaseHash)
-    onlyIfReleaseExists(releaseHash)
     public
     view
+    onlyIfReleaseExists(releaseHash)
     returns (string)
   {
     return _recordedVersions[_recordedReleases[releaseHash].versionHash].build;
@@ -326,9 +326,9 @@ contract ReleaseDB is Authorized {
   /// @dev Returns the URI of the release lockfile for the given release hash.
   /// @param releaseHash Release hash
   function getReleaseLockfileURI(bytes32 releaseHash)
-    onlyIfReleaseExists(releaseHash)
     public
     view
+    onlyIfReleaseExists(releaseHash)
     returns (string)
   {
     return _recordedReleases[releaseHash].releaseLockfileURI;
@@ -431,14 +431,14 @@ contract ReleaseDB is Authorized {
   /// @param nameHash The nameHash of the package to check against.
   /// @param versionHash The versionHash of the version to check.
   function isLatestMajorTree(bytes32 nameHash, bytes32 versionHash)
-    onlyIfVersionExists(versionHash)
     public
     view
+    onlyIfVersionExists(versionHash)
     returns (bool)
   {
     SemVersionLib.SemVersion storage version = _recordedVersions[versionHash];
 
-    SemVersionLib.SemVersion storage latestMajor =
+    SemVersionLib.SemVersion storage latestMajor = // solium-disable-line operator-whitespace
       _recordedVersions[
         _recordedReleases[
           getLatestMajorTree(nameHash)
@@ -452,14 +452,14 @@ contract ReleaseDB is Authorized {
   /// @param nameHash The nameHash of the package to check against.
   /// @param versionHash The versionHash of the version to check.
   function isLatestMinorTree(bytes32 nameHash, bytes32 versionHash)
-    onlyIfVersionExists(versionHash)
     public
     view
+    onlyIfVersionExists(versionHash)
     returns (bool)
   {
     SemVersionLib.SemVersion storage version = _recordedVersions[versionHash];
 
-    SemVersionLib.SemVersion storage latestMinor =
+    SemVersionLib.SemVersion storage latestMinor = // solium-disable-line operator-whitespace
       _recordedVersions[
         _recordedReleases[
           getLatestMinorTree(nameHash, version.major)
@@ -473,14 +473,14 @@ contract ReleaseDB is Authorized {
   /// @param nameHash The nameHash of the package to check against.
   /// @param versionHash The versionHash of the version to check.
   function isLatestPatchTree(bytes32 nameHash, bytes32 versionHash)
-    onlyIfVersionExists(versionHash)
     public
     view
+    onlyIfVersionExists(versionHash)
     returns (bool)
   {
     SemVersionLib.SemVersion storage version = _recordedVersions[versionHash];
 
-    SemVersionLib.SemVersion storage latestPatch =
+    SemVersionLib.SemVersion storage latestPatch = // solium-disable-line operator-whitespace
       _recordedVersions[
         _recordedReleases[
           getLatestPatchTree(
@@ -498,14 +498,14 @@ contract ReleaseDB is Authorized {
   /// @param nameHash The nameHash of the package to check against.
   /// @param versionHash The versionHash of the version to check.
   function isLatestPreReleaseTree(bytes32 nameHash, bytes32 versionHash)
-    onlyIfVersionExists(versionHash)
     public
     view
+    onlyIfVersionExists(versionHash)
     returns (bool)
   {
     SemVersionLib.SemVersion storage version = _recordedVersions[versionHash];
 
-    SemVersionLib.SemVersion storage latestPreRelease =
+    SemVersionLib.SemVersion storage latestPreRelease = // solium-disable-line operator-whitespace
       _recordedVersions[
         _recordedReleases[
           getLatestPreReleaseTree(
@@ -533,8 +533,8 @@ contract ReleaseDB is Authorized {
   /// @dev Sets the given release as the new leaf of the major branch of the release tree if it is greater or equal to the current leaf.
   /// @param releaseHash The release hash of the release to check.
   function updateMajorTree(bytes32 releaseHash)
-    onlyIfReleaseExists(releaseHash)
     internal
+    onlyIfReleaseExists(releaseHash)
     returns (bool)
   {
     bytes32 nameHash;

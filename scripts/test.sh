@@ -69,4 +69,5 @@ else
   start_client
 fi
 
+npm run lint
 node_modules/.bin/truffle test --network "$NETWORK"
