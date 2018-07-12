@@ -40,9 +40,9 @@ library IndexedOrderedSetLib {
   /// @param self The set
   /// @param value The value to look up the index for.
   function indexOf(IndexedOrderedSet storage self, bytes32 value)
-    requireValue(self, value)
     public
     view
+    requireValue(self, value)
     returns (uint)
   {
     return self._valueIndices[value];
@@ -71,8 +71,8 @@ library IndexedOrderedSetLib {
   /// @param self The set
   /// @param value The value to remove from the set.
   function remove(IndexedOrderedSet storage self, bytes32 value)
-    requireValue(self, value)
     public
+    requireValue(self, value)
     returns (bool)
   {
     uint idx = indexOf(self, value);
