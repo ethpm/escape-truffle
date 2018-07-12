@@ -54,12 +54,12 @@ contract ReleaseDB is Authorized {
    *  Modifiers
    */
   modifier onlyIfVersionExists(bytes32 versionHash) {
-    require(versionExists(versionHash));
+    require(versionExists(versionHash), "ethpm@releaseDB:version-does-not-exist");
     _;
   }
 
   modifier onlyIfReleaseExists(bytes32 releaseHash) {
-    require(releaseExists(releaseHash));
+    require(releaseExists(releaseHash), "ethpm@releaseDB:release-does-not-exist");
     _;
   }
 

@@ -11,7 +11,7 @@ library IndexedOrderedSetLib {
   }
 
   modifier requireValue(IndexedOrderedSet storage self, bytes32 value) {
-    require(contains(self, value));
+    require(contains(self, value), "ethpm@setLib:set-does-not-contain-val");
     _;
   }
 

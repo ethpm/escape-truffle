@@ -30,8 +30,8 @@ contract ReleaseValidator {
     view
     returns (bool)
   {
-    require(address(packageDb) != 0x0);
-    require(address(releaseDb) != 0x0);
+    require(address(packageDb) != 0x0, "ethpm@validator:no-packageDB-address");
+    require(address(releaseDb) != 0x0, "ethpm@validator:no-releaseDB-address");
 
     if (!validateAuthorization(packageDb, callerAddress, name)) {
       // package exists and msg.sender is not the owner not the package owner.
