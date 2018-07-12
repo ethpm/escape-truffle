@@ -438,7 +438,7 @@ contract ReleaseDB is Authorized {
   {
     SemVersionLib.SemVersion storage version = _recordedVersions[versionHash];
 
-    SemVersionLib.SemVersion storage latestMajor =
+    SemVersionLib.SemVersion storage latestMajor = // solium-disable-line operator-whitespace
       _recordedVersions[
         _recordedReleases[
           getLatestMajorTree(nameHash)
@@ -459,7 +459,7 @@ contract ReleaseDB is Authorized {
   {
     SemVersionLib.SemVersion storage version = _recordedVersions[versionHash];
 
-    SemVersionLib.SemVersion storage latestMinor =
+    SemVersionLib.SemVersion storage latestMinor = // solium-disable-line operator-whitespace
       _recordedVersions[
         _recordedReleases[
           getLatestMinorTree(nameHash, version.major)
@@ -480,7 +480,7 @@ contract ReleaseDB is Authorized {
   {
     SemVersionLib.SemVersion storage version = _recordedVersions[versionHash];
 
-    SemVersionLib.SemVersion storage latestPatch =
+    SemVersionLib.SemVersion storage latestPatch = // solium-disable-line operator-whitespace
       _recordedVersions[
         _recordedReleases[
           getLatestPatchTree(
@@ -505,7 +505,7 @@ contract ReleaseDB is Authorized {
   {
     SemVersionLib.SemVersion storage version = _recordedVersions[versionHash];
 
-    SemVersionLib.SemVersion storage latestPreRelease =
+    SemVersionLib.SemVersion storage latestPreRelease = // solium-disable-line operator-whitespace
       _recordedVersions[
         _recordedReleases[
           getLatestPreReleaseTree(
