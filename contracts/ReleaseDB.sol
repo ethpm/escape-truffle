@@ -93,7 +93,7 @@ contract ReleaseDB is Authorized {
     } else {
       // Populate the basic rlease data.
       release.exists = true;
-      release.createdAt = block.timestamp;
+      release.createdAt = block.timestamp; // solium-disable-line security/no-block-members
       release.nameHash = nameHash;
       release.versionHash = versionHash;
 
@@ -105,7 +105,7 @@ contract ReleaseDB is Authorized {
     }
 
     // Record the last time the release was updated.
-    release.updatedAt = block.timestamp;
+    release.updatedAt = block.timestamp; // solium-disable-line security/no-block-members
 
     // Save the release lockfile URI
     release.releaseLockfileURI = releaseLockfileURI;

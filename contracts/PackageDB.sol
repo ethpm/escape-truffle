@@ -62,7 +62,7 @@ contract PackageDB is Authorized {
 
       // Set package data
       package.exists = true;
-      package.createdAt = block.timestamp;
+      package.createdAt = block.timestamp; // solium-disable-line security/no-block-members
       package.name = name;
 
       // Add the nameHash to the list of all package nameHashes.
@@ -71,7 +71,7 @@ contract PackageDB is Authorized {
       emit PackageCreate(nameHash);
     }
 
-    package.updatedAt = block.timestamp;
+    package.updatedAt = block.timestamp; // solium-disable-line security/no-block-members
 
     return true;
   }
@@ -104,7 +104,7 @@ contract PackageDB is Authorized {
     emit PackageOwnerUpdate(nameHash, _recordedPackages[nameHash].owner, newPackageOwner);
 
     _recordedPackages[nameHash].owner = newPackageOwner;
-    _recordedPackages[nameHash].updatedAt = block.timestamp;
+    _recordedPackages[nameHash].updatedAt = block.timestamp; // solium-disable-line security/no-block-members
 
     return true;
   }
