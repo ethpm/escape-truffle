@@ -470,6 +470,25 @@ contract('ReleaseDB', function(accounts){
       );
     });
 
+    it('allows re-publication at the same tag as a deleted release', async function(){
+      assert( await releaseDB.releaseExists(v200h) === true );
+      assert( await releaseDB.getNumReleasesForNameHash(nameHash) === '8' );
+      const initialReleaseData = await releaseDB.getReleaseData(v200h);
+
+      await releaseDB.removeRelease(v200h, 'testing');
+      assert( await releaseDB.releaseExists(v200h) === false );
+      assert( await releaseDB.getNumReleasesForNameHash(nameHash) === '7' );
+
+      await releaseDB.setRelease(
+        nameHash,
+        v200vh,
+        'ipfs://some-ipfs-uri-a'
+      );
+
+      assert( await releaseDB.releaseExists(v200h) === true );
+      assert( await releaseDB.getNumReleasesForNameHash(nameHash) === '8' );
+    })
+
   });
 
   describe('Getters', function(){
