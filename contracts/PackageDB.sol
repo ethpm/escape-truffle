@@ -35,7 +35,7 @@ contract PackageDB is Authorized {
    *  Modifiers
    */
   modifier onlyIfPackageExists(bytes32 nameHash) {
-    require(packageExists(nameHash), "ethpm@packageDB:package-does-not-exist");
+    require(packageExists(nameHash), "escape:PackageDB:package-not-found");
     _;
   }
 

@@ -79,9 +79,9 @@ contract PackageIndex is Authorized, PackageIndexInterface {
     auth
     returns (bool)
   {
-    require(address(packageDb) != 0x0,        "ethpm@index:no-packageDB-address");
-    require(address(releaseDb) != 0x0,        "ethpm@index:no-releaseDB-address");
-    require(address(releaseValidator) != 0x0, "ethpm@index:no-validator-address");
+    require(address(packageDb) != 0x0,        "escape:PackageIndex:package-db-not-set");
+    require(address(releaseDb) != 0x0,        "escape:PackageIndex:release-db-not-set");
+    require(address(releaseValidator) != 0x0, "escape:PackageIndex:release-validator-not-set");
 
     return release(name, [major, minor, patch], preRelease, build, releaseLockfileURI);
   }

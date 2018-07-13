@@ -19,7 +19,7 @@ contract AuthorizedInterface {
   Authority public authority;
 
   modifier auth {
-    require(isAuthorized(),"ethpm@authority:caller-not-authorized");
+    require(isAuthorized(),"escape:Authority:caller-not-authorized");
     _;
   }
 
