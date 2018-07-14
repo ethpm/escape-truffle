@@ -17,6 +17,7 @@ env:
   - NETWORK=ganache GAS_REPORTER=true
 
 matrix:
+  fast_finish: true
   allow_failures:
     - env: NETWORK=coverage
     - env: NETWORK=geth
