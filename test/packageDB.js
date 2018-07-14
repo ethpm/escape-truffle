@@ -2,7 +2,7 @@ const helpers = require('./helpers');
 const PackageDB = artifacts.require('PackageDB');
 const constants = helpers.constants;
 const assertFailure = helpers.assertFailure;
-const assertRevert = helpers.assertRevert;
+const assertCallFailure = helpers.assertCallFailure;
 
 contract('PackageDB', function(accounts){
   let semVersionLib;
@@ -104,7 +104,7 @@ contract('PackageDB', function(accounts){
       assert(!exists);
       assert(num === (0).toString());
 
-      await assertRevert(
+      await assertCallFailure(
         packageDB.getPackageData(nameHash)
       );
     });
@@ -120,7 +120,7 @@ contract('PackageDB', function(accounts){
       let exists = await packageDB.packageExists(nameHash);
       assert(!exists);
 
-      await assertRevert(
+      await assertFailure(
         packageDB.removePackage(nameHash, reason)
       );
     });

@@ -22,14 +22,28 @@ module.exports = {
     }
   },
 
-  // Revert string check: calls
-  assertRevert: async (promise) => {
+  // There's variant behavior across three clients when a require gate fails during a `.call`
+  // + ganache-cli > 6.1.3: if require contains reason string, there's no failure.
+  // + testrpc-sc (coverage) : errors with a revert message
+  // + geth: response that web3 doesn't handle correctly.
+  assertCallFailure: async (promise) => {
+    let result;
     try {
       await promise;
       assert.fail();
     } catch(err){
-      // Geth errors with a response web3 chokes on :/
-      assert(err.message.includes('revert') || err.message.includes('0x'));
+
+      // testrpc-sc (ganache 6.1.0)
+      if (process.env.SOLIDITY_COVERAGE) {
+
+        assert(err.message.includes('revert'))
+
+      // geth: weird web3 error
+      // we'd also see this with newer ganache if there is no reason string
+      } else if (process.env.GETH) {
+
+        assert(err.message.includes('0x'));
+      }
     }
   },
 
