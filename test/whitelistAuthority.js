@@ -31,7 +31,7 @@ contract('WhitelistAuthority', function(accounts){
 
       it('should set a new Owner', async function(){
         assert(await authorized.owner() === accounts[0]);
-        authorized.setOwner(accounts[1]);
+        await authorized.setOwner(accounts[1]);
         assert(await authorized.owner() === accounts[1]);
       });
 
