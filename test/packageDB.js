@@ -78,7 +78,8 @@ contract('PackageDB', function(accounts){
       const unpublishedHash = await packageDB.hashName('unpublished');
 
       await assertFailure(
-        packageDB.setPackageOwner(unpublishedHash, owner)
+        packageDB.setPackageOwner(unpublishedHash, owner),
+        'package-not-found'
       )
     });
   });
@@ -121,7 +122,8 @@ contract('PackageDB', function(accounts){
       assert(!exists);
 
       await assertFailure(
-        packageDB.removePackage(nameHash, reason)
+        packageDB.removePackage(nameHash, reason),
+        'package-not-found'
       );
     });
   });

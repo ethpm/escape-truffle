@@ -112,7 +112,8 @@ contract('PackageIndex', function(accounts){
       const releaseInfo = ['test', 1, 2, 3, 'a', 'b', 'ipfs://some-ipfs-uri']
 
       await assertFailure(
-        packageIndex.release(...releaseInfo)
+        packageIndex.release(...releaseInfo),
+        'package-db-not-set'
       );
     });
 
@@ -133,7 +134,8 @@ contract('PackageIndex', function(accounts){
       const releaseInfo = ['test', 1, 2, 3, 'a', 'b', 'ipfs://some-ipfs-uri']
 
       await assertFailure(
-        packageIndex.release(...releaseInfo)
+        packageIndex.release(...releaseInfo),
+        'release-db-not-set'
       );
 
       assert( await packageIndex.packageExists('test') === false );
@@ -156,7 +158,8 @@ contract('PackageIndex', function(accounts){
       const releaseInfo = ['test', 1, 2, 3, 'a', 'b', 'ipfs://some-ipfs-uri']
 
       await assertFailure(
-        packageIndex.release(...releaseInfo)
+        packageIndex.release(...releaseInfo),
+        'release-validator-not-set'
       );
 
       assert( await packageIndex.packageExists('test') === false );
@@ -180,7 +183,8 @@ contract('PackageIndex', function(accounts){
       const releaseInfo = ['test', 1, 2, 3, 'a', 'b', 'ipfs://some-ipfs-uri']
 
       await assertFailure(
-        packageIndex.release(...releaseInfo)
+        packageIndex.release(...releaseInfo),
+        'caller-not-authorized'
       );
 
       assert( await packageIndex.packageExists('test') === false );
@@ -403,7 +407,8 @@ contract('PackageIndex', function(accounts){
         assert( await packageIndex.packageExists(name) === false );
 
         await assertFailure(
-          packageIndex.transferPackageOwner(name, newOwner)
+          packageIndex.transferPackageOwner(name, newOwner),
+          'package-not-found'
         )
       });
 

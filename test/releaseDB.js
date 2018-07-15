@@ -466,7 +466,8 @@ contract('ReleaseDB', function(accounts){
       assert( await releaseDB.releaseExists(v100h) === false );
 
       await assertFailure(
-        releaseDB.removeRelease(v100h, 'testing')
+        releaseDB.removeRelease(v100h, 'testing'),
+        'release-not-found'
       );
     });
 
