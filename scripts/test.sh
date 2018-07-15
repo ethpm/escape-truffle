@@ -20,7 +20,7 @@ cleanup() {
 
 # Set client port
 if [ "$NETWORK" = "geth" ]; then
-  PORT=8546 # websockets
+  PORT=8545
 fi
 
 if [ "$NETWORK" = "ganache" ]; then
@@ -36,24 +36,24 @@ client_running() {
 start_client() {
   if [ "$NETWORK" = "geth" ]; then
     docker run \
-      -v /"$PWD"/scripts:/scripts \
+      -v /$PWD/scripts:/scripts \
       -d \
-      -p 8546:8546 \
+      -p 8545:8545 \
       -p 30303:30303 \
-      ethereum/client-go:v1.8.6 \
-      --nodiscover \
+      ethereum/client-go:latest \
+      --rpc \
+      --rpcaddr '0.0.0.0' \
+      --rpcport 8545 \
       --rpccorsdomain '*' \
-      --ws \
-      --wsaddr '0.0.0.0' \
-      --wsorigins '*' \
+      --nodiscover \
       --dev \
       --dev.period 1 \
       --targetgaslimit '8000000' \
       js ./scripts/geth-accounts.js \
       > /dev/null &
 
-      echo "Pausing for 30s to complete client launch."
-      sleep 30
+      echo "Pausing for 2 minutes of auto-mining to approach target gaslimit."
+      sleep 120
 
   else
     node_modules/.bin/ganache-cli --noVMErrorsOnRPCResponse --port "$PORT"> /dev/null &

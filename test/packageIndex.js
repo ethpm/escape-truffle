@@ -76,7 +76,7 @@ contract('PackageIndex', function(accounts){
       authority = await WhitelistAuthority.new();
     })
 
-    it('should release when initialized correctly', async function(){
+    it('should release when initialized correctly [ @geth ]', async function(){
       packageDB = await PackageDB.new();
       releaseDB = await ReleaseDB.new();
       releaseValidator = await ReleaseValidator.new();
@@ -206,7 +206,7 @@ contract('PackageIndex', function(accounts){
     })
 
     describe('getters', function(){
-      it('packageDb', async function(){
+      it('packageDb [ @geth ]', async function(){
         assert(await packageIndex.getPackageDb() === packageDB.address);
       });
 
@@ -220,7 +220,7 @@ contract('PackageIndex', function(accounts){
     });
 
     describe('releases', function(){
-      it('should retrieve release by index', async function(){
+      it('should retrieve release by index [ @geth ]', async function(){
         const releaseInfoA = ['test', 1, 2, 3, 'a', 'b', 'ipfs://some-ipfs-uri']
         const releaseInfoB = ['test', 2, 3, 4, 'c', 'd', 'ipfs://some-other-ipfs-uri']
 
@@ -376,7 +376,7 @@ contract('PackageIndex', function(accounts){
       })
     });
 
-    describe('Ownership', function(){
+    describe('Ownership [ @geth ]', function(){
       const info = ['test-a', 1, 2, 3, '', '', 'ipfs://some-ipfs-uri'];
       const owner = accounts[0];
       const newOwner = accounts[1];

@@ -11,14 +11,13 @@ contract('WhitelistAuthority', function(accounts){
     describe('constructor', function(){
       before(async () => authorized = await WhitelistAuthority.new());
 
-      it('should set an owner on deployment', async function(){
+      it('should set an owner on deployment [ @geth ]', async function(){
         assert(await authorized.owner() === accounts[0]);
       });
 
       it('should emit `OwnerUpdate`', async function(){
         const events = await authorized.getPastEvents('OwnerUpdate');
         const event = events[0];
-
         assert(events.length === 1);
         assert(event.event === 'OwnerUpdate');
         assert(event.returnValues.oldOwner === constants.zeroAddress);
@@ -26,7 +25,7 @@ contract('WhitelistAuthority', function(accounts){
       })
     });
 
-    describe('setOwner', function(){
+    describe('setOwner [ @geth ]', function(){
       before(async () => authorized = await WhitelistAuthority.new());
 
       it('should set a new Owner', async function(){
@@ -55,7 +54,7 @@ contract('WhitelistAuthority', function(accounts){
         signature = WhitelistAuthority.abi.find(item => item.name === 'setAuthority').signature;
       })
 
-      it('should allow the owner to set the authority', async function(){
+      it('should allow the owner to set the authority [ @geth ]', async function(){
         const newAuthority = accounts[1];
         await whitelist.setAuthority(newAuthority);
         assert(await whitelist.authority() === newAuthority);
@@ -79,7 +78,7 @@ contract('WhitelistAuthority', function(accounts){
           });
       });
 
-      it('should not allow non-owner to set the authority', async function(){
+      it('should not allow non-owner to set the authority [ @geth ]', async function(){
         const nonOwner = accounts[8];
 
         const currentOwner = await whitelist.owner();

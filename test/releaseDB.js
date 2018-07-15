@@ -109,7 +109,7 @@ contract('ReleaseDB', function(accounts){
   });
 
   describe('Releases: Version Tracking Cases', function(){
-    it('v100vh', async function(){
+    it('v100vh [ @geth ]', async function(){
       await releaseDB.setRelease(
         nameHash,
         v100vh,
@@ -491,7 +491,7 @@ contract('ReleaseDB', function(accounts){
 
   });
 
-  describe('Getters', function(){
+  describe('Getters [ @geth ]', function(){
     let nameHash;
     let versionHash;
     let releaseHash;
