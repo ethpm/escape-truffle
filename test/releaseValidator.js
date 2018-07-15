@@ -149,11 +149,11 @@ contract('ReleaseValidator', function(accounts){
     });
   });
 
-  describe('Backfiling', function(){
+  describe('Backfilling', function(){
 
-    async function assertNotBackfiled(
+    async function assertBackfills(
       original,
-      backfile,
+      backfill,
       packageIndex,
       packageDB,
       releaseDB
@@ -162,26 +162,71 @@ contract('ReleaseValidator', function(accounts){
 
       assert( await packageIndex.packageExists(name) === false );
       assert( await packageIndex.releaseExists(...original.slice(0,-1)) === false );
-      assert( await packageIndex.releaseExists(...backfile.slice(0,-1)) === false );
+      assert( await packageIndex.releaseExists(...backfill.slice(0,-1)) === false );
 
       await packageIndex.release(...original);
 
       assert( await packageIndex.packageExists(name) === true )
       assert( await packageIndex.releaseExists(...original.slice(0,-1)) === true );
-      assert( await packageIndex.releaseExists(...backfile.slice(0,-1)) === false );
+      assert( await packageIndex.releaseExists(...backfill.slice(0,-1)) === false );
 
       let packageData = await packageIndex.getPackageData(name);
       assert( packageData.numReleases === '1' );
 
-      await packageIndex.release(...backfile);
+      await packageIndex.release(...backfill);
 
       assert( await packageIndex.packageExists(name) === true )
       assert( await packageIndex.releaseExists(...original.slice(0,-1)) === true );
-      assert( await packageIndex.releaseExists(...backfile.slice(0,-1)) === false );
+      assert( await packageIndex.releaseExists(...backfill.slice(0,-1)) === true );
 
       packageData = await packageIndex.getPackageData(name);
-      assert( packageData.numReleases === '1' );
+      assert( packageData.numReleases === '2' );
 
+    }
+
+    async function assertPreservesOrder(
+      original,
+      backfill,
+      packageDB,
+      releaseDB,
+      treeType,
+    ){
+      let isLatest;
+      let notLatest;
+      const originalNameHash = await packageDB.hashName(original[0]);
+      const originalVersionHash = await releaseDB.hashVersion(...original.slice(1, -1));
+
+      const backfillNameHash = await packageDB.hashName(backfill[0]);
+      const backfillVersionHash = await releaseDB.hashVersion(...backfill.slice(1, -1));
+
+      switch(treeType){
+        case 'major':
+          isLatest = await releaseDB.isLatestMajorTree(originalNameHash, originalVersionHash)
+          notLatest = await releaseDB.isLatestMajorTree(backfillNameHash, backfillVersionHash);
+          assert(isLatest);
+          assert.isNotOk(notLatest);
+          break;
+        case 'minor':
+          isLatest = await releaseDB.isLatestMinorTree(originalNameHash, originalVersionHash)
+          notLatest = await releaseDB.isLatestMinorTree(backfillNameHash, backfillVersionHash);
+          assert(isLatest);
+          assert.isNotOk(notLatest);
+          break;
+        case 'patch':
+          isLatest = await releaseDB.isLatestPatchTree(originalNameHash, originalVersionHash)
+          notLatest = await releaseDB.isLatestPatchTree(backfillNameHash, backfillVersionHash);
+          assert(isLatest);
+          assert.isNotOk(notLatest);
+          break;
+        case 'prerelease':
+          isLatest = await releaseDB.isLatestPreReleaseTree(originalNameHash, originalVersionHash)
+          notLatest = await releaseDB.isLatestPreReleaseTree(backfillNameHash, backfillVersionHash);
+          assert(isLatest);
+          assert.isNotOk(notLatest);
+          break;
+        default:
+          assert.fail('Missing tree type in test');
+      }
     }
 
     const uri = 'ipfs://some-ipfs-uri';
@@ -194,7 +239,7 @@ contract('ReleaseValidator', function(accounts){
       beta:       ['test', 1, 0, 0, 'beta.10', '', uri ],
     }
 
-    const backfiles = {
+    const backfills = {
       major:      ['test', 1, 0, 0, '', '', uri ],
       minor:      ['test', 1, 1, 0, '', '', uri ],
       patch:      ['test', 1, 0, 1, '', '', uri ],
@@ -204,74 +249,130 @@ contract('ReleaseValidator', function(accounts){
       alpha11:    ['test', 1, 0, 0, 'alpha.11', '', uri ],
     }
 
-    it('should not backfile: major: 2.0.0 --> 1.0.0', async function(){
-      await assertNotBackfiled(
+    it('should backfill: major: 2.0.0 --> 1.0.0', async function(){
+      await assertBackfills(
         originals.major,
-        backfiles.major,
+        backfills.major,
         packageIndex,
         packageDB,
         releaseDB
       );
+
+      await assertPreservesOrder(
+        originals.major,
+        backfills.major,
+        packageDB,
+        releaseDB,
+        'major'
+      )
     })
 
-    it('should not backfile: minor: 1.2.0 --> 1.1.0', async function(){
-      await assertNotBackfiled(
+    it('should backfill: minor: 1.2.0 --> 1.1.0', async function(){
+      await assertBackfills(
         originals.minor,
-        backfiles.minor,
+        backfills.minor,
         packageIndex,
         packageDB,
         releaseDB
       );
+
+      await assertPreservesOrder(
+        originals.minor,
+        backfills.minor,
+        packageDB,
+        releaseDB,
+        'minor'
+      )
     });
 
-    it('should not backfile: patch: 1.0.2 --> 1.0.1', async function(){
-      await assertNotBackfiled(
+    it('should backfill: patch: 1.0.2 --> 1.0.1', async function(){
+      await assertBackfills(
         originals.patch,
-        backfiles.patch,
+        backfills.patch,
         packageIndex,
         packageDB,
         releaseDB
       );
+
+      await assertPreservesOrder(
+        originals.patch,
+        backfills.patch,
+        packageDB,
+        releaseDB,
+        'patch'
+      )
     });
 
-    it('should not backfile: prerelease: 1.0.0.alpha.10 --> 1.0.0.alpha', async function(){
-      await assertNotBackfiled(
+    it('should backfill: prerelease: 1.0.0.alpha.10 --> 1.0.0.alpha', async function(){
+      await assertBackfills(
         originals.alpha,
-        backfiles.alpha,
+        backfills.alpha,
         packageIndex,
         packageDB,
         releaseDB
       );
-    });
 
-    it('should not backfile: prerelease: 1.0.0.alpha.10 --> 1.0.0.alpha.1', async function(){
-      await assertNotBackfiled(
+      await assertPreservesOrder(
         originals.alpha,
-        backfiles.alpha1,
-        packageIndex,
+        backfills.alpha,
         packageDB,
-        releaseDB
-      );
+        releaseDB,
+        'prerelease'
+      )
     });
 
-    it('should not backfile: prerelease: 1.0.0.alpha.10 --> 1.0.0.alpha.2', async function(){
-      await assertNotBackfiled(
+    it('should backfill: prerelease: 1.0.0.alpha.10 --> 1.0.0.alpha.1', async function(){
+      await assertBackfills(
         originals.alpha,
-        backfiles.alpha2,
+        backfills.alpha1,
         packageIndex,
         packageDB,
         releaseDB
       );
+
+      await assertPreservesOrder(
+        originals.alpha,
+        backfills.alpha1,
+        packageDB,
+        releaseDB,
+        'prerelease'
+      )
     });
 
-    it('should not backfile: prerelease: 1.0.0.beta.10 --> 1.0.0.alpha.11', async function(){
-      await assertNotBackfiled(
+    it('should backfill: prerelease: 1.0.0.alpha.10 --> 1.0.0.alpha.2', async function(){
+      await assertBackfills(
+        originals.alpha,
+        backfills.alpha2,
+        packageIndex,
+        packageDB,
+        releaseDB
+      );
+
+      await assertPreservesOrder(
+        originals.alpha,
+        backfills.alpha2,
+        packageDB,
+        releaseDB,
+        'prerelease'
+      )
+    });
+
+    it('should backfill: prerelease: 1.0.0.beta.10 --> 1.0.0.alpha.11', async function(){
+      await assertBackfills(
         originals.beta,
-        backfiles.alpha11,
+        backfills.alpha11,
         packageIndex,
         packageDB,
         releaseDB
       );
+
+      await assertPreservesOrder(
+        originals.beta,
+        backfills.alpha11,
+        packageDB,
+        releaseDB,
+        'prerelease'
+      )
     });
   });
 
