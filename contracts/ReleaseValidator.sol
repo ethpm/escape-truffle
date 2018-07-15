@@ -128,7 +128,7 @@ contract ReleaseValidator {
       return true;
     }
 
-    if (bytes(name).length < 2 || bytes(name).length > 214) {
+    if (bytes(name).length < 2 || bytes(name).length > 255) {
       return false;
     }
     for (uint i = 0; i < bytes(name).length; i++) {
