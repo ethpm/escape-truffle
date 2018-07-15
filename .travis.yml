@@ -8,7 +8,7 @@ services:
   - docker
 
 before_install:
-  - docker pull ethereum/client-go:v1.8.6
+  - docker pull ethereum/client-go:latest
 
 env:
   - NETWORK=ganache
@@ -17,6 +17,7 @@ env:
   - NETWORK=ganache GAS_REPORTER=true
 
 matrix:
+  fast_finish: true
   allow_failures:
     - env: NETWORK=coverage
     - env: NETWORK=geth

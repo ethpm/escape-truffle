@@ -18,11 +18,17 @@ const mochaGasSettingsDocs = {
   }
 }
 
+const mochaGeth = {
+  grep: "geth",
+}
+
 let mocha = {};
 if (process.env.GAS_REPORTER){
   mocha = mochaGasSettingsShell
 } else if (process.env.GAS_DOCS){
   mocha = mochaGasSettingsDocs
+} else if (process.env.NETWORK === 'geth'){
+  mocha = mochaGeth
 }
 
 module.exports = {
@@ -35,9 +41,8 @@ module.exports = {
     },
     geth: {
       host: "127.0.0.1",
-      port: 8546,
+      port: 8545,
       network_id: "*",
-      websockets: true
     },
     coverage: {
       host: "127.0.0.1",

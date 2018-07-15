@@ -2,7 +2,7 @@ const helpers = require('./helpers');
 const PackageDB = artifacts.require('PackageDB');
 const constants = helpers.constants;
 const assertFailure = helpers.assertFailure;
-const assertRevert = helpers.assertRevert;
+const assertCallFailure = helpers.assertCallFailure;
 
 contract('PackageDB', function(accounts){
   let semVersionLib;
@@ -17,7 +17,7 @@ contract('PackageDB', function(accounts){
     nameHash = await packageDB.hashName(packageName);
   });
 
-  describe('setPackage', function(){
+  describe('setPackage [ @geth ]', function(){
     it('should create a package record', async function(){
       const now = helpers.now();
       await packageDB.setPackage(packageName);
@@ -53,7 +53,7 @@ contract('PackageDB', function(accounts){
     });
   });
 
-  describe('setPackageOwner', function(){
+  describe('setPackageOwner [ @geth ]', function(){
     const owner = accounts[1];
 
     it('should set the package owner', async function(){
@@ -83,7 +83,7 @@ contract('PackageDB', function(accounts){
     });
   });
 
-  describe('removePackage', function(){
+  describe('removePackage [ @geth ]', function(){
     let reason = `
       In order to possess what you do not possess
         You must go by the way of dispossession.
@@ -104,7 +104,7 @@ contract('PackageDB', function(accounts){
       assert(!exists);
       assert(num === (0).toString());
 
-      await assertRevert(
+      await assertCallFailure(
         packageDB.getPackageData(nameHash)
       );
     });
@@ -120,7 +120,7 @@ contract('PackageDB', function(accounts){
       let exists = await packageDB.packageExists(nameHash);
       assert(!exists);
 
-      await assertRevert(
+      await assertFailure(
         packageDB.removePackage(nameHash, reason)
       );
     });

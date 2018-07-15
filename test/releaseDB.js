@@ -6,7 +6,7 @@
 const helpers = require('./helpers');
 const constants = helpers.constants;
 const assertFailure = helpers.assertFailure;
-const assertRevert = helpers.assertRevert;
+const assertCallFailure = helpers.assertCallFailure;
 
 const PackageDB = artifacts.require('PackageDB');
 const ReleaseDB = artifacts.require('ReleaseDB');
@@ -109,7 +109,7 @@ contract('ReleaseDB', function(accounts){
   });
 
   describe('Releases: Version Tracking Cases', function(){
-    it('v100vh', async function(){
+    it('v100vh [ @geth ]', async function(){
       await releaseDB.setRelease(
         nameHash,
         v100vh,
@@ -491,7 +491,7 @@ contract('ReleaseDB', function(accounts){
 
   });
 
-  describe('Getters', function(){
+  describe('Getters [ @geth ]', function(){
     let nameHash;
     let versionHash;
     let releaseHash;
@@ -537,14 +537,14 @@ contract('ReleaseDB', function(accounts){
       assert( majorMinorPatch['2'] === (3).toString());
     });
 
-    it('throws when querying a version that does not exist', async function(){
+    it('returns false (or errors) when querying a version that does not exist', async function(){
       const nameHash = await packageDB.hashName('test');
       const trueVersionHash = await releaseDB.hashVersion(2, 0, 0, '', '');
       const falseVersionHash = await releaseDB.hashVersion(0, 0, 0, '', '');
 
       assert( await releaseDB.isLatestMajorTree(nameHash, trueVersionHash) );
 
-      await assertRevert(
+      await assertCallFailure(
         releaseDB.isLatestMajorTree(nameHash, falseVersionHash)
       );
     })

@@ -84,7 +84,7 @@ contract('ReleaseValidator', function(accounts){
       prerelease: ['test', 1, 1, 1, 'beta.1', '', uri ]
     };
 
-    it('should not release 0, 0, 0', async function(){
+    it('should not release 0, 0, 0 [ @geth ]', async function(){
       const info = releases.zero;
       assert( await packageIndex.packageExists(info[0]) === false );
 
