@@ -416,7 +416,8 @@ contract('ReleaseValidator', function(accounts){
 
       await packageIndex.setPackageDb(helpers.zeroAddress);
       await assertFailure(
-        packageIndex.release(...infoB)
+        packageIndex.release(...infoB),
+        'package-db-not-set'
       );
     });
 
@@ -430,7 +431,8 @@ contract('ReleaseValidator', function(accounts){
 
       await packageIndex.setReleaseDb(helpers.zeroAddress);
       await assertFailure(
-        packageIndex.release(...infoB)
+        packageIndex.release(...infoB),
+        'release-db-not-set'
       );
     });
   });

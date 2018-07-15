@@ -13,12 +13,16 @@ module.exports = {
   waitSecond: async() => new Promise(a => setTimeout(() => a(), 1000)),
 
   // Status check: transactions
-  assertFailure: async (promise) => {
+  assertFailure: async (promise, reason) => {
     try {
       await promise;
       assert.fail();
     } catch(err){
       assert(err.receipt && parseInt(err.receipt.status) === 0);
+
+      if (err.reason){
+        assert(err.reason.includes(reason), `Expected reason: "${err.reason}"`);
+      }
     }
   },
 
