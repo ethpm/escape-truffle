@@ -63,3 +63,6 @@ typings/
 # locks
 package-lock.json
 
+# Mnemonics and keys
+.secrets.js
+

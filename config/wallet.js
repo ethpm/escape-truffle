@@ -32,8 +32,8 @@ const noFileMsg = `Could not locate file: '.secrets.js'.\n` +
 if (publicNetworks.includes(process.env.NETWORK)){
 
   // Has file?
-  if (fs.existsSync('../.secrets.js')) {
-    const secrets = require('./.secrets');
+  if (fs.existsSync('./.secrets.js')) {
+    const secrets = require('../.secrets.js');
 
     // Has keys?
     if (!secrets[network].mnemonic || !secrets[network].infura){
