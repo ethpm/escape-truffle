@@ -17,6 +17,35 @@ $ npm test        # vs. ganache-cli
 $ npm test:geth   # vs. geth
 ```
 
+### Deploy
+
+This repository contains deployment scripts that let you to quickly publish
+your own package registry to a public testnet and authorize your account
+address as its owner.
+
+Clone the repo and create a `.secrets.js` file in the project root that looks like this:
+
+```javascript
+module.exports = {
+    ropsten: {
+      mnemonic: 'use your own twelve word mnemonic here do not use this one',
+      infura: "F6tUooiW4thx777DtPsa" // <-- Example Infura API key.
+    },
+    rinkeby: {
+      ..etc..
+    }
+}
+```
+
+At the command line run:
+```shell
+$ npm run deploy:ropsten
+```
+
++ Infura API keys are available [here](https://infura.io/register)
++ A 12 word mnemonic (for testing purposes only) can be generated [here](iancoleman.io/bip39)
+
+
 ### Coverage
 ```
 $ npm run coverage
@@ -39,3 +68,5 @@ $ cd docs
 $ pip install -r requirements.txt
 $ make html
 ```
+
+
