@@ -47,4 +47,4 @@ else
 fi
 
 # Deploy to specified network, resetting all previous deployments
-node_modules/.bin/truffle migrate --reset --network "$NETWORK"
+node_modules/.bin/truffle migrate --reset --network "$NETWORK" --interactive

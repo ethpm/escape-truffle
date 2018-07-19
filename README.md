@@ -19,7 +19,7 @@ $ npm test:geth   # vs. geth
 
 ### Deploy
 
-This repository contains deployment scripts that let you to quickly publish
+This repository contains deployment scripts that let you quickly publish
 your own package registry to a public testnet and authorize your account
 address as its owner.
 
