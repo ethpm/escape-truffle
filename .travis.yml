@@ -9,6 +9,7 @@ services:
 
 before_install:
   - docker pull ethereum/client-go:latest
+  - docker pull ethereum/solc:0.4.24
 
 env:
   - NETWORK=ganache

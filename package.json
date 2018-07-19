@@ -7,15 +7,19 @@
     "test": "test"
   },
   "scripts": {
+    "ci": "./scripts/ci.sh",
+    "compile": "./node_modules/.bin/truffle compile",
+    "coverage": "./node_modules/.bin/solidity-coverage",
+    "deploy:ganache": "PRODUCTION=true NETWORK=ganache ./scripts/deploy.sh",
+    "deploy:rinkeby": "PRODUCTION=true NETWORK=rinkeby ./scripts/deploy.sh",
+    "deploy:ropsten": "PRODUCTION=true NETWORK=ropsten ./scripts/deploy.sh",
+    "deploy:kovan": "PRODUCTION=true NETWORK=kovan ./scripts/deploy.sh",
+    "docs:gas": "NETWORK=ganache GAS_DOCS=true ./scripts/test.sh",
+    "ganache": "./node_modules/.bin/ganache-cli --noVMErrorsOnRPCResponse --port 8547",
+    "lint": "./node_modules/.bin/solium -d contracts/",
     "test": "NETWORK=ganache ./scripts/test.sh",
     "test:geth": "NETWORK=geth ./scripts/test.sh",
-    "test:gas": "NETWORK=ganache GAS_REPORTER=true ./scripts/test.sh",
-    "docs:gas": "NETWORK=ganache GAS_DOCS=true ./scripts/test.sh",
-    "coverage": "./node_modules/.bin/solidity-coverage",
-    "lint": "./node_modules/.bin/solium -d contracts/",
-    "compile": "./node_modules/.bin/truffle compile",
-    "ganache": "./node_modules/.bin/ganache-cli --noVMErrorsOnRPCResponse --port 8547",
-    "ci": "./scripts/ci.sh"
+    "test:gas": "NETWORK=ganache GAS_REPORTER=true ./scripts/test.sh"
   },
   "repository": {
     "type": "git",
@@ -38,6 +42,9 @@
     "shelljs": "^0.8.1",
     "solidity-coverage": "^0.5.0",
     "solium": "^1.1.7",
-    "truffle": "5.0.0-next.3"
+    "truffle": "5.0.0-next.4"
+  },
+  "dependencies": {
+    "truffle-hdwallet-provider": "git+https://github.com/trufflesuite/truffle-hdwallet-provider.git#web3-one"
   }
 }
