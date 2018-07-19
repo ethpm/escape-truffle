@@ -1,5 +1,5 @@
 const assert = require('assert');
-const setPermissions = require('../scripts/permissions');
+const setPermissions = require('../config/permissions');
 
 module.exports = {
 

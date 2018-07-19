@@ -1,5 +1,5 @@
-// Mocha test configurations consumed by truffle-config.js, toggled by process.env.<MODE>.
-// Idea borrowed from AragonOS's config.
+// Mocha configs consumed by truffle-config.js, toggled by process.env.<MODE>.
+// Idea borrowed from AragonOS.
 
 /**
  * Run mocha with gas analytics: env: GAS_REPORTER

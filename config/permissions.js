@@ -1,4 +1,4 @@
-const PermissionsLogger = require('./permissionsLogger');
+const PermissionsLogger = require('./logger');
 const util = require('util');
 
 async function setPermissions(

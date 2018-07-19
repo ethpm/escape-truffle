@@ -3,7 +3,7 @@ const ReleaseDB = artifacts.require('ReleaseDB');
 const PackageIndex = artifacts.require('PackageIndex');
 const ReleaseValidator = artifacts.require('ReleaseValidator');
 const WhitelistAuthority = artifacts.require('WhitelistAuthority');
-const setPermissions = require('../scripts/permissions');
+const setPermissions = require('../config/permissions');
 
 module.exports = async function(deployer) {
   if (!process.env.PRODUCTION) return;
