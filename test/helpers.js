@@ -27,26 +27,24 @@ module.exports = {
   },
 
   // There's variant behavior across three clients when a require gate fails during a `.call`
-  // + ganache-cli > 6.1.3: if require contains reason string, there's no failure.
+  // + ganache-cli > 6.1.3 / geth : if require contains reason string - no failure, null result.
   // + testrpc-sc (coverage) : errors with a revert message
-  // + geth: response that web3 doesn't handle correctly.
-  assertCallFailure: async (promise) => {
+  // + geth (no reason string): response that web3 doesn't handle correctly.
+  assertCallFailure: async (promise, expectedResult) => {
     let result;
     try {
-      await promise;
+      result = await promise;
       assert.fail();
     } catch(err){
 
       // testrpc-sc (ganache 6.1.0)
       if (process.env.SOLIDITY_COVERAGE) {
-
         assert(err.message.includes('revert'))
 
-      // geth: weird web3 error
-      // we'd also see this with newer ganache if there is no reason string
-      } else if (process.env.GETH) {
-
-        assert(err.message.includes('0x'));
+      // ganache 6.1.4 & geth (should) return a null, false, zero result
+      // for all the return args
+      } else if (process.env.NETWORK === 'ganache' || process.env.NETWORK === 'geth') {
+        assert(result === expectedResult || err.message.includes('0x'));
       }
     }
   },

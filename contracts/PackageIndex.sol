@@ -124,9 +124,9 @@ contract PackageIndex is Authorized, PackageIndexInterface {
       );
     }
 
-    // Run release validator. This method returns a non-zero integer code
-    // if the release cannot proceed.
-    uint8 code = releaseValidator.validateRelease(
+    // Run release validator. This method reverts with an error message string
+    // on failure.
+    releaseValidator.validateRelease(
       packageDb,
       releaseDb,
       msg.sender,
@@ -136,11 +136,6 @@ contract PackageIndex is Authorized, PackageIndexInterface {
       build,
       releaseLockfileURI
     );
-
-    // Revert with error message if release did not validate.
-    if (code != 0){
-      revert(releaseValidator.errors(code));
-    }
 
     // Compute hashes
     bool _packageExists = packageExists(name);

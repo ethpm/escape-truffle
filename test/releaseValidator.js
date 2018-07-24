@@ -5,6 +5,7 @@
 const helpers = require('./helpers');
 const constants = helpers.constants;
 const assertFailure = helpers.assertFailure;
+const assertCallFailure = helpers.assertCallFailure;
 
 const PackageDB = artifacts.require('PackageDB');
 const ReleaseDB = artifacts.require('ReleaseDB');
@@ -529,49 +530,54 @@ contract('ReleaseValidator', function(accounts){
     })
   });
 
-  describe('validateRelease checks existence of DBs', function(){
-    it('returns error code 1 if PackageDB param is null', async function(){
+  describe('validateRelease checks existence of DBs [ @geth ]', function(){
+    it('returns false if PackageDB param is null', async function(){
       const info = ['test', 1, 0, 0, '', '', 'ipfs://some-ipfs-uri'];
 
       assert( await packageIndex.packageExists('test') === false );
 
-      const code = await releaseValidator.validateRelease(
-        helpers.zeroAddress,
-        releaseDB.address,
-        accounts[0],
-        info[0],
-        info.slice(1,4),
-        info[4],
-        info[5],
-        info[6]
+      // NB: we should be able to get the reason string out of this
+      // failed call to a view fn but newer ganache (or ethereumjs-vm?)
+      // handles this case by returning boolean: false.
+      // Geth triggers a strange '0x' / address not found error out of web3 )
+      await assertCallFailure(
+        releaseValidator.validateRelease(
+          helpers.zeroAddress,
+          releaseDB.address,
+          accounts[0],
+          info[0],
+          info.slice(1,4),
+          info[4],
+          info[5],
+          info[6],
+          {from: accounts[3]}
+        ),
+        false
       );
-
-      const message = await releaseValidator.errors(code);
-
-      assert(code === '1');
-      assert(message.includes('package-db-not-set'));
     });
 
-    it('returns error code 2 if ReleaseDB is null', async function(){
+    it('returns false if ReleaseDB is null', async function(){
       const info = ['test', 1, 0, 0, '', '', 'ipfs://some-ipfs-uri'];
 
       assert( await packageIndex.packageExists('test') === false );
 
-      const code = await releaseValidator.validateRelease(
-        packageDB.address,
-        helpers.zeroAddress,
-        accounts[0],
-        info[0],
-        info.slice(1,4),
-        info[4],
-        info[5],
-        info[6]
+      // NB: we should be able to get the reason string out of this
+      // failed call to a view fn but newer ganache (or ethereumjs-vm?)
+      // handles this case by returning boolean: false.
+      // Geth triggers a strange '0x' / address not found error out of web3 )
+      await assertCallFailure(
+        releaseValidator.validateRelease(
+          packageDB.address,
+          helpers.zeroAddress,
+          accounts[0],
+          info[0],
+          info.slice(1,4),
+          info[4],
+          info[5],
+          info[6]
+        ),
+        false
       );
-
-      const message = await releaseValidator.errors(code);
-
-      assert(code === '2');
-      assert(message.includes('release-db-not-set'));
     });
   });
 

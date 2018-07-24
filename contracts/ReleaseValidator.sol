@@ -7,21 +7,6 @@ import {ReleaseDB} from "./ReleaseDB.sol";
 /// @title Database contract for a package index.
 /// @author Piper Merriam <pipermerriam@gmail.com>
 contract ReleaseValidator {
-
-  /// @dev Maps integer error codes returned by `validateRelease` to human readable error strings.
-  mapping (uint8 => string) public errors;
-
-  /// @dev Initializes `errors` map with human readable error messages.
-  constructor() public {
-    errors[1] = "escape:ReleaseValidator:package-db-not-set";
-    errors[2] = "escape:ReleaseValidator:release-db-not-set";
-    errors[3] = "escape:ReleaseValidator:caller-not-authorized";
-    errors[4] = "escape:ReleaseValidator:version-exists";
-    errors[5] = "escape:ReleaseValidator:invalid-package-name";
-    errors[6] = "escape:ReleaseValidator:invalid-lockfile-uri";
-    errors[7] = "escape:ReleaseValidator:invalid-release-version";
-  }
-
   /// @dev Runs validation on all of the data needed for releasing a package.  Returns success.
   /// @param packageDb The address of the PackageDB
   /// @param releaseDb The address of the ReleaseDB
@@ -43,31 +28,31 @@ contract ReleaseValidator {
   )
     public
     view
-    returns (uint8 code)
+    returns (bool)
   {
     if (address(packageDb) == 0x0){
       // packageDb address is null
-      return 1;
+      revert("escape:ReleaseValidator:package-db-not-set");
     } else if (address(releaseDb) == 0x0){
       // releaseDb address is null
-      return 2;
+      revert("escape:ReleaseValidator:release-db-not-set");
     } else if (!validateAuthorization(packageDb, callerAddress, name)) {
       // package exists and msg.sender is not the owner not the package owner.
-      return 3;
+      revert("escape:ReleaseValidator:caller-not-authorized");
     } else if (!validateIsNewRelease(packageDb, releaseDb, name, majorMinorPatch, preRelease, build)) {
       // this version has already been released.
-      return 4;
+      revert("escape:ReleaseValidator:version-exists");
     } else if (!validatePackageName(packageDb, name)) {
       // invalid package name.
-      return 5;
+      revert("escape:ReleaseValidator:invalid-package-name");
     } else if (!validateReleaseLockfileURI(releaseLockfileURI)) {
       // disallow empty release lockfile URI
-      return 6;
+      revert("escape:ReleaseValidator:invalid-lockfile-uri");
     } else if (!validateReleaseVersion(majorMinorPatch)) {
       // disallow version 0.0.0
-      return 7;
+      revert("escape:ReleaseValidator:invalid-release-version");
     }
-    return 0;
+    return true;
   }
 
   /// @dev Validate whether the callerAddress is authorized to make this release.
