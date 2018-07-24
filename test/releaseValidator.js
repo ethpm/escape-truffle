@@ -5,6 +5,7 @@
 const helpers = require('./helpers');
 const constants = helpers.constants;
 const assertFailure = helpers.assertFailure;
+const assertCallFailure = helpers.assertCallFailure;
 
 const PackageDB = artifacts.require('PackageDB');
 const ReleaseDB = artifacts.require('ReleaseDB');
@@ -44,6 +45,7 @@ contract('ReleaseValidator', function(accounts){
       packageIndex,
       packageDB,
       releaseDB,
+      reason
     ){
       const nameHash = await packageDB.hashName(info[0])
       const versionHash = await releaseDB.hashVersion(...info.slice(1, -1));
@@ -62,7 +64,10 @@ contract('ReleaseValidator', function(accounts){
       info.pop();
       info.push(otherUri);
 
-      await packageIndex.release(...info);
+      await assertFailure(
+        packageIndex.release(...info),
+        reason
+      );
 
       packageData = await packageIndex.getPackageData(info[0]);
       releaseData = await packageIndex.getReleaseData(releaseHash);
@@ -88,7 +93,10 @@ contract('ReleaseValidator', function(accounts){
       const info = releases.zero;
       assert( await packageIndex.packageExists(info[0]) === false );
 
-      await packageIndex.release(...info);
+      await assertFailure(
+        packageIndex.release(...info),
+        'invalid-release-version'
+      );
 
       assert( await packageIndex.packageExists(info[0]) === false );
       assert( await packageIndex.releaseExists(...info.slice(0,-1)) === false);
@@ -99,7 +107,8 @@ contract('ReleaseValidator', function(accounts){
         releases.zeroMinor,
         packageIndex,
         packageDB,
-        releaseDB
+        releaseDB,
+        'version-exists',
       );
     });
 
@@ -108,7 +117,8 @@ contract('ReleaseValidator', function(accounts){
         releases.zeroPatch,
         packageIndex,
         packageDB,
-        releaseDB
+        releaseDB,
+        'version-exists',
       );
     });
 
@@ -117,7 +127,8 @@ contract('ReleaseValidator', function(accounts){
         releases.major,
         packageIndex,
         packageDB,
-        releaseDB
+        releaseDB,
+        'version-exists',
       );
     });
 
@@ -126,7 +137,8 @@ contract('ReleaseValidator', function(accounts){
         releases.minor,
         packageIndex,
         packageDB,
-        releaseDB
+        releaseDB,
+        'version-exists',
       );
     });
 
@@ -135,7 +147,8 @@ contract('ReleaseValidator', function(accounts){
         releases.patch,
         packageIndex,
         packageDB,
-        releaseDB
+        releaseDB,
+        'version-exists',
       );
     });
 
@@ -144,7 +157,8 @@ contract('ReleaseValidator', function(accounts){
         releases.prerelease,
         packageIndex,
         packageDB,
-        releaseDB
+        releaseDB,
+        'version-exists',
       );
     });
   });
@@ -407,11 +421,16 @@ contract('ReleaseValidator', function(accounts){
       assert( await packageIndex.packageExists(name) === true);
     }
 
-    async function assertDoesNotRelease(packageIndex, info){
+    async function assertDoesNotRelease(packageIndex, info, reason){
       const name = info[0];
 
       assert( await packageIndex.packageExists(name) === false);
-      await packageIndex.release(...info);
+
+      await assertFailure(
+        packageIndex.release(...info),
+        reason
+      );
+
       assert( await packageIndex.packageExists(name) === false);
     }
 
@@ -445,52 +464,52 @@ contract('ReleaseValidator', function(accounts){
     describe('invalid', function(){
       it('a', async function(){
         info[0] = cases.a;
-        await assertDoesNotRelease(packageIndex, info);
+        await assertDoesNotRelease(packageIndex, info, 'invalid-package-name');
       });
 
       it('a * 215', async function(){
         info[0] = cases.a215;
-        await assertDoesNotRelease(packageIndex, info);
+        await assertDoesNotRelease(packageIndex, info, 'invalid-package-name');
       })
 
       it('-starts-with-dash', async function(){
         info[0] = cases.startsDash;
-        await assertDoesNotRelease(packageIndex, info);
+        await assertDoesNotRelease(packageIndex, info, 'invalid-package-name');
       })
 
       it('9starts-with-number', async function(){
         info[0] = cases.startsNumber;
-        await assertDoesNotRelease(packageIndex, info);
+        await assertDoesNotRelease(packageIndex, info, 'invalid-package-name');
       })
 
       it('hasCapitals', async function(){
         info[0] = cases.hasCaps;
-        await assertDoesNotRelease(packageIndex, info);
+        await assertDoesNotRelease(packageIndex, info, 'invalid-package-name');
       })
 
       it('Starts-with-capital', async function(){
         info[0] = cases.startsCaps;
-        await assertDoesNotRelease(packageIndex, info);
+        await assertDoesNotRelease(packageIndex, info, 'invalid-package-name');
       })
 
       it('with_underscore', async function(){
         info[0] = cases.underscore;
-        await assertDoesNotRelease(packageIndex, info);
+        await assertDoesNotRelease(packageIndex, info, 'invalid-package-name');
       })
 
       it('with.period', async function(){
         info[0] = cases.period;
-        await assertDoesNotRelease(packageIndex, info);
+        await assertDoesNotRelease(packageIndex, info, 'invalid-package-name');
       })
 
       it('with$money-symbol', async function(){
         info[0] = cases.dollar;
-        await assertDoesNotRelease(packageIndex, info);
+        await assertDoesNotRelease(packageIndex, info, 'invalid-package-name');
       })
 
       it('with()parenthesis', async function(){
         info[0] = cases.parens;
-        await assertDoesNotRelease(packageIndex, info);
+        await assertDoesNotRelease(packageIndex, info, 'invalid-package-name');
       })
     });
   });
@@ -501,39 +520,63 @@ contract('ReleaseValidator', function(accounts){
       const info = ['test', 1, 0, 0, '', '', ''];
 
       assert( await packageIndex.packageExists('test') === false );
-      await packageIndex.release(...info);
+
+      await assertFailure(
+        packageIndex.release(...info),
+        'invalid-lockfile-uri'
+      );
+
       assert( await packageIndex.packageExists('test') === false );
     })
   });
 
-  describe('Existence of dependent DB', function(){
-    it('throws on release if the PackageDB has been unset', async function(){
-      const infoA = ['test', 1, 0, 0, '', '', 'ipfs://some-ipfs-uri'];
-      const infoB = ['test', 1, 1, 0, '', '', 'ipfs://some-ipfs-uri'];
+  describe('validateRelease checks existence of DBs [ @geth ]', function(){
+    it('returns false if PackageDB param is null', async function(){
+      const info = ['test', 1, 0, 0, '', '', 'ipfs://some-ipfs-uri'];
 
       assert( await packageIndex.packageExists('test') === false );
-      await packageIndex.release(...infoA);
-      assert( await packageIndex.packageExists('test') === true );
 
-      await packageIndex.setPackageDb(helpers.zeroAddress);
-      await assertFailure(
-        packageIndex.release(...infoB),
-        'package-db-not-set'
+      // NB: we should be able to get the reason string out of this
+      // failed call to a view fn but newer ganache (or ethereumjs-vm?)
+      // handles this case by returning boolean: false.
+      // Geth triggers a strange '0x' / address not found error out of web3 )
+      await assertCallFailure(
+        releaseValidator.validateRelease(
+          helpers.zeroAddress,
+          releaseDB.address,
+          accounts[0],
+          info[0],
+          info.slice(1,4),
+          info[4],
+          info[5],
+          info[6],
+          {from: accounts[3]}
+        ),
+        false
       );
     });
 
-    it('throws on release if the ReleaseDB has been unset', async function(){
-      const infoA = ['test', 1, 0, 0, '', '', 'ipfs://some-ipfs-uri'];
-      const infoB = ['test', 1, 1, 0, '', '', 'ipfs://some-ipfs-uri'];
+    it('returns false if ReleaseDB is null', async function(){
+      const info = ['test', 1, 0, 0, '', '', 'ipfs://some-ipfs-uri'];
 
       assert( await packageIndex.packageExists('test') === false );
-      await packageIndex.release(...infoA);
-      assert( await packageIndex.packageExists('test') === true );
 
-      await packageIndex.setReleaseDb(helpers.zeroAddress);
-      await assertFailure(
-        packageIndex.release(...infoB),
-        'release-db-not-set'
+      // NB: we should be able to get the reason string out of this
+      // failed call to a view fn but newer ganache (or ethereumjs-vm?)
+      // handles this case by returning boolean: false.
+      // Geth triggers a strange '0x' / address not found error out of web3 )
+      await assertCallFailure(
+        releaseValidator.validateRelease(
+          packageDB.address,
+          helpers.zeroAddress,
+          accounts[0],
+          info[0],
+          info.slice(1,4),
+          info[4],
+          info[5],
+          info[6]
+        ),
+        false
       );
     });
   });
@@ -555,7 +598,12 @@ contract('ReleaseValidator', function(accounts){
       assert(data.packageOwner === newOwner);
 
       assert( await packageIndex.releaseExists(...infoB.slice(0, -1)) === false );
-      await packageIndex.release(...infoB, {from: nonOwner})
+
+      await assertFailure(
+        packageIndex.release(...infoB, {from: nonOwner}),
+        'caller-not-authorized'
+      );
+
       assert( await packageIndex.releaseExists(...infoB.slice(0, -1)) === false );
     });
   })

@@ -30,24 +30,27 @@ contract ReleaseValidator {
     view
     returns (bool)
   {
-    require(address(packageDb) != 0x0, "escape:ReleaseValidator:package-db-not-set");
-    require(address(releaseDb) != 0x0, "escape:ReleaseValidator:release-db-not-set");
-
-    if (!validateAuthorization(packageDb, callerAddress, name)) {
+    if (address(packageDb) == 0x0){
+      // packageDb address is null
+      revert("escape:ReleaseValidator:package-db-not-set");
+    } else if (address(releaseDb) == 0x0){
+      // releaseDb address is null
+      revert("escape:ReleaseValidator:release-db-not-set");
+    } else if (!validateAuthorization(packageDb, callerAddress, name)) {
       // package exists and msg.sender is not the owner not the package owner.
-      return false;
+      revert("escape:ReleaseValidator:caller-not-authorized");
     } else if (!validateIsNewRelease(packageDb, releaseDb, name, majorMinorPatch, preRelease, build)) {
       // this version has already been released.
-      return false;
+      revert("escape:ReleaseValidator:version-exists");
     } else if (!validatePackageName(packageDb, name)) {
       // invalid package name.
-      return false;
+      revert("escape:ReleaseValidator:invalid-package-name");
     } else if (!validateReleaseLockfileURI(releaseLockfileURI)) {
       // disallow empty release lockfile URI
-      return false;
+      revert("escape:ReleaseValidator:invalid-lockfile-uri");
     } else if (!validateReleaseVersion(majorMinorPatch)) {
       // disallow version 0.0.0
-      return false;
+      revert("escape:ReleaseValidator:invalid-release-version");
     }
     return true;
   }
