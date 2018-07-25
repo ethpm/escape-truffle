@@ -469,8 +469,8 @@ contract('ReleaseValidator', function(accounts){
 
       it('a * 256', async function(){
         info[0] = cases.a256;
-        await assertDoesNotRelease(packageIndex, info);
-\      })
+        await assertDoesNotRelease(packageIndex, info, 'invalid-package-name');
+      })
 
       it('-starts-with-dash', async function(){
         info[0] = cases.startsDash;
