@@ -49,7 +49,7 @@ contract('PackageDB', function(accounts){
       await helpers.waitSecond();
       await packageDB.setPackage(packageName);
       const record = await packageDB.getPackageData(nameHash);
-      assert(record.createdAt < record.updatedAt);
+      assert(record.createdAt.toNumber() < record.updatedAt.toNumber());
     });
   });
 
@@ -95,7 +95,7 @@ contract('PackageDB', function(accounts){
       let num = await packageDB.getNumPackages();
 
       assert(exists);
-      assert(num === (1).toString());
+      assert(num.toNumber() === 1);
 
       await packageDB.removePackage(nameHash, reason);
 
@@ -103,7 +103,7 @@ contract('PackageDB', function(accounts){
       num = await packageDB.getNumPackages();
 
       assert(!exists);
-      assert(num === (0).toString());
+      assert(num.toNumber() === 0);
 
       // There is a bug somewhere causing reverts
       // in `view` fns to be ignored. In this case it seems like
