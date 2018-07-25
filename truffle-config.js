@@ -72,7 +72,7 @@ module.exports = {
     ropsten: {
       provider: () => new HDWalletProvider(mnemonic, `https://ropsten.infura.io/${infura}`),
       network_id: 3,
-      gas: 6000000,
+      gas: 5500000,
       gasPrice: 20000000000,
       confirmations: 2,
     },
