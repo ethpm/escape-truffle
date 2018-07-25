@@ -116,7 +116,8 @@ contract('ReleaseDB', function(accounts){
         'ipfs://some-ipfs-uri-a'
       );
 
-      assert( await releaseDB.getNumReleasesForNameHash(nameHash) === '1' )
+      const numReleases = await releaseDB.getNumReleasesForNameHash(nameHash);
+      assert( numReleases.toNumber() === 1 )
       assert( await releaseDB.getLatestMajorTree(nameHash) === v100h )
       assert( await releaseDB.getLatestMinorTree(nameHash, 1) === v100h )
       assert( await releaseDB.getLatestPatchTree(nameHash, 1, 0) === v100h )
@@ -130,7 +131,8 @@ contract('ReleaseDB', function(accounts){
         'ipfs://some-ipfs-uri-c'
       );
 
-      assert( await releaseDB.getNumReleasesForNameHash(nameHash) === '2' )
+      const numReleases = await releaseDB.getNumReleasesForNameHash(nameHash);
+      assert( numReleases.toNumber() === 2 )
     })
 
     it('v110vh', async function(){
@@ -140,7 +142,8 @@ contract('ReleaseDB', function(accounts){
         'ipfs://some-ipfs-uri-b'
       );
 
-      assert( await releaseDB.getNumReleasesForNameHash(nameHash) === '3' )
+      const numReleases = await releaseDB.getNumReleasesForNameHash(nameHash);
+      assert( numReleases.toNumber() === 3 )
       assert( await releaseDB.getLatestMajorTree(nameHash) === v110h )
       assert( await releaseDB.getLatestMinorTree(nameHash, 1) === v110h )
       assert( await releaseDB.getLatestPatchTree(nameHash, 1, 0) === v100h )
@@ -156,7 +159,8 @@ contract('ReleaseDB', function(accounts){
         'ipfs://some-ipfs-uri-c'
       );
 
-      assert( await releaseDB.getNumReleasesForNameHash(nameHash) === '4' )
+      const numReleases = await releaseDB.getNumReleasesForNameHash(nameHash);
+      assert( numReleases.toNumber() === 4 )
 
       assert( await releaseDB.getLatestMajorTree(nameHash) === v110h )
       assert( await releaseDB.getLatestMinorTree(nameHash, 1) === v110h  )
@@ -174,7 +178,8 @@ contract('ReleaseDB', function(accounts){
         'ipfs://some-ipfs-uri-d'
       );
 
-      assert( await releaseDB.getNumReleasesForNameHash(nameHash) === '5' )
+      const numReleases = await releaseDB.getNumReleasesForNameHash(nameHash);
+      assert( numReleases.toNumber() === 5 )
 
       assert( await releaseDB.getLatestMajorTree(nameHash) === v200h )
       assert( await releaseDB.getLatestMinorTree(nameHash, 1) === v110h )
@@ -195,7 +200,8 @@ contract('ReleaseDB', function(accounts){
         'ipfs://some-ipfs-uri-e'
       );
 
-      assert( await releaseDB.getNumReleasesForNameHash(nameHash) === '6' )
+      const numReleases = await releaseDB.getNumReleasesForNameHash(nameHash);
+      assert( numReleases.toNumber() === 6 )
 
       assert( await releaseDB.getLatestMajorTree(nameHash) === v200h )
       assert( await releaseDB.getLatestMinorTree(nameHash, 1) === v123h )
@@ -218,7 +224,8 @@ contract('ReleaseDB', function(accounts){
         'ipfs://some-ipfs-uri-f'
       );
 
-      assert( await releaseDB.getNumReleasesForNameHash(nameHash) === '7' )
+      const numReleases = await releaseDB.getNumReleasesForNameHash(nameHash);
+      assert( numReleases.toNumber() === 7 )
 
       assert( await releaseDB.getLatestMajorTree(nameHash) === v200h )
       assert( await releaseDB.getLatestMinorTree(nameHash, 1) === v124a1bzh )
@@ -242,7 +249,8 @@ contract('ReleaseDB', function(accounts){
         'ipfs://some-ipfs-uri-g'
       );
 
-      assert( await releaseDB.getNumReleasesForNameHash(nameHash) === '8' )
+      const numReleases = await releaseDB.getNumReleasesForNameHash(nameHash);
+      assert( numReleases.toNumber() === 8 )
 
       assert( await releaseDB.getLatestMajorTree(nameHash) === v200h )
       assert( await releaseDB.getLatestMinorTree(nameHash, 1) === v124a1bah )
@@ -266,7 +274,8 @@ contract('ReleaseDB', function(accounts){
         'ipfs://some-ipfs-uri-g'
       );
 
-      assert( await releaseDB.getNumReleasesForNameHash(nameHash) === '9' )
+      const numReleases = await releaseDB.getNumReleasesForNameHash(nameHash);
+      assert( numReleases.toNumber() === 9 )
 
       assert( await releaseDB.getLatestMajorTree(nameHash) === v200h )
       assert( await releaseDB.getLatestMinorTree(nameHash, 1) === v124a2bah )
@@ -290,7 +299,8 @@ contract('ReleaseDB', function(accounts){
         'ipfs://some-ipfs-uri-h'
       );
 
-      assert( await releaseDB.getNumReleasesForNameHash(nameHash) === '10' )
+      const numReleases = await releaseDB.getNumReleasesForNameHash(nameHash);
+      assert( numReleases.toNumber() === 10 )
 
       assert( await releaseDB.getLatestMajorTree(nameHash) === v200h )
       assert( await releaseDB.getLatestMinorTree(nameHash, 1) === v124a10bah )
@@ -314,7 +324,8 @@ contract('ReleaseDB', function(accounts){
         'ipfs://some-ipfs-uri-h'
       );
 
-      assert( await releaseDB.getNumReleasesForNameHash(nameHash) === '11' )
+      const numReleases = await releaseDB.getNumReleasesForNameHash(nameHash);
+      assert( numReleases.toNumber() === 11 )
 
       assert( await releaseDB.getLatestMajorTree(nameHash) === v200h )
       assert( await releaseDB.getLatestMinorTree(nameHash, 1) === v124b1bah )
@@ -338,7 +349,8 @@ contract('ReleaseDB', function(accounts){
         'ipfs://some-ipfs-uri-h'
       );
 
-      assert( await releaseDB.getNumReleasesForNameHash(nameHash) === '12' )
+      const numReleases = await releaseDB.getNumReleasesForNameHash(nameHash);
+      assert( numReleases.toNumber() === 12 )
 
       assert( await releaseDB.getLatestMajorTree(nameHash) === v200h )
       assert( await releaseDB.getLatestMinorTree(nameHash, 1) === v124h )
@@ -364,7 +376,8 @@ contract('ReleaseDB', function(accounts){
         'ipfs://updated-ipfs-uri-h'
       );
 
-      assert( await releaseDB.getNumReleasesForNameHash(nameHash) === '12' );
+      const numReleases = await releaseDB.getNumReleasesForNameHash(nameHash);
+      assert( numReleases.toNumber() === 12 );
       assert( await releaseDB.getReleaseLockfileURI(v124h) === newUri );
 
       const events = await releaseDB.getPastEvents('ReleaseUpdate', {fromBlock: 0, toBlock: 'latest'});
@@ -375,39 +388,44 @@ contract('ReleaseDB', function(accounts){
 
   describe('Removals', function(){
     it('removes a pre-release and updates correctly', async function(){
-      assert( await releaseDB.getNumReleasesForNameHash(nameHash) === '12' )
+      let numReleases = await releaseDB.getNumReleasesForNameHash(nameHash);
+
+      assert( numReleases.toNumber() === 12 )
       assert( await releaseDB.getLatestPatchTree(nameHash, 1, 2) === v124h )
       assert( await releaseDB.getLatestPreReleaseTree(nameHash, 1, 2, 4) === v124h );
 
       await releaseDB.removeRelease(v124b1bah, 'testing');
 
-      const numReleases = await releaseDB.getNumReleasesForNameHash(nameHash);
+      numReleases = await releaseDB.getNumReleasesForNameHash(nameHash);
 
-      for (let i = 0; i < numReleases; i++){
+      for (let i = 0; i < numReleases.toNumber(); i++){
         const rh = await releaseDB.getReleaseHashForNameHash(nameHash, i)
         assert( await releaseDB.releaseExists(rh) );
         await releaseDB.updateLatestTree(rh);
       }
 
-      assert( await releaseDB.getNumReleasesForNameHash(nameHash) === '11' )
+      numReleases = await releaseDB.getNumReleasesForNameHash(nameHash);
+      assert( numReleases.toNumber() === 11 )
       assert( await releaseDB.releaseExists(v124b1bah) === false )
       assert( await releaseDB.getLatestPatchTree(nameHash, 1, 2) === v124h)
       assert( await releaseDB.getLatestPreReleaseTree(nameHash, 1, 2, 4) === v124h)
     });
 
     it('removes a patch release and updates correctly', async function(){
-      assert( await releaseDB.getNumReleasesForNameHash(nameHash) === '11' )
+      let numReleases = await releaseDB.getNumReleasesForNameHash(nameHash);
+      assert( numReleases.toNumber() === 11 )
       assert( await releaseDB.getLatestPatchTree(nameHash, 1, 2) === v124h )
       assert( await releaseDB.getLatestPreReleaseTree(nameHash, 1, 2, 4) === v124h )
 
       await releaseDB.removeRelease(v124h, 'testing');
 
-      assert( await releaseDB.getNumReleasesForNameHash(nameHash) === '10' )
+      numReleases = await releaseDB.getNumReleasesForNameHash(nameHash);
+      assert( numReleases.toNumber() === 10 )
       assert( await releaseDB.releaseExists(v124h) === false )
 
-      const numReleases = await releaseDB.getNumReleasesForNameHash(nameHash);
+      numReleases = await releaseDB.getNumReleasesForNameHash(nameHash);
 
-      for (let i = 0; i < numReleases; i++){
+      for (let i = 0; i < numReleases.toNumber(); i++){
         const rh = await releaseDB.getReleaseHashForNameHash(nameHash, i)
         assert( await releaseDB.releaseExists(rh) );
         await releaseDB.updateLatestTree(rh);
@@ -418,18 +436,20 @@ contract('ReleaseDB', function(accounts){
     });
 
     it('removes a minor release and updates correctly', async function(){
-      assert( await releaseDB.getNumReleasesForNameHash(nameHash) === '10' )
+      let numReleases = await releaseDB.getNumReleasesForNameHash(nameHash);
+      assert( numReleases.toNumber() === 10 )
       assert( await releaseDB.getLatestPatchTree(nameHash, 1, 2) === v124a10bah )
       assert( await releaseDB.getLatestPreReleaseTree(nameHash, 1, 2, 3) === v123h )
 
       await releaseDB.removeRelease(v123h, 'testing');
 
-      assert( await releaseDB.getNumReleasesForNameHash(nameHash) === '9' )
+      numReleases = await releaseDB.getNumReleasesForNameHash(nameHash);
+      assert( numReleases.toNumber() === 9 )
       assert( await releaseDB.releaseExists(v123h) === false )
 
-      const numReleases = await releaseDB.getNumReleasesForNameHash(nameHash);
+      numReleases = await releaseDB.getNumReleasesForNameHash(nameHash);
 
-      for (let i = 0; i < numReleases; i++){
+      for (let i = 0; i < numReleases.toNumber(); i++){
         const rh = await releaseDB.getReleaseHashForNameHash(nameHash, i)
         assert( await releaseDB.releaseExists(rh) );
         await releaseDB.updateLatestTree(rh);
@@ -441,18 +461,20 @@ contract('ReleaseDB', function(accounts){
 
 
     it('removes a major release and updates correctly', async function(){
-      assert( await releaseDB.getNumReleasesForNameHash(nameHash) === '9' )
+      let numReleases = await releaseDB.getNumReleasesForNameHash(nameHash);
+      assert( numReleases.toNumber() === 9 )
       assert( await releaseDB.getLatestPatchTree(nameHash, 1, 0) === v101h )
       assert( await releaseDB.getLatestPreReleaseTree(nameHash, 1, 0, 0) === v100h )
 
       await releaseDB.removeRelease(v100h, 'testing');
 
-      assert( await releaseDB.getNumReleasesForNameHash(nameHash) === '8' )
+      numReleases = await releaseDB.getNumReleasesForNameHash(nameHash);
+      assert( numReleases.toNumber() === 8 )
       assert( await releaseDB.releaseExists(v100h) === false )
 
-      const numReleases = await releaseDB.getNumReleasesForNameHash(nameHash);
+      numReleases = await releaseDB.getNumReleasesForNameHash(nameHash);
 
-      for (let i = 0; i < numReleases; i++){
+      for (let i = 0; i < numReleases.toNumber(); i++){
         const rh = await releaseDB.getReleaseHashForNameHash(nameHash, i)
         assert( await releaseDB.releaseExists(rh) );
         await releaseDB.updateLatestTree(rh);
@@ -473,12 +495,16 @@ contract('ReleaseDB', function(accounts){
 
     it('allows re-publication at the same tag as a deleted release', async function(){
       assert( await releaseDB.releaseExists(v200h) === true );
-      assert( await releaseDB.getNumReleasesForNameHash(nameHash) === '8' );
+
+      numReleases = await releaseDB.getNumReleasesForNameHash(nameHash);
+      assert( numReleases.toNumber() === 8 );
       const initialReleaseData = await releaseDB.getReleaseData(v200h);
 
       await releaseDB.removeRelease(v200h, 'testing');
       assert( await releaseDB.releaseExists(v200h) === false );
-      assert( await releaseDB.getNumReleasesForNameHash(nameHash) === '7' );
+
+      numReleases = await releaseDB.getNumReleasesForNameHash(nameHash);
+      assert( numReleases.toNumber() === 7 );
 
       await releaseDB.setRelease(
         nameHash,
@@ -487,7 +513,9 @@ contract('ReleaseDB', function(accounts){
       );
 
       assert( await releaseDB.releaseExists(v200h) === true );
-      assert( await releaseDB.getNumReleasesForNameHash(nameHash) === '8' );
+
+      numReleases = await releaseDB.getNumReleasesForNameHash(nameHash);
+      assert( numReleases.toNumber() === 8 );
     })
 
   });
@@ -524,8 +552,8 @@ contract('ReleaseDB', function(accounts){
 
       assert( releaseData.nameHash  === nameHash )
       assert( releaseData.versionHash === versionHash )
-      assert( releaseData.createdAt >= now )
-      assert( releaseData.updatedAt >= now )
+      assert( releaseData.createdAt.toNumber() >= now )
+      assert( releaseData.updatedAt.toNumber() >= now )
 
       assert( await releaseDB.getPreRelease(releaseHash) === 'beta.1' )
       assert( await releaseDB.getBuild(releaseHash) === 'build.abcd1234' )
@@ -533,9 +561,9 @@ contract('ReleaseDB', function(accounts){
 
       const majorMinorPatch = await releaseDB.getMajorMinorPatch(versionHash);
 
-      assert( majorMinorPatch['0'] === (1).toString());
-      assert( majorMinorPatch['1'] === (2).toString());
-      assert( majorMinorPatch['2'] === (3).toString());
+      assert( majorMinorPatch['0'].toNumber() === 1 );
+      assert( majorMinorPatch['1'].toNumber() === 2 );
+      assert( majorMinorPatch['2'].toNumber() === 3 );
     });
 
     it('returns false (or errors) when querying a version that does not exist', async function(){

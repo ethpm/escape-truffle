@@ -44,14 +44,14 @@ contract('PackageIndex', function(accounts){
     assert( allHashes.includes(releaseHash) );
     assert( exists );
 
-    assert( releaseData.major === major.toString() );
-    assert( releaseData.minor === minor.toString() );
-    assert( releaseData.patch === patch.toString() );
-    assert( releaseData.preRelease === preRelease.toString() );
+    assert( releaseData.major.toNumber() === major);
+    assert( releaseData.minor.toNumber() === minor );
+    assert( releaseData.patch.toNumber() === patch );
+    assert( releaseData.preRelease === preRelease );
     assert( releaseData.build === build );
     assert( releaseData.releaseLockfileURI === lockfileUri );
-    assert( releaseData.createdAt === timestamp.toString() );
-    assert( releaseData.updatedAt === timestamp.toString() );
+    assert( releaseData.createdAt.toNumber() === timestamp );
+    assert( releaseData.updatedAt.toNumber() === timestamp );
   }
 
   describe('Initialization', function(){
@@ -295,7 +295,7 @@ contract('PackageIndex', function(accounts){
         await packageIndex.release(...releaseInfoC)
 
         const packageData =  await packageIndex.getPackageData('test-r');
-        assert(packageData.numReleases === '3' );
+        assert(packageData.numReleases.toNumber() === 3 );
 
         const releaseHashes = await packageIndex.getAllPackageReleaseHashes('test-r');
 
@@ -341,9 +341,9 @@ contract('PackageIndex', function(accounts){
         const packageDataB = await packageIndex.getPackageData('test-b');
         const packageDataC = await packageIndex.getPackageData('test-c');
 
-        assert( packageDataA.numReleases == '1' )
-        assert( packageDataB.numReleases == '2' )
-        assert( packageDataC.numReleases == '3' )
+        assert( packageDataA.numReleases.toNumber() === 1 )
+        assert( packageDataB.numReleases.toNumber() === 2 )
+        assert( packageDataC.numReleases.toNumber() === 3 )
 
         const allReleaseHashes = await packageIndex.getAllReleaseHashes();
 
@@ -356,7 +356,7 @@ contract('PackageIndex', function(accounts){
 
         // Misc getters
         const numPackages = await packageIndex.getNumPackages();
-        assert(numPackages === '3');
+        assert(numPackages.toNumber() === 3);
 
         const releaseHashAtZero = await packageIndex.getReleaseHash(0);
         assert(releaseHashAtZero === releaseHashA);

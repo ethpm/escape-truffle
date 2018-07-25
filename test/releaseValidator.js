@@ -58,7 +58,7 @@ contract('ReleaseValidator', function(accounts){
       let packageData = await packageIndex.getPackageData(info[0]);
       let releaseData = await packageIndex.getReleaseData(releaseHash);
 
-      assert(packageData.numReleases === '1');
+      assert(packageData.numReleases.toNumber() === 1);
       assert(releaseData.releaseLockfileURI === uri)
 
       info.pop();
@@ -72,7 +72,7 @@ contract('ReleaseValidator', function(accounts){
       packageData = await packageIndex.getPackageData(info[0]);
       releaseData = await packageIndex.getReleaseData(releaseHash);
 
-      assert(packageData.numReleases === '1');
+      assert(packageData.numReleases.toNumber() === 1);
       assert(releaseData.releaseLockfileURI === uri);
     };
 
@@ -185,7 +185,7 @@ contract('ReleaseValidator', function(accounts){
       assert( await packageIndex.releaseExists(...backfill.slice(0,-1)) === false );
 
       let packageData = await packageIndex.getPackageData(name);
-      assert( packageData.numReleases === '1' );
+      assert( packageData.numReleases.toNumber() === 1 );
 
       await packageIndex.release(...backfill);
 
@@ -194,7 +194,7 @@ contract('ReleaseValidator', function(accounts){
       assert( await packageIndex.releaseExists(...backfill.slice(0,-1)) === true );
 
       packageData = await packageIndex.getPackageData(name);
-      assert( packageData.numReleases === '2' );
+      assert( packageData.numReleases.toNumber() === 2 );
 
     }
 
