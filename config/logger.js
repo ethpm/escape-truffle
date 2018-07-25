@@ -10,7 +10,7 @@ class PermissionsLogger {
   start(){
     if (!this.verbose) return;
 
-    log(`${t}Initializing registry contracts...`);
+    log(`${t}\nInitializing registry contracts...`);
     log(`${t}----------------------------------`);
   }
 
