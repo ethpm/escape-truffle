@@ -546,7 +546,8 @@ contract('ReleaseDB', function(accounts){
       assert( await releaseDB.isLatestMajorTree(nameHash, trueVersionHash) );
 
       await assertCallFailure(
-        releaseDB.isLatestMajorTree(nameHash, falseVersionHash)
+        releaseDB.isLatestMajorTree(nameHash, falseVersionHash),
+        false
       );
     })
   });

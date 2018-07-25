@@ -124,20 +124,18 @@ contract PackageIndex is Authorized, PackageIndexInterface {
       );
     }
 
-    if (!releaseValidator.validateRelease(
-          packageDb,
-          releaseDb,
-          msg.sender,
-          name,
-          majorMinorPatch,
-          preRelease,
-          build,
-          releaseLockfileURI)
-       )
-    {
-      // Release is invalid
-      return false;
-    }
+    // Run release validator. This method reverts with an error message string
+    // on failure.
+    releaseValidator.validateRelease(
+      packageDb,
+      releaseDb,
+      msg.sender,
+      name,
+      majorMinorPatch,
+      preRelease,
+      build,
+      releaseLockfileURI
+    );
 
     // Compute hashes
     bool _packageExists = packageExists(name);
