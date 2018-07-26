@@ -13,8 +13,9 @@
 
 const fs = require('fs');
 
-let infura
+let infura;
 let mnemonic;
+let ENSName;
 
 const publicNetworks = ['ropsten', 'rinkeby'];
 const network = process.env.NETWORK;
@@ -42,12 +43,14 @@ if (publicNetworks.includes(process.env.NETWORK)){
 
     mnemonic = secrets[network].mnemonic;
     infura = secrets[network].infura;
+    ENSName = secrets[network].ENSName;
 
   } else throw new Error(noFileMsg);
 }
 
 module.exports =  {
   mnemonic: mnemonic,
-  infura: infura
+  infura: infura,
+  ENSName: ENSName
 }
 
