@@ -42,7 +42,7 @@ contract PackageIndexInterface is AuthorizedInterface {
   /// @param patch The patch portion of the semver version string.
   /// @param preRelease The pre-release portion of the semver version string.  Use empty string if the version string has no pre-release portion.
   /// @param build The build portion of the semver version string.  Use empty string if the version string has no build portion.
-  /// @param releaseManifestURI The URI for the release manifest for this release.
+  /// @param manifestURI The URI for the release manifest for this release.
   function release(
     string name,
     uint32 major,
@@ -50,7 +50,7 @@ contract PackageIndexInterface is AuthorizedInterface {
     uint32 patch,
     string preRelease,
     string build,
-    string releaseManifestURI
+    string manifestURI
   )
     public
     returns (bool);
@@ -129,7 +129,7 @@ contract PackageIndexInterface is AuthorizedInterface {
       uint32 patch,
       string preRelease,
       string build,
-      string releaseManifestURI,
+      string manifestURI,
       uint createdAt,
       uint updatedAt
     );
@@ -177,7 +177,7 @@ contract PackageIndexInterface is AuthorizedInterface {
   /// @param patch The patch portion of the semver version string.
   /// @param preRelease The pre-release portion of the semver version string.  Use empty string if the version string has no pre-release portion.
   /// @param build The build portion of the semver version string.  Use empty string if the version string has no build portion.
-  function getReleaseManifestURI(
+  function getManifestURI(
     string name,
     uint32 major,
     uint32 minor,

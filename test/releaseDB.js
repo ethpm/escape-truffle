@@ -378,7 +378,7 @@ contract('ReleaseDB', function(accounts){
 
       const numReleases = await releaseDB.getNumReleasesForNameHash(nameHash);
       assert( numReleases.toNumber() === 12 );
-      assert( await releaseDB.getReleaseManifestURI(v124h) === newUri );
+      assert( await releaseDB.getManifestURI(v124h) === newUri );
 
       const events = await releaseDB.getPastEvents('ReleaseUpdate', {fromBlock: 0, toBlock: 'latest'});
       assert(events.length === 1);
@@ -557,7 +557,7 @@ contract('ReleaseDB', function(accounts){
 
       assert( await releaseDB.getPreRelease(releaseHash) === 'beta.1' )
       assert( await releaseDB.getBuild(releaseHash) === 'build.abcd1234' )
-      assert( await releaseDB.getReleaseManifestURI(releaseHash) == 'ipfs://some-ipfs-uri' )
+      assert( await releaseDB.getManifestURI(releaseHash) == 'ipfs://some-ipfs-uri' )
 
       const majorMinorPatch = await releaseDB.getMajorMinorPatch(versionHash);
 

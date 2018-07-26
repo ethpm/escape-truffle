@@ -65,7 +65,7 @@ contract PackageIndex is Authorized, PackageIndexInterface {
   /// @param patch The patch portion of the semver version string.
   /// @param preRelease The pre-release portion of the semver version string.  Use empty string if the version string has no pre-release portion.
   /// @param build The build portion of the semver version string.  Use empty string if the version string has no build portion.
-  /// @param releaseManifestURI The URI for the release manifest for this release.
+  /// @param manifestURI The URI for the release manifest for this release.
   function release(
     string name,
     uint32 major,
@@ -73,7 +73,7 @@ contract PackageIndex is Authorized, PackageIndexInterface {
     uint32 patch,
     string preRelease,
     string build,
-    string releaseManifestURI
+    string manifestURI
   )
     public
     auth
@@ -83,7 +83,7 @@ contract PackageIndex is Authorized, PackageIndexInterface {
     require(address(releaseDb) != 0x0,        "escape:PackageIndex:release-db-not-set");
     require(address(releaseValidator) != 0x0, "escape:PackageIndex:release-validator-not-set");
 
-    return release(name, [major, minor, patch], preRelease, build, releaseManifestURI);
+    return release(name, [major, minor, patch], preRelease, build, manifestURI);
   }
 
   /// @dev Creates a a new release for the named package.  If this is the first release for the given package then this will also assign msg.sender as the owner of the package.  Returns success.
@@ -92,13 +92,13 @@ contract PackageIndex is Authorized, PackageIndexInterface {
   /// @param majorMinorPatch The major/minor/patch portion of the version string.
   /// @param preRelease The pre-release portion of the semver version string.  Use empty string if the version string has no pre-release portion.
   /// @param build The build portion of the semver version string.  Use empty string if the version string has no build portion.
-  /// @param releaseManifestURI The URI for the release manifest for this release.
+  /// @param manifestURI The URI for the release manifest for this release.
   function release(
     string name,
     uint32[3] majorMinorPatch,
     string preRelease,
     string build,
-    string releaseManifestURI
+    string manifestURI
   )
     internal
     returns (bool)
@@ -134,7 +134,7 @@ contract PackageIndex is Authorized, PackageIndexInterface {
       majorMinorPatch,
       preRelease,
       build,
-      releaseManifestURI
+      manifestURI
     );
 
     // Compute hashes
@@ -152,7 +152,7 @@ contract PackageIndex is Authorized, PackageIndexInterface {
     }
 
     // Create the release and add it to the list of package release hashes.
-    releaseDb.setRelease(nameHash, versionHash, releaseManifestURI);
+    releaseDb.setRelease(nameHash, versionHash, manifestURI);
 
     // Log the release.
     emit PackageRelease(nameHash, releaseDb.hashRelease(nameHash, versionHash));
@@ -302,7 +302,7 @@ contract PackageIndex is Authorized, PackageIndexInterface {
       uint32 patch,
       string preRelease,
       string build,
-      string releaseManifestURI,
+      string manifestURI,
       uint createdAt,
       uint updatedAt
     )
@@ -312,8 +312,8 @@ contract PackageIndex is Authorized, PackageIndexInterface {
     (major, minor, patch) = releaseDb.getMajorMinorPatch(versionHash);
     preRelease = getPreRelease(releaseHash);
     build = getBuild(releaseHash);
-    releaseManifestURI = getReleaseManifestURI(releaseHash);
-    return (major, minor, patch, preRelease, build, releaseManifestURI, createdAt, updatedAt);
+    manifestURI = getManifestURI(releaseHash);
+    return (major, minor, patch, preRelease, build, manifestURI, createdAt, updatedAt);
   }
 
   /// @dev Returns the release hash at the provide index in the array of all release hashes.
@@ -414,7 +414,7 @@ contract PackageIndex is Authorized, PackageIndexInterface {
   /// @param patch The patch portion of the semver version string.
   /// @param preRelease The pre-release portion of the semver version string.  Use empty string if the version string has no pre-release portion.
   /// @param build The build portion of the semver version string.  Use empty string if the version string has no build portion.
-  function getReleaseManifestURI(
+  function getManifestURI(
     string name,
     uint32 major,
     uint32 minor,
@@ -428,7 +428,7 @@ contract PackageIndex is Authorized, PackageIndexInterface {
   {
     bytes32 versionHash = releaseDb.hashVersion(major, minor, patch, preRelease, build);
     bytes32 releaseHash = releaseDb.hashRelease(packageDb.hashName(name), versionHash);
-    return getReleaseManifestURI(releaseHash);
+    return getManifestURI(releaseHash);
   }
 
 
@@ -462,12 +462,12 @@ contract PackageIndex is Authorized, PackageIndexInterface {
 
   /// @dev Retrieves the release manifest URI from the package db.
   /// @param releaseHash The release hash to retrieve the URI from.
-  function getReleaseManifestURI(bytes32 releaseHash)
+  function getManifestURI(bytes32 releaseHash)
     internal
     view
     returns (string)
   {
-    return ReleaseDB(releaseDb).getReleaseManifestURI(releaseHash);
+    return ReleaseDB(releaseDb).getManifestURI(releaseHash);
   }
 
   /// @dev Retrieves the pre-release string from the package db.

@@ -59,7 +59,7 @@ contract('ReleaseValidator', function(accounts){
       let releaseData = await packageIndex.getReleaseData(releaseHash);
 
       assert(packageData.numReleases.toNumber() === 1);
-      assert(releaseData.releaseManifestURI === uri)
+      assert(releaseData.manifestURI === uri)
 
       info.pop();
       info.push(otherUri);
@@ -73,7 +73,7 @@ contract('ReleaseValidator', function(accounts){
       releaseData = await packageIndex.getReleaseData(releaseHash);
 
       assert(packageData.numReleases.toNumber() === 1);
-      assert(releaseData.releaseManifestURI === uri);
+      assert(releaseData.manifestURI === uri);
     };
 
     const uri = 'ipfs://some-ipfs-uri';

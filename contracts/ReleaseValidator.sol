@@ -15,7 +15,7 @@ contract ReleaseValidator {
   /// @param majorMinorPatch The major/minor/patch portion of the version string.
   /// @param preRelease The pre-release portion of the version string.
   /// @param build The build portion of the version string.
-  /// @param releaseManifestURI The URI of the release manifest.
+  /// @param manifestURI The URI of the release manifest.
   function validateRelease(
     PackageDB packageDb,
     ReleaseDB releaseDb,
@@ -24,7 +24,7 @@ contract ReleaseValidator {
     uint32[3] majorMinorPatch,
     string preRelease,
     string build,
-    string releaseManifestURI
+    string manifestURI
   )
     public
     view
@@ -45,7 +45,7 @@ contract ReleaseValidator {
     } else if (!validatePackageName(packageDb, name)) {
       // invalid package name.
       revert("escape:ReleaseValidator:invalid-package-name");
-    } else if (!validateReleaseManifestURI(releaseManifestURI)) {
+    } else if (!validateManifestURI(manifestURI)) {
       // disallow empty release manifest URI
       revert("escape:ReleaseValidator:invalid-manifest-uri");
     } else if (!validateReleaseVersion(majorMinorPatch)) {
@@ -146,13 +146,13 @@ contract ReleaseValidator {
   }
 
   /// @dev Returns boolean whether the provided release manifest URI is valid.
-  /// @param releaseManifestURI The URI for a release manifest.
-  function validateReleaseManifestURI(string releaseManifestURI)
+  /// @param manifestURI The URI for a release manifest.
+  function validateManifestURI(string manifestURI)
     public
     pure
     returns (bool)
   {
-    if (bytes(releaseManifestURI).length == 0) {
+    if (bytes(manifestURI).length == 0) {
       return false;
     }
     return true;

@@ -18,7 +18,7 @@ contract ReleaseDB is Authorized {
     uint updatedAt;
     bytes32 nameHash;
     bytes32 versionHash;
-    string releaseManifestURI;
+    string manifestURI;
   }
 
   // Release Data: (releaseHash => value)
@@ -72,11 +72,11 @@ contract ReleaseDB is Authorized {
   /// @dev Creates or updates a release for a package.  Returns success.
   /// @param nameHash The name hash of the package.
   /// @param versionHash The version hash for the release version.
-  /// @param releaseManifestURI The URI for the release manifest for this release.
+  /// @param manifestURI The URI for the release manifest for this release.
   function setRelease(
     bytes32 nameHash,
     bytes32 versionHash,
-    string releaseManifestURI
+    string manifestURI
   )
     public
     auth
@@ -108,7 +108,7 @@ contract ReleaseDB is Authorized {
     release.updatedAt = block.timestamp; // solium-disable-line security/no-block-members
 
     // Save the release manifest URI
-    release.releaseManifestURI = releaseManifestURI;
+    release.manifestURI = manifestURI;
 
     // Track latest released versions for each branch of the release tree.
     updateLatestTree(releaseHash);
@@ -325,13 +325,13 @@ contract ReleaseDB is Authorized {
 
   /// @dev Returns the URI of the release manifest for the given release hash.
   /// @param releaseHash Release hash
-  function getReleaseManifestURI(bytes32 releaseHash)
+  function getManifestURI(bytes32 releaseHash)
     public
     view
     onlyIfReleaseExists(releaseHash)
     returns (string)
   {
-    return _recordedReleases[releaseHash].releaseManifestURI;
+    return _recordedReleases[releaseHash].manifestURI;
   }
 
   /*
