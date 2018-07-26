@@ -42,7 +42,7 @@ contract PackageIndexInterface is AuthorizedInterface {
   /// @param patch The patch portion of the semver version string.
   /// @param preRelease The pre-release portion of the semver version string.  Use empty string if the version string has no pre-release portion.
   /// @param build The build portion of the semver version string.  Use empty string if the version string has no build portion.
-  /// @param releaseLockfileURI The URI for the release lockfile for this release.
+  /// @param releaseManifestURI The URI for the release manifest for this release.
   function release(
     string name,
     uint32 major,
@@ -50,7 +50,7 @@ contract PackageIndexInterface is AuthorizedInterface {
     uint32 patch,
     string preRelease,
     string build,
-    string releaseLockfileURI
+    string releaseManifestURI
   )
     public
     returns (bool);
@@ -129,7 +129,7 @@ contract PackageIndexInterface is AuthorizedInterface {
       uint32 patch,
       string preRelease,
       string build,
-      string releaseLockfileURI,
+      string releaseManifestURI,
       uint createdAt,
       uint updatedAt
     );
@@ -170,14 +170,14 @@ contract PackageIndexInterface is AuthorizedInterface {
   /// @param numReleases The length of the slice
   function getReleaseHashes(uint offset, uint numReleases) public view returns (bytes32[]);
 
-  /// @dev Returns the release lockfile for the given release data
+  /// @dev Returns the release manifest for the given release data
   /// @param name Package name
   /// @param major The major portion of the semver version string.
   /// @param minor The minor portion of the semver version string.
   /// @param patch The patch portion of the semver version string.
   /// @param preRelease The pre-release portion of the semver version string.  Use empty string if the version string has no pre-release portion.
   /// @param build The build portion of the semver version string.  Use empty string if the version string has no build portion.
-  function getReleaseLockfileURI(
+  function getReleaseManifestURI(
     string name,
     uint32 major,
     uint32 minor,

@@ -15,7 +15,7 @@ contract ReleaseValidator {
   /// @param majorMinorPatch The major/minor/patch portion of the version string.
   /// @param preRelease The pre-release portion of the version string.
   /// @param build The build portion of the version string.
-  /// @param releaseLockfileURI The URI of the release lockfile.
+  /// @param releaseManifestURI The URI of the release manifest.
   function validateRelease(
     PackageDB packageDb,
     ReleaseDB releaseDb,
@@ -24,7 +24,7 @@ contract ReleaseValidator {
     uint32[3] majorMinorPatch,
     string preRelease,
     string build,
-    string releaseLockfileURI
+    string releaseManifestURI
   )
     public
     view
@@ -45,9 +45,9 @@ contract ReleaseValidator {
     } else if (!validatePackageName(packageDb, name)) {
       // invalid package name.
       revert("escape:ReleaseValidator:invalid-package-name");
-    } else if (!validateReleaseLockfileURI(releaseLockfileURI)) {
-      // disallow empty release lockfile URI
-      revert("escape:ReleaseValidator:invalid-lockfile-uri");
+    } else if (!validateReleaseManifestURI(releaseManifestURI)) {
+      // disallow empty release manifest URI
+      revert("escape:ReleaseValidator:invalid-manifest-uri");
     } else if (!validateReleaseVersion(majorMinorPatch)) {
       // disallow version 0.0.0
       revert("escape:ReleaseValidator:invalid-release-version");
@@ -145,14 +145,14 @@ contract ReleaseValidator {
     return true;
   }
 
-  /// @dev Returns boolean whether the provided release lockfile URI is valid.
-  /// @param releaseLockfileURI The URI for a release lockfile.
-  function validateReleaseLockfileURI(string releaseLockfileURI)
+  /// @dev Returns boolean whether the provided release manifest URI is valid.
+  /// @param releaseManifestURI The URI for a release manifest.
+  function validateReleaseManifestURI(string releaseManifestURI)
     public
     pure
     returns (bool)
   {
-    if (bytes(releaseLockfileURI).length == 0) {
+    if (bytes(releaseManifestURI).length == 0) {
       return false;
     }
     return true;
