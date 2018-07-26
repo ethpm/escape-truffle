@@ -17,15 +17,18 @@
  *                               .getVersion('^1.1.5');
  */
 
-const ensUtils = require('../ens/ropstenENSUtils');
-const nameHash = require('eth-ens-namehash');
 const assert = require('assert');
-const PackageIndex = artifacts.require('PackageIndex');
-const log = console.log;
+const readline = require('readline');
+const nameHash = require('eth-ens-namehash');
+const colors = require('colors');
+const ora = require('ora');
 
-const {
-  ENSName
-} = require('../config/wallet');
+const log = console.log;
+const ensUtils = require('../ens/ropstenENSUtils');
+const { ENSName } = require('../config/wallet');
+
+const PackageIndex = artifacts.require('PackageIndex');
+
 
 // ------------------------------------- Validators ------------------------------------------------
 const validateENSName = function(){
@@ -79,106 +82,158 @@ const validateCanBeRegistered = async function(web3, registrar){
 
 //-----------------------------------------MAIN-----------------------------------------------------
 const registerIndex = async function(){
-  try {
+  let spinner;
+  const affirmations = ['y', 'yes', 'YES', 'Yes'];
+  const confirm = `> ${colors.green('Confirmed:')}`;
 
-    validateENSName();
-    await validatePackageIndex();
+  validateENSName();
+  await validatePackageIndex();
 
-    const registrar = await ensUtils.getRopstenTestRegistrarInstance(web3);
-    await validateCanBeRegistered(web3, registrar);
+  const registrar = await ensUtils.getRopstenTestRegistrarInstance(web3);
+  await validateCanBeRegistered(web3, registrar);
 
-    const options = {from: web3.currentProvider.addresses[0]};
+  const options = {from: web3.currentProvider.addresses[0]};
 
-    // ----------------------------------- Preamble ------------------------------------------------
 
-    log(`....This script will link the package registry (PackageIndex)`)
-    log(`you have deployed on Ropsten to an ENS domain name registered`)
-    log(`with the Ropsten FIFS test registrar.........................`);
-    log();
-    log(`* The domain name will be valid for 28 days ONLY.`);
-    log(`* Do NOT use this script for a production registry.`)
-    log();
-    log('----------------------------------------------------------')
-    log(`Account:        ${web3.currentProvider.addresses[0]}`);
-    log(`Domain:         ${ENSName}.test`)
-    log(`PackageIndex:   ${PackageIndex.address}`)
-    log('----------------------------------------------------------')
-    log();
+  // ----------------------------------- Preamble ------------------------------------------------
 
-    // ------------------------------- Name Registration -------------------------------------------
-    await registrar
-      .methods
-      .register(web3.utils.sha3(ENSName), web3.currentProvider.addresses[0])
-      .send(options)
-      .on('transactionHash', (hash) => {
-        log(`Registering domain.... (tx ${hash})`)
-      })
+  log(`....This script will link the package registry (PackageIndex)`)
+  log(`you have deployed on Ropsten to an ENS domain name registered`)
+  log(`with the Ropsten FIFS test registrar.........................`);
+  log();
+  log(`* The domain name ${colors.bold('will expire in 28 days')}.`);
+  log(`* ${colors.bold('DO NOT')} use this script for a production registry.`);
+  log(`* Script executes three transactions.`);
+  log(`* Sometimes Ropsten takes a while to mine...`);
+  log();
+  log('----------------------------------------------------------')
+  log(`Account:        ${web3.currentProvider.addresses[0]}`);
+  log(`Domain:         ${ENSName}.test`)
+  log(`PackageIndex:   ${PackageIndex.address}`)
+  log('----------------------------------------------------------')
+  log();
 
-    // Confirm and get expiration date
-    const time = await registrar
+  // ------------------------------- User Confirmation -------------------------------------------
+  const quest = `${colors.green('* Continue with registration?')} (y/n) >> `;
+
+  const input = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+
+  input.question(quest, async (answer) => {
+    if (!affirmations.includes(answer.trim())){
+      log();
+      log('Exiting without registering.');
+      log();
+      process.exit(0);
+    }
+
+    try {
+    // ------------------------------- Name Registration -----------------------------------------
+      await registrar
         .methods
-        .expiryTimes(web3.utils.sha3(ENSName))
+        .register(web3.utils.sha3(ENSName), web3.currentProvider.addresses[0])
+        .send(options)
+        .on('transactionHash', (hash) => {
+          log();
+          log(`> Registering domain....`);
+
+          spinner = new ora({
+            text: `tx: ${hash}`,
+            color: 'red'
+          });
+
+          spinner.start();
+        })
+
+      spinner.stopAndPersist({symbol: '>'});
+
+      // Confirm and get expiration date
+      const time = await registrar
+          .methods
+          .expiryTimes(web3.utils.sha3(ENSName))
+          .call();
+
+      log(`${confirm} Domain "${ENSName}.test" ` +
+          `will expire ${new Date(parseInt(time * 1000)).toDateString()}`
+      );
+      log();
+
+      // -------------------------------- Resolver Setup -------------------------------------------
+
+      const resolver = ensUtils.getRopstenResolverInstance(web3);
+      const ens = ensUtils.getRopstenENSInstance(web3);
+      const domainHash = nameHash.hash(`${ENSName}.test`);
+
+      await ens
+        .methods
+        .setResolver(domainHash, resolver.options.address)
+        .send(options)
+        .on('transactionHash', hash => {
+          log(`> Setting resolver for domain...`);
+
+          spinner = new ora({
+            text: `tx: ${hash}`,
+            color: 'red'
+          });
+
+          spinner.start();
+        });
+
+      spinner.stopAndPersist({symbol: '>'});
+
+      const resolverAddress = await ens
+        .methods
+        .resolver(domainHash)
         .call();
 
-    log(`Confirmed: Domain "${ENSName}.test" ` +
-        `will expire ${new Date(parseInt(time * 1000)).toDateString()}`
-    );
-    log();
+      // Validate ENS Resolver settings and report
+      const resolverErr = `Expected resolver to be set for domain name hash correctly.`
+      assert(resolverAddress === resolver.options.address, resolverErr);
 
-    // -------------------------------- Resolver Setup ---------------------------------------------
+      log(`${confirm} "${ENSName}.test" is using ENS Resolver at ${resolverAddress}`)
+      log();
 
-    const resolver = ensUtils.getRopstenResolverInstance(web3);
-    const ens = ensUtils.getRopstenENSInstance(web3);
-    const domainHash = nameHash.hash(`${ENSName}.test`);
+      // -------------------------- Resolve PackageIndex Contract ----------------------------------
+      await resolver
+        .methods
+        .setAddr(domainHash, PackageIndex.address)
+        .send(options)
+        .on('transactionHash', hash => {
+          log(`> Setting domain to resolve "PackageIndex"...`)
 
-    await ens
-      .methods
-      .setResolver(domainHash, resolver.options.address)
-      .send(options)
-      .on('transactionHash', hash =>
-        log(`Setting resolver for domain... (tx ${hash})`)
-      );
+          spinner = new ora({
+            text: `tx: ${hash}`,
+            color: 'red'
+          });
 
-    const resolverAddress = await ens
-      .methods
-      .resolver(domainHash)
-      .call();
+          spinner.start();
+        });
 
-    // Validate ENS Resolver settings and report
-    const resolverErr = `Expected resolver to be set for domain name hash correctly.`
-    assert(resolverAddress === resolver.options.address, resolverErr);
+      spinner.stopAndPersist({symbol: '>'});
 
-    log(`Confirmed: "${ENSName}.test" is using Resolver at address: ${resolverAddress}`)
-    log();
+      const resolved = await resolver
+        .methods
+        .addr(domainHash)
+        .call();
 
-    // -------------------------- Resolve PackageIndex Contract ------------------------------------
-    await resolver
-      .methods
-      .setAddr(domainHash, PackageIndex.address)
-      .send(options)
-      .on('transactionHash', hash =>
-        log(`Setting domain to resolve "PackageIndex"...`)
-      );
+      // Validate name-to-contract resolution and report
+      const resolvedErr = `Expected Resolver to resolve PackageIndex for domain correctly.`
+      assert(resolved === PackageIndex.address, resolverErr);
 
-    const resolved = await resolver
-      .methods
-      .addr(domainHash)
-      .call();
+      log(`${confirm} "${ENSName}.test" resolves PackageIndex at ${PackageIndex.address}`);
+      log();
+      log('Finished');
+      log();
 
-    // Validate name-to-contract resolution and report
-    const resolvedErr = `Expected Resolver to resolve PackageIndex for domain correctly.`
-    assert(resolved === PackageIndex.address, resolverErr);
+      process.exit(0);
 
-    log(`Confirmed: "${ENSName}.test" resolves "PackageIndex" at ${PackageIndex.address}`);
-    log();
-    log('Finished');
-    log();
-
-    process.exit(0);
-  } catch(err){
-    log(err);
-    process.exit(0);
-  }
+    } catch(err){
+      log(err);
+      process.exit(0);
+    }
+  });
 }
 
 module.exports = registerIndex;

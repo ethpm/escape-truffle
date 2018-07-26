@@ -73,7 +73,7 @@ module.exports = {
       provider: () => new HDWalletProvider(mnemonic, `https://ropsten.infura.io/${infura}`),
       network_id: 3,
       gas: 5500000,
-      gasPrice: 20000000000,
+      gasPrice: 50000000000,
       confirmations: 2,
     },
     // Rinkeby deployment via Infura (geth)
