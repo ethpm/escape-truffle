@@ -59,7 +59,7 @@ contract('ReleaseValidator', function(accounts){
       let releaseData = await packageIndex.getReleaseData(releaseHash);
 
       assert(packageData.numReleases.toNumber() === 1);
-      assert(releaseData.releaseLockfileURI === uri)
+      assert(releaseData.manifestURI === uri)
 
       info.pop();
       info.push(otherUri);
@@ -73,7 +73,7 @@ contract('ReleaseValidator', function(accounts){
       releaseData = await packageIndex.getReleaseData(releaseHash);
 
       assert(packageData.numReleases.toNumber() === 1);
-      assert(releaseData.releaseLockfileURI === uri);
+      assert(releaseData.manifestURI === uri);
     };
 
     const uri = 'ipfs://some-ipfs-uri';
@@ -514,16 +514,16 @@ contract('ReleaseValidator', function(accounts){
     });
   });
 
-  describe('Lockfile', function(){
+  describe('Manifest', function(){
 
-    it('does not allow an empty lockfile', async function(){
+    it('does not allow an empty manifestURI field', async function(){
       const info = ['test', 1, 0, 0, '', '', ''];
 
       assert( await packageIndex.packageExists('test') === false );
 
       await assertFailure(
         packageIndex.release(...info),
-        'invalid-lockfile-uri'
+        'invalid-manifest-uri'
       );
 
       assert( await packageIndex.packageExists('test') === false );

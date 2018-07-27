@@ -28,7 +28,7 @@ contract('PackageIndex', function(accounts){
     patch,
     preRelease,
     build,
-    lockfileUri,
+    manifestUri,
     receipt,
     releaseData,
   ){
@@ -49,7 +49,7 @@ contract('PackageIndex', function(accounts){
     assert( releaseData.patch.toNumber() === patch );
     assert( releaseData.preRelease === preRelease );
     assert( releaseData.build === build );
-    assert( releaseData.releaseLockfileURI === lockfileUri );
+    assert( releaseData.manifestURI === manifestUri );
     assert( releaseData.createdAt.toNumber() === timestamp );
     assert( releaseData.updatedAt.toNumber() === timestamp );
   }
@@ -244,15 +244,15 @@ contract('PackageIndex', function(accounts){
         assert( actualReleaseHashB == releaseHashB )
       })
 
-      it('should retrieve the lockfile Uri', async function(){
+      it('should retrieve the manifest Uri', async function(){
         const releaseInfo = ['test', 2, 3, 4, 'c', 'e', 'ipfs://some--ipfs-uri']
 
         const versionHash = await releaseDB.hashVersion(...releaseInfo.slice(1, -1))
         const releaseHash = await releaseDB.hashRelease(nameHash, versionHash)
 
         await packageIndex.release(...releaseInfo)
-        const lockfileUri = await packageIndex.getReleaseLockfileURI(...releaseInfo.slice(0, -1))
-        assert(lockfileUri === releaseInfo.pop())
+        const manifestUri = await packageIndex.getReleaseManifestURI(...releaseInfo.slice(0, -1))
+        assert(manifestUri === releaseInfo.pop())
       });
 
       it('should retrieve release by release hash', async function(){
