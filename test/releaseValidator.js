@@ -108,7 +108,7 @@ contract('ReleaseValidator', function(accounts){
         packageIndex,
         packageDB,
         releaseDB,
-        'version-exists',
+        'version-previously-published',
       );
     });
 
@@ -118,7 +118,7 @@ contract('ReleaseValidator', function(accounts){
         packageIndex,
         packageDB,
         releaseDB,
-        'version-exists',
+        'version-previously-published',
       );
     });
 
@@ -128,7 +128,7 @@ contract('ReleaseValidator', function(accounts){
         packageIndex,
         packageDB,
         releaseDB,
-        'version-exists',
+        'version-previously-published',
       );
     });
 
@@ -138,7 +138,7 @@ contract('ReleaseValidator', function(accounts){
         packageIndex,
         packageDB,
         releaseDB,
-        'version-exists',
+        'version-previously-published',
       );
     });
 
@@ -148,7 +148,7 @@ contract('ReleaseValidator', function(accounts){
         packageIndex,
         packageDB,
         releaseDB,
-        'version-exists',
+        'version-previously-published',
       );
     });
 
@@ -158,9 +158,39 @@ contract('ReleaseValidator', function(accounts){
         packageIndex,
         packageDB,
         releaseDB,
-        'version-exists',
+        'version-previously-published',
       );
     });
+
+    it('should not re-release a version that has been removed from the ReleaseDB', async function(){
+      const info = ['test', 2, 0, 0, '', '', uri];
+
+      const nameHash = await packageDB.hashName(info[0])
+      const versionHash = await releaseDB.hashVersion(...info.slice(1, -1));
+      const releaseHash = await releaseDB.hashRelease(nameHash, versionHash)
+
+      assert( await packageIndex.releaseExists(...info.slice(0,-1)) === false );
+      await packageIndex.release(...info);
+      assert( await packageIndex.releaseExists(...info.slice(0,-1)) === true );
+
+      let packageData = await packageIndex.getPackageData(info[0]);
+      let releaseData = await packageIndex.getReleaseData(releaseHash);
+
+      assert(packageData.numReleases.toNumber() === 1);
+      assert(releaseData.manifestURI === uri)
+
+      await releaseDB.removeRelease(releaseHash, 'testing');
+      assert( await packageIndex.releaseExists(...info.slice(0,-1)) === false );
+
+      await assertFailure(
+        packageIndex.release(...info),
+        'version-previously-published',
+      );
+
+      packageData = await packageIndex.getPackageData(info[0]);
+      assert(packageData.numReleases.toNumber() === 0);
+    });
+
   });
 
   describe('Backfilling', function(){
@@ -606,5 +636,5 @@ contract('ReleaseValidator', function(accounts){
 
       assert( await packageIndex.releaseExists(...infoB.slice(0, -1)) === false );
     });
-  })
+  });
 });
