@@ -177,7 +177,7 @@ contract PackageIndexInterface is AuthorizedInterface {
   /// @param patch The patch portion of the semver version string.
   /// @param preRelease The pre-release portion of the semver version string.  Use empty string if the version string has no pre-release portion.
   /// @param build The build portion of the semver version string.  Use empty string if the version string has no build portion.
-  function getManifestURI(
+  function getReleaseManifestURI(
     string name,
     uint32 major,
     uint32 minor,

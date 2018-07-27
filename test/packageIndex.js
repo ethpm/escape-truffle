@@ -251,7 +251,7 @@ contract('PackageIndex', function(accounts){
         const releaseHash = await releaseDB.hashRelease(nameHash, versionHash)
 
         await packageIndex.release(...releaseInfo)
-        const manifestUri = await packageIndex.getManifestURI(...releaseInfo.slice(0, -1))
+        const manifestUri = await packageIndex.getReleaseManifestURI(...releaseInfo.slice(0, -1))
         assert(manifestUri === releaseInfo.pop())
       });
 

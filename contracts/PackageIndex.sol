@@ -312,7 +312,7 @@ contract PackageIndex is Authorized, PackageIndexInterface {
     (major, minor, patch) = releaseDb.getMajorMinorPatch(versionHash);
     preRelease = getPreRelease(releaseHash);
     build = getBuild(releaseHash);
-    manifestURI = getManifestURI(releaseHash);
+    manifestURI = getReleaseManifestURI(releaseHash);
     return (major, minor, patch, preRelease, build, manifestURI, createdAt, updatedAt);
   }
 
@@ -414,7 +414,7 @@ contract PackageIndex is Authorized, PackageIndexInterface {
   /// @param patch The patch portion of the semver version string.
   /// @param preRelease The pre-release portion of the semver version string.  Use empty string if the version string has no pre-release portion.
   /// @param build The build portion of the semver version string.  Use empty string if the version string has no build portion.
-  function getManifestURI(
+  function getReleaseManifestURI(
     string name,
     uint32 major,
     uint32 minor,
@@ -428,7 +428,7 @@ contract PackageIndex is Authorized, PackageIndexInterface {
   {
     bytes32 versionHash = releaseDb.hashVersion(major, minor, patch, preRelease, build);
     bytes32 releaseHash = releaseDb.hashRelease(packageDb.hashName(name), versionHash);
-    return getManifestURI(releaseHash);
+    return getReleaseManifestURI(releaseHash);
   }
 
 
@@ -462,7 +462,7 @@ contract PackageIndex is Authorized, PackageIndexInterface {
 
   /// @dev Retrieves the release manifest URI from the package db.
   /// @param releaseHash The release hash to retrieve the URI from.
-  function getManifestURI(bytes32 releaseHash)
+  function getReleaseManifestURI(bytes32 releaseHash)
     internal
     view
     returns (string)
