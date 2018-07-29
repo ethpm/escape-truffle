@@ -14,25 +14,31 @@ async function setPermissions(
 
   logger.start();
 
-  await packageIndex.setAuthority(authority.address);
   logger.setAuthority(packageIndex);
+  await packageIndex.setAuthority(authority.address);
+  logger.stopSpinner()
 
-  await packageDB.setAuthority(authority.address);
   logger.setAuthority(packageDB);
+  await packageDB.setAuthority(authority.address);
+  logger.stopSpinner()
 
-  await releaseDB.setAuthority(authority.address);
   logger.setAuthority(releaseDB);
+  await releaseDB.setAuthority(authority.address);
+  logger.stopSpinner()
 
   logger.newline();
 
-  await packageIndex.setPackageDb(packageDB.address);
   logger.setDep(packageDB, 'database')
+  await packageIndex.setPackageDb(packageDB.address);
+  logger.stopSpinner()
 
-  await packageIndex.setReleaseDb(releaseDB.address);
   logger.setDep(releaseDB, 'database');
+  await packageIndex.setReleaseDb(releaseDB.address);
+  logger.stopSpinner()
 
-  await packageIndex.setReleaseValidator(releaseValidator.address);
   logger.setDep(releaseValidator, 'validator');
+  await packageIndex.setReleaseValidator(releaseValidator.address);
+  logger.stopSpinner()
 
   logger.newline();
 
@@ -76,6 +82,12 @@ async function setPermissions(
     .signature;
 
   // ReleaseDB
+  logger.setCanCall(
+    packageIndex,
+    releaseDB,
+    'setRelease'
+  );
+
   await authority.setCanCall(
     packageIndex.address,
     releaseDB.address,
@@ -83,20 +95,9 @@ async function setPermissions(
     true
   );
 
-  logger.setCanCall(
-    packageIndex,
-    releaseDB,
-    'setRelease'
-  );
+  logger.stopSpinner()
 
   // PackageDB
-  await authority.setCanCall(
-    packageIndex.address,
-    packageDB.address,
-    setPackage,
-    true
-  );
-
   logger.setCanCall(
     packageIndex,
     packageDB,
@@ -106,9 +107,11 @@ async function setPermissions(
   await authority.setCanCall(
     packageIndex.address,
     packageDB.address,
-    setPackageOwner,
+    setPackage,
     true
   );
+
+  logger.stopSpinner()
 
   logger.setCanCall(
     packageIndex,
@@ -116,13 +119,16 @@ async function setPermissions(
     'setPackageOwner'
   );
 
-  logger.newline();
-
-  await authority.setAnyoneCanCall(
-    releaseDB.address,
-    setVersion,
+  await authority.setCanCall(
+    packageIndex.address,
+    packageDB.address,
+    setPackageOwner,
     true
   );
+
+  logger.stopSpinner()
+
+  logger.newline();
 
   logger.setAnyoneCanCall(
     releaseDB,
@@ -131,26 +137,42 @@ async function setPermissions(
 
   await authority.setAnyoneCanCall(
     releaseDB.address,
-    updateLatestTree,
+    setVersion,
     true
   );
+
+  logger.stopSpinner()
 
   logger.setAnyoneCanCall(
     releaseDB,
     'updateLatestTree'
   );
 
+  await authority.setAnyoneCanCall(
+    releaseDB.address,
+    updateLatestTree,
+    true
+  );
+
+  logger.stopSpinner()
 
   // PackageIndex
+  logger.setAnyoneCanCall(
+    packageIndex,
+    'release'
+  );
+
   await authority.setAnyoneCanCall(
     packageIndex.address,
     release,
     true
   );
 
+  logger.stopSpinner()
+
   logger.setAnyoneCanCall(
     packageIndex,
-    'release'
+    'transferPackageOwner'
   );
 
   await authority.setAnyoneCanCall(
@@ -159,10 +181,7 @@ async function setPermissions(
     true
   );
 
-  logger.setAnyoneCanCall(
-    packageIndex,
-    'transferPackageOwner'
-  );
+  logger.stopSpinner()
 
   logger.finish();
 }
