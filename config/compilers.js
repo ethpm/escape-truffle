@@ -12,6 +12,18 @@ if (process.env.CI){
       docker: true,
     },
   }
+// Development and Production Settings
+} else {
+  compilers = {
+    solc: {
+      settings: {
+        optimizer: {
+          enabled: true,
+          runs: 200
+        },
+      }
+    },
+  }
 }
 
 module.exports = compilers;
