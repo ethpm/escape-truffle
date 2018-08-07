@@ -171,6 +171,52 @@ contract PackageDB is Authorized {
     return _recordedPackages[nameHash].name;
   }
 
+  /// @dev Returns `limit` number of package ids at starting from `index` offset
+  /// @param _offset  index to begin retrieving names from. First request should use zero,
+  ///                 subsequent requests should use the returned offset value
+  /// @param limit    number of ids to return
+  function getAllPackageIds(uint _offset, uint limit)
+    public
+    view
+    returns (
+      bytes32[] packageIds,
+      uint offset
+    )
+  {
+    bytes32[] memory hashes;                 // Array of package names to return
+    uint cursor = _offset;                   // Index counter to traverse DB array
+    uint remaining;                          // Counter to collect `limit` packages
+    uint totalPackages = getNumPackages();   // Total number of packages in registry
+
+    // Is request within range?
+    if (cursor < totalPackages){
+
+      // Get total remaining records
+      remaining = totalPackages - cursor;
+
+      // Number of records to collect is lesser of `remaining` and `limit`
+      if (remaining > limit ){
+        remaining = limit;
+      }
+
+      // Allocate return array
+      hashes = new bytes32[](remaining);
+
+      // Collect records, skipping deleted entries
+      // in the IndexedOrderedSet mapping.
+      while(remaining > 0){
+        bytes32 hash = getPackageNameHash(cursor);
+
+        if (packageExists(hash)){
+          hashes[remaining - 1] = hash;
+          remaining--;
+        }
+        cursor++;
+      }
+    }
+    return (hashes, cursor);
+  }
+
   /*
    *  Hash Functions
    */
