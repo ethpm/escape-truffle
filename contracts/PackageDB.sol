@@ -201,15 +201,11 @@ contract PackageDB is Authorized {
       // Allocate return array
       hashes = new bytes32[](remaining);
 
-      // Collect records, skipping deleted entries
-      // in the IndexedOrderedSet mapping.
+      // Collect records. (IndexedOrderedSet manages deletions.)
       while(remaining > 0){
         bytes32 hash = getPackageNameHash(cursor);
-
-        if (packageExists(hash)){
-          hashes[remaining - 1] = hash;
-          remaining--;
-        }
+        hashes[remaining - 1] = hash;
+        remaining--;
         cursor++;
       }
     }
