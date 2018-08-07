@@ -339,6 +339,20 @@ contract PackageIndex is Authorized, PackageIndexInterface {
   }
 
   /// @dev Returns an array of all release hashes for the named package.
+  /// @param name     Package name
+  function getAllReleaseIds(string name, uint _offset, uint limit)
+    public
+    view
+    returns (
+      bytes32[] releaseIds,
+      uint offset
+    )
+  {
+    bytes32 nameHash = packageDb.hashName(name);
+    return releaseDb.getAllReleaseHashes(nameHash, _offset, limit);
+  }
+
+  /// @dev Returns an array of all release hashes for the named package.
   /// @param name Package name
   function getAllPackageReleaseHashes(string name)
     public
