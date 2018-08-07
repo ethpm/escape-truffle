@@ -275,35 +275,6 @@ contract('PackageIndex', function(accounts){
         await assertRelease(...releaseInfoB, responseB.receipt, releaseDataB)
       });
 
-      it('should retrieve a list of release hashes', async function(){
-        nameHash = await packageDB.hashName('test-r');
-
-        const releaseInfoA = ['test-r', 1, 2, 3, 't', 'u', 'ipfs://some-ipfs-uri']
-        const releaseInfoB = ['test-r', 2, 3, 4, 'v', 'y', 'ipfs://some-other-ipfs-uri']
-        const releaseInfoC = ['test-r', 3, 4, 5, 'w', 'q', 'ipfs://yet-another-ipfs-uri']
-
-        const versionHashA = await releaseDB.hashVersion(...releaseInfoA.slice(1, -1))
-        const versionHashB = await releaseDB.hashVersion(...releaseInfoB.slice(1, -1))
-        const versionHashC = await releaseDB.hashVersion(...releaseInfoC.slice(1, -1))
-
-        const releaseHashA = await releaseDB.hashRelease(nameHash, versionHashA)
-        const releaseHashB = await releaseDB.hashRelease(nameHash, versionHashB)
-        const releaseHashC = await releaseDB.hashRelease(nameHash, versionHashC)
-
-        await packageIndex.release(...releaseInfoA)
-        await packageIndex.release(...releaseInfoB)
-        await packageIndex.release(...releaseInfoC)
-
-        const packageData =  await packageIndex.getPackageData('test-r');
-        assert(packageData.numReleases.toNumber() === 3 );
-
-        const releaseHashes = await packageIndex.getAllPackageReleaseHashes('test-r');
-
-        assert(releaseHashes["0"] === releaseHashA);
-        assert(releaseHashes["1"] === releaseHashB);
-        assert(releaseHashes["2"] === releaseHashC);
-      });
-
       it('should retrieve a list of ALL release hashes', async function(){
         const nameHashA = await packageDB.hashName('test-a')
         const nameHashB = await packageDB.hashName('test-b')
