@@ -263,6 +263,20 @@ contract PackageIndex is Authorized, PackageIndexInterface {
     return packageDb.getNumPackages();
   }
 
+  /// @dev Returns a slice of the array of all package hashes for the named package.
+  /// @param _offset The starting index for the slice.
+  /// @param limit  The length of the slice
+  function getAllPackageIds(uint _offset, uint limit)
+    public
+    view
+    returns(
+      bytes32[] packageIds,
+      uint offset
+    )
+  {
+    return packageDb.getAllPackageIds(_offset, limit);
+  }
+
   /// @dev Returns the name of the package at the provided index
   /// @param idx The index of the name hash to lookup.
   function getPackageName(uint idx)
@@ -271,6 +285,16 @@ contract PackageIndex is Authorized, PackageIndexInterface {
     returns (string)
   {
     return getPackageName(packageDb.getPackageNameHash(idx));
+  }
+
+  /// @dev Retrieves the name for the given name hash.
+  /// @param nameHash The name hash to lookup the name for.
+  function getPackageName(bytes32 nameHash)
+    public
+    view
+    returns (string)
+  {
+    return PackageDB(packageDb).getPackageName(nameHash);
   }
 
   /// @dev Returns the package data.
@@ -428,16 +452,6 @@ contract PackageIndex is Authorized, PackageIndexInterface {
     address packageOwner;
     (packageOwner,,,) = getPackageData(name);
     return (packageOwner != _address);
-  }
-
-  /// @dev Retrieves the name for the given name hash.
-  /// @param nameHash The name hash to lookup the name for.
-  function getPackageName(bytes32 nameHash)
-    internal
-    view
-    returns (string)
-  {
-    return PackageDB(packageDb).getPackageName(nameHash);
   }
 
   /// @dev Retrieves the release manifest URI from the package db.
