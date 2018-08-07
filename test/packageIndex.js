@@ -380,7 +380,7 @@ contract('PackageIndex', function(accounts){
       })
     });
 
-    describe('getAllReleaseIds (normal cases)', function(){
+    describe('getAllReleaseIds', function(){
       let releaseHashA;
       let releaseHashB;
       let releaseHashC;
@@ -404,6 +404,37 @@ contract('PackageIndex', function(accounts){
         await packageIndex.release(...releaseInfoB)
         await packageIndex.release(...releaseInfoC)
       })
+
+      it('returns ([],0) for a non-existent release', async() => {
+        const limit = 20;
+        const result = await packageIndex.getAllReleaseIds('test-none', 0, limit);
+
+        assert(Array.isArray(result.releaseIds));
+        assert(result.releaseIds.length === 0);
+        assert(result.offset.toNumber() === 0)
+      });
+
+      it('returns ([],offset) when offset equals # of releases', async()=>{
+        const limit = 20;
+        const packageData = await packageIndex.getPackageData('test-r');
+        const numReleases = packageData.numReleases.toNumber();
+        assert(numReleases === 3 );
+
+        const offset = numReleases;
+        const result = await packageIndex.getAllReleaseIds('test-r', offset, limit);
+
+        assert(Array.isArray(result.releaseIds));
+        assert(result.releaseIds.length === 0);
+        assert(result.offset.toNumber() === offset)
+      });
+
+      it('returns ([],0) when limit param is zero', async()=> {
+        const result = await packageIndex.getAllReleaseIds('test-r',0,0);
+
+        assert(Array.isArray(result.releaseIds));
+        assert(result.releaseIds.length === 0);
+        assert(result.offset.toNumber() === 0)
+      });
 
       it('returns ([allReleaseIds], limit) when limit is greater than # of releases', async function(){
         const packageData = await packageIndex.getPackageData('test-r');
