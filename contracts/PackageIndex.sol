@@ -352,41 +352,7 @@ contract PackageIndex is Authorized, PackageIndexInterface {
     return releaseDb.getAllReleaseHashes(nameHash, _offset, limit);
   }
 
-  /// @dev Returns an array of all release hashes for the named package.
-  /// @param name Package name
-  function getAllPackageReleaseHashes(string name)
-    public
-    view
-    returns (bytes32[])
-  {
-    uint numReleases;
-    (,,numReleases,) = getPackageData(name);
-    return getPackageReleaseHashes(name, 0, numReleases);
-  }
-
-  /// @dev Returns a slice of the array of all release hashes for the named package.
-  /// @param name Package name
-  /// @param offset The starting index for the slice.
-  /// @param numReleases The length of the slice
-  function getPackageReleaseHashes(
-    string name,
-    uint offset,
-    uint numReleases
-  )
-    public
-    view
-    returns (bytes32[])
-  {
-    bytes32 nameHash = packageDb.hashName(name);
-    bytes32[] memory releaseHashes = new bytes32[](numReleases);
-
-    for (uint i = offset; i < offset + numReleases; i++) {
-      releaseHashes[i] = releaseDb.getReleaseHashForNameHash(nameHash, i);
-    }
-
-    return releaseHashes;
-  }
-
+  /// @dev Returns total number of releases in the registry
   function getNumReleases()
     public
     view
