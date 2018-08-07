@@ -380,6 +380,101 @@ contract('PackageIndex', function(accounts){
       })
     });
 
+    describe('getAllReleaseIds (normal cases)', function(){
+      let releaseHashA;
+      let releaseHashB;
+      let releaseHashC;
+
+      const releaseInfoA = ['test-r', 1, 2, 3, 't', 'u', 'ipfs://some-ipfs-uri']
+      const releaseInfoB = ['test-r', 2, 3, 4, 'v', 'y', 'ipfs://some-other-ipfs-uri']
+      const releaseInfoC = ['test-r', 3, 4, 5, 'w', 'q', 'ipfs://yet-another-ipfs-uri']
+
+      beforeEach(async function(){
+        nameHash = await packageDB.hashName('test-r');
+
+        const versionHashA = await releaseDB.hashVersion(...releaseInfoA.slice(1, -1))
+        const versionHashB = await releaseDB.hashVersion(...releaseInfoB.slice(1, -1))
+        const versionHashC = await releaseDB.hashVersion(...releaseInfoC.slice(1, -1))
+
+        releaseHashA = await releaseDB.hashRelease(nameHash, versionHashA)
+        releaseHashB = await releaseDB.hashRelease(nameHash, versionHashB)
+        releaseHashC = await releaseDB.hashRelease(nameHash, versionHashC)
+
+        await packageIndex.release(...releaseInfoA)
+        await packageIndex.release(...releaseInfoB)
+        await packageIndex.release(...releaseInfoC)
+      })
+
+      it('returns ([allReleaseIds], limit) when limit is greater than # of releases', async function(){
+        const packageData = await packageIndex.getPackageData('test-r');
+        assert(packageData.numReleases.toNumber() === 3 );
+
+        const limit = packageData.numReleases.toNumber() + 1;
+        const result = await packageIndex.getAllReleaseIds('test-r', 0, limit);
+
+        assert(result.offset.toNumber() === packageData.numReleases.toNumber());
+        assert(result.releaseIds.length === packageData.numReleases.toNumber());
+        assert(result.releaseIds.includes(releaseHashA));
+        assert(result.releaseIds.includes(releaseHashB));
+        assert(result.releaseIds.includes(releaseHashC));
+      });
+
+      it('returns releases and offset when limit is < # of releases', async function(){
+        const packageData = await packageIndex.getPackageData('test-r');
+        const numReleases = packageData.numReleases.toNumber();
+        assert(numReleases === 3 );
+
+        const limit = 2;
+        const resultA = await packageIndex.getAllReleaseIds('test-r', 0, limit);
+
+        // Initial results (2)
+        assert(resultA.releaseIds.length === limit);
+        assert(resultA.offset.toNumber() === limit);
+
+        const resultB = await packageIndex.getAllReleaseIds('test-r', resultA.offset, limit);
+
+        // Remaining results (1)
+        assert(resultB.releaseIds.length === numReleases - limit);
+        assert(resultB.offset.toNumber() === numReleases);
+
+        const resultC = await packageIndex.getAllReleaseIds('test-r', resultB.offset, limit);
+
+        // Empty results, terminal index
+        assert(resultC.releaseIds.length === 0);
+        assert(resultC.offset.toNumber() === numReleases);
+
+        let allIds = resultA.releaseIds.concat(resultB.releaseIds);
+
+        assert(allIds.length === numReleases);
+        assert(allIds.includes(releaseHashA));
+        assert(allIds.includes(releaseHashB));
+        assert(allIds.includes(releaseHashC));
+      });
+
+      it('handles DBs with removed items correctly', async function(){
+        const packageData = await packageIndex.getPackageData('test-r');
+        const numReleases = packageData.numReleases.toNumber();
+        assert(numReleases === 3 );
+
+        const limit = numReleases;
+        await releaseDB.removeRelease(releaseHashB, 'because');
+
+        const resultA = await packageIndex.getAllReleaseIds('test-r', 0, limit);
+        const offsetA = resultA.offset.toNumber();
+
+        // Initial results (2)
+        assert(resultA.releaseIds.length === limit - 1);
+        assert(offsetA === limit - 1);
+        assert(!resultA.releaseIds.includes(releaseHashB));
+
+        const resultB = await packageIndex.getAllReleaseIds('test-r', offsetA, limit);
+
+        // Empty results, terminal index
+        assert(resultB.releaseIds.length === 0);
+        assert(resultB.offset.toNumber() === offsetA);
+      });
+    });
+
     describe('Ownership [ @geth ]', function(){
       const info = ['test-a', 1, 2, 3, '', '', 'ipfs://some-ipfs-uri'];
       const owner = accounts[0];
