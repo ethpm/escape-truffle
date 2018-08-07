@@ -171,10 +171,9 @@ contract PackageDB is Authorized {
     return _recordedPackages[nameHash].name;
   }
 
-  /// @dev Returns `limit` number of package ids at starting from `index` offset
-  /// @param _offset  index to begin retrieving names from. First request should use zero,
-  ///                 subsequent requests should use the returned offset value
-  /// @param limit    number of ids to return
+  /// @dev Returns a slice of the array of all package hashes for the named package.
+  /// @param offset The starting index for the slice.
+  /// @param limit  The length of the slice
   function getAllPackageIds(uint _offset, uint limit)
     public
     view
@@ -183,7 +182,7 @@ contract PackageDB is Authorized {
       uint offset
     )
   {
-    bytes32[] memory hashes;                 // Array of package names to return
+    bytes32[] memory hashes;                 // Array of package ids to return
     uint cursor = _offset;                   // Index counter to traverse DB array
     uint remaining;                          // Counter to collect `limit` packages
     uint totalPackages = getNumPackages();   // Total number of packages in registry
