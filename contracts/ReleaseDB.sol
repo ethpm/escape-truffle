@@ -261,14 +261,11 @@ contract ReleaseDB is Authorized {
       // Allocate return array
       hashes = new bytes32[](remaining);
 
-      // Collect records, skipping deleted entries
+      // Collect records. (IndexedOrderedSet manages deletions.)
       while(remaining > 0){
         bytes32 hash = getReleaseHashForNameHash(nameHash, cursor);
-
-        if (releaseExists(hash)){
-          hashes[remaining - 1] = hash;
-          remaining--;
-        }
+        hashes[remaining - 1] = hash;
+        remaining--;
         cursor++;
       }
     }
