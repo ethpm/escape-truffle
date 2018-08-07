@@ -106,6 +106,15 @@ contract PackageIndexInterface is AuthorizedInterface {
   /// @param idx The index of the name hash to lookup.
   function getPackageName(uint idx) public view returns (string);
 
+  /// @dev Returns the name of the package at the provided index
+  /// @param releaseId The index of the name hash to lookup.
+  function getPackageName(bytes32 releaseId) public view returns (string);
+
+  /// @dev Returns a slice of the array of all package hashes for the named package.
+  /// @param offset The starting index for the slice.
+  /// @param limit  The length of the slice
+  function getAllPackageIds(uint offset, uint limit) public view returns (bytes32[], uint);
+
   /// @dev Returns the package data.
   /// @param name Package name
   function getPackageData(string name)
@@ -143,22 +152,11 @@ contract PackageIndexInterface is AuthorizedInterface {
   /// @param releaseIdx The index of the release to retrieve.
   function getReleaseHashForPackage(string name, uint releaseIdx) public view returns (bytes32);
 
-  /// @dev Returns an array of all release hashes for the named package.
-  /// @param name Package name
-  function getAllPackageReleaseHashes(string name) public view returns (bytes32[]);
-
   /// @dev Returns a slice of the array of all release hashes for the named package.
   /// @param name Package name
   /// @param offset The starting index for the slice.
-  /// @param numReleases The length of the slice
-  function getPackageReleaseHashes(
-    string name,
-    uint offset,
-    uint numReleases
-  )
-    public
-    view
-    returns (bytes32[]);
+  /// @param limit  The length of the slice
+  function getAllReleaseIds(string name, uint offset, uint limit) public view returns (bytes32[], uint);
 
   function getNumReleases() public view returns (uint);
 
