@@ -38,10 +38,11 @@ contract('PackageIndex', function(accounts){
     const nameHash = await packageDB.hashName(name)
     const versionHash = await releaseDB.hashVersion(major, minor, patch, preRelease, build)
     const releaseHash = await releaseDB.hashRelease(nameHash, versionHash)
-    const allHashes = await packageIndex.getAllPackageReleaseHashes(name);
+    const ids = await packageIndex.getAllReleaseIds(name, 0, 100);
+
     const exists = await packageIndex.releaseExists(name, major, minor, patch, preRelease, build)
 
-    assert( allHashes.includes(releaseHash) );
+    assert( ids.releaseIds.includes(releaseHash) );
     assert( exists );
 
     assert( releaseData.major.toNumber() === major);
@@ -222,6 +223,32 @@ contract('PackageIndex', function(accounts){
         assert(await packageIndex.getReleaseValidator() === releaseValidator.address);
       });
     });
+
+    describe('packages', function(){
+      it('should retrieve all packages ids / package names', async function(){
+        nameHash = await packageDB.hashName('test-r');
+
+        const releaseInfoA = ['test-r', 1, 2, 3, 't', 'u', 'ipfs://some-ipfs-uri']
+        const releaseInfoB = ['test-r', 2, 3, 4, 'v', 'y', 'ipfs://some-other-ipfs-uri']
+
+        const nameHashA = await packageDB.hashName(releaseInfoA[0]);
+        const nameHashB = await packageDB.hashName(releaseInfoA[0]);
+
+        await packageIndex.release(...releaseInfoA)
+        await packageIndex.release(...releaseInfoB)
+
+        const ids = await packageIndex.getAllPackageIds(0,100);
+
+        assert(ids.packageIds.includes(nameHashA));
+        assert(ids.packageIds.includes(nameHashB));
+
+        const nameA = await packageIndex.methods['getPackageName(bytes32)'](nameHashA);
+        const nameB = await packageIndex.methods['getPackageName(bytes32)'](nameHashB);
+
+        assert(nameA === releaseInfoA[0]);
+        assert(nameB === releaseInfoB[0]);
+      });
+    })
 
     describe('releases', function(){
       it('should retrieve release by index [ @geth ]', async function(){
