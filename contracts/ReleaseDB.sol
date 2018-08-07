@@ -231,12 +231,10 @@ contract ReleaseDB is Authorized {
     return _allReleaseHashes.get(idx);
   }
 
-  /// @dev Returns `limit` number of release hashes starting from `index` offset
-  /// @param nameHash hash of name of package being queried
-  /// @param _offset  index to begin retrieving names from. First request should use zero,
-  ///                 subsequent requests should use the returned offset value
-  /// @param limit    number of ids to return
-  function getAllReleaseHashes(bytes32 nameHash, uint _offset, uint limit)
+  /// @dev Returns a slice of the array of all releases hashes for the named package.
+  /// @param offset The starting index for the slice.
+  /// @param limit  The length of the slice
+  function getAllReleaseIds(bytes32 nameHash, uint _offset, uint limit)
     public
     view
     returns (
@@ -244,7 +242,7 @@ contract ReleaseDB is Authorized {
       uint offset
     )
   {
-    bytes32[] memory hashes;                                  // Release hashes to return
+    bytes32[] memory hashes;                                  // Release ids to return
     uint cursor = _offset;                                    // Index counter to traverse DB array
     uint remaining;                                           // Counter to collect `limit` packages
     uint totalReleases = getNumReleasesForNameHash(nameHash); // Total number of packages in registry
