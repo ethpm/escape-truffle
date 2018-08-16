@@ -19,7 +19,7 @@ module.exports = {
       await promise;
       assert.fail();
     } catch(err){
-      assert(err.receipt && parseInt(err.receipt.status) === 0);
+      assert(err.receipt && !err.receipt.status);
 
       if (err.reason){
         assert(err.reason.includes(reason), `Expected reason: "${err.reason}"`);
