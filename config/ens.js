@@ -1,6 +1,6 @@
 /**
  * This script registers a name specified in .secrets.js to ENS and links it to the
- * address of a PackageIndex registry contract which the user has deployed to Ropsten
+ * address of a PackageRegistry contract which the user has deployed to Ropsten
  * using `npm run deploy:ropsten`. The contract address is obtained from the project `build`
  * folder. The domain name is registered under the `.test` namespace using Ropsten's
  * "first-in-first-served" registrar.
@@ -27,7 +27,7 @@ const log = console.log;
 const ensUtils = require('../ens/ropstenENSUtils');
 const { ENSName } = require('../config/wallet');
 
-const PackageIndex = artifacts.require('PackageIndex');
+const PackageRegistry = artifacts.require('PackageRegistry');
 
 
 // ------------------------------------- Validators ------------------------------------------------
@@ -44,14 +44,14 @@ const validateENSName = function(){
   }
 }
 
-const validatePackageIndex = async function(){
+const validatePackageRegistry = async function(){
   const msg =
-  `Unable to locate artifacts for "PackageIndex" contract deployed to Ropsten.\n` +
+  `Unable to locate artifacts for "PackageRegistry" contract deployed to Ropsten.\n` +
   `* Have you executed "npm run deploy:ropsten" successfully?\n` +
   `* See the EthPM package registry docs for help.\n`
 
   try {
-    await PackageIndex.deployed();
+    await PackageRegistry.deployed();
   } catch (err) {
     log(msg);
     process.exit(0);
@@ -87,7 +87,7 @@ const registerIndex = async function(){
   const confirm = `> ${colors.green('Confirmed:')}`;
 
   validateENSName();
-  await validatePackageIndex();
+  await validatePackageRegistry();
 
   const registrar = await ensUtils.getRopstenTestRegistrarInstance(web3);
   await validateCanBeRegistered(web3, registrar);
@@ -97,7 +97,7 @@ const registerIndex = async function(){
 
   // ----------------------------------- Preamble ------------------------------------------------
 
-  log(`....This script will link the package registry (PackageIndex)`)
+  log(`....This script will link the package registry (PackageRegistry)`)
   log(`you have deployed on Ropsten to an ENS domain name registered`)
   log(`with the Ropsten FIFS test registrar.........................`);
   log();
@@ -107,9 +107,9 @@ const registerIndex = async function(){
   log(`* Sometimes Ropsten takes a while to mine...`);
   log();
   log('----------------------------------------------------------')
-  log(`Account:        ${web3.currentProvider.addresses[0]}`);
-  log(`Domain:         ${ENSName}.test`)
-  log(`PackageIndex:   ${PackageIndex.address}`)
+  log(`Account:         ${web3.currentProvider.addresses[0]}`);
+  log(`Domain:          ${ENSName}.test`)
+  log(`PackageRegistry: ${PackageRegistry.address}`)
   log('----------------------------------------------------------')
   log();
 
@@ -195,13 +195,13 @@ const registerIndex = async function(){
       log(`${confirm} "${ENSName}.test" is using ENS Resolver at ${resolverAddress}`)
       log();
 
-      // -------------------------- Resolve PackageIndex Contract ----------------------------------
+      // -------------------------- Resolve PackageRegistry Contract ----------------------------------
       await resolver
         .methods
-        .setAddr(domainHash, PackageIndex.address)
+        .setAddr(domainHash, PackageRegistry.address)
         .send(options)
         .on('transactionHash', hash => {
-          log(`> Setting domain to resolve "PackageIndex"...`)
+          log(`> Setting domain to resolve "PackageRegistry"...`)
 
           spinner = new ora({
             text: `tx: ${hash}`,
@@ -219,10 +219,10 @@ const registerIndex = async function(){
         .call();
 
       // Validate name-to-contract resolution and report
-      const resolvedErr = `Expected Resolver to resolve PackageIndex for domain correctly.`
-      assert(resolved === PackageIndex.address, resolverErr);
+      const resolvedErr = `Expected Resolver to resolve PackageRegistry for domain correctly.`
+      assert(resolved === PackageRegistry.address, resolverErr);
 
-      log(`${confirm} "${ENSName}.test" resolves PackageIndex at ${PackageIndex.address}`);
+      log(`${confirm} "${ENSName}.test" resolves PackageRegistry at ${PackageRegistry.address}`);
       log();
       log('Finished');
       log();

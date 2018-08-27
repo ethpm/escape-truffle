@@ -50,7 +50,7 @@ class PermissionsLogger {
   setDep(contract,type){
     if (!this.verbose) return;
 
-    this._spin(`Set ${contract.constructor.contractName} as ${type} for PackageIndex`);
+    this._spin(`Set ${contract.constructor.contractName} as ${type} for PackageRegistry`);
   }
 
   setCanCall(caller, target, method){
