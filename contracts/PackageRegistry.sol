@@ -230,7 +230,7 @@ contract PackageRegistry is Authorized, PackageRegistryInterface {
     view
     returns (string)
   {
-    return PackageDB(packageDb).getPackageName(nameHash);
+    return packageDb.getPackageName(nameHash);
   }
 
   /// @dev Returns the package data.
@@ -266,9 +266,9 @@ contract PackageRegistry is Authorized, PackageRegistryInterface {
     bytes32 nameHash;
     (nameHash,versionHash, ,) = releaseDb.getReleaseData(releaseId);
 
-    name = PackageDB(packageDb).getPackageName(nameHash);
-    version = ReleaseDB(releaseDb).getVersion(versionHash);
-    manifestURI = ReleaseDB(releaseDb).getManifestURI(releaseId);
+    name = packageDb.getPackageName(nameHash);
+    version = releaseDb.getVersion(versionHash);
+    manifestURI = releaseDb.getManifestURI(releaseId);
 
     return (name, version, manifestURI);
   }
