@@ -47,13 +47,13 @@ start_client() {
       --rpccorsdomain '*' \
       --nodiscover \
       --dev \
-      --dev.period 1 \
+      --dev.period 0 \
       --targetgaslimit '8000000' \
       js ./scripts/geth-accounts.js \
       > /dev/null &
 
-      echo "Pausing for 2 minutes of auto-mining to approach target gaslimit."
-      sleep 120
+      #echo "Pausing for 2 minutes of auto-mining to approach target gaslimit."
+      #sleep 120
 
   else
     node_modules/.bin/ganache-cli --noVMErrorsOnRPCResponse --port "$PORT"> /dev/null &
