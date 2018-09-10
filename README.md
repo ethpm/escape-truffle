@@ -34,7 +34,7 @@ module.exports = {
   ropsten: {
     mnemonic: 'use your own twelve word mnemonic here do not use this one',
     infura: "F6tUooiW4thx777DtPsa" // Example Infura API key.
-    ENSName: "my-registry.test"    // Example ENS name (must use .test postfix)
+    ENSName: "my-registry"         // Example ENS name (will register as `my-registry.test`
   },
   rinkeby: {
     ..etc..
