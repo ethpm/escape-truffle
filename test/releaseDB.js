@@ -11,7 +11,7 @@ const assertCallFailure = helpers.assertCallFailure;
 const PackageDB = artifacts.require('PackageDB');
 const ReleaseDB = artifacts.require('ReleaseDB');
 
-contract('ReleaseDB', function(accounts){
+contract('ReleaseDB [ @geth ]', function(accounts){
   let packageDB;
   let releaseDB;
   let nameHash;
@@ -109,7 +109,7 @@ contract('ReleaseDB', function(accounts){
     });
   });
 
-  describe('Getters [ @geth ]', function(){
+  describe('Getters', function(){
     let nameHash;
     let versionHash;
     let badVersionHash;

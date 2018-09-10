@@ -13,7 +13,7 @@ const PackageRegistry = artifacts.require('PackageRegistry');
 const ReleaseValidator = artifacts.require('ReleaseValidator');
 const WhitelistAuthority = artifacts.require('WhitelistAuthority');
 
-contract('PackageRegistry', function(accounts){
+contract('PackageRegistry [ @geth ]', function(accounts){
   let packageDB;
   let releaseDB;
   let packageRegistry;
@@ -69,7 +69,7 @@ contract('PackageRegistry', function(accounts){
       authority = await WhitelistAuthority.new();
     })
 
-    it('should release when initialized correctly [ @geth ]', async function(){
+    it('should release when initialized correctly', async function(){
       packageDB = await PackageDB.new();
       releaseDB = await ReleaseDB.new();
       releaseValidator = await ReleaseValidator.new();
@@ -203,7 +203,7 @@ contract('PackageRegistry', function(accounts){
     })
 
     describe('getters', function(){
-      it('packageDb [ @geth ]', async function(){
+      it('packageDb', async function(){
         assert(await packageRegistry.getPackageDb() === packageDB.address);
       });
 
@@ -433,7 +433,7 @@ contract('PackageRegistry', function(accounts){
       });
     });
 
-    describe('ownership [ @geth ]', function(){
+    describe('ownership', function(){
       const info = ['test-a', '1.2.3','ipfs://some-ipfs-uri'];
       const owner = accounts[0];
       const newOwner = accounts[1];

@@ -4,7 +4,7 @@ const constants = helpers.constants;
 const assertFailure = helpers.assertFailure;
 const assertCallFailure = helpers.assertCallFailure;
 
-contract('PackageDB', function(accounts){
+contract('PackageDB [ @geth ]', function(accounts){
   let semVersionLib;
   let indexedOrderedSetLib;
   let packageDB;
@@ -17,7 +17,7 @@ contract('PackageDB', function(accounts){
     nameHash = await packageDB.hashName(packageName);
   });
 
-  describe('setPackage [ @geth ]', function(){
+  describe('setPackage', function(){
     it('should create a package record', async function(){
       const now = helpers.now();
       await packageDB.setPackage(packageName);
@@ -53,7 +53,7 @@ contract('PackageDB', function(accounts){
     });
   });
 
-  describe('setPackageOwner [ @geth ]', function(){
+  describe('setPackageOwner', function(){
     const owner = accounts[1];
 
     it('should set the package owner', async function(){
@@ -84,7 +84,7 @@ contract('PackageDB', function(accounts){
     });
   });
 
-  describe('removePackage [ @geth ]', function(){
+  describe('removePackage', function(){
     let reason = `
       In order to possess what you do not possess
         You must go by the way of dispossession.

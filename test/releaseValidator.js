@@ -13,7 +13,7 @@ const PackageRegistry = artifacts.require('PackageRegistry');
 const ReleaseValidator = artifacts.require('ReleaseValidator');
 const WhitelistAuthority = artifacts.require('WhitelistAuthority');
 
-contract('ReleaseValidator', function(accounts){
+contract('ReleaseValidator [ @geth ]', function(accounts){
   let packageDB;
   let releaseDB;
   let packageRegistry;
@@ -242,7 +242,7 @@ contract('ReleaseValidator', function(accounts){
     });
   });
 
-  describe('ValidateRelease checks existence of DBs [ @geth ]', function(){
+  describe('ValidateRelease checks existence of DBs', function(){
     it('returns false if PackageDB param is null', async function(){
       const info = ['test', '1.0.0', 'ipfs://some-ipfs-uri'];
 
