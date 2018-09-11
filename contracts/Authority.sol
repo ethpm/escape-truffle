@@ -2,7 +2,7 @@ pragma solidity ^0.4.24;
 pragma experimental "v0.5.0";
 
 
-contract Authority {
+contract AuthorityInterface {
   function canCall(
     address callerAddress,
     address codeAddress,
@@ -16,7 +16,7 @@ contract Authority {
 
 contract AuthorizedInterface {
   address public owner;
-  Authority public authority;
+  AuthorityInterface public authority;
 
   modifier auth {
     require(isAuthorized(),"escape:Authority:caller-not-authorized");
@@ -28,7 +28,7 @@ contract AuthorizedInterface {
 
   function setOwner(address newOwner) public returns (bool);
 
-  function setAuthority(Authority newAuthority) public returns (bool);
+  function setAuthority(AuthorityInterface newAuthority) public returns (bool);
 
   function isAuthorized() internal returns (bool);
 }
@@ -50,7 +50,7 @@ contract Authorized is AuthorizedInterface {
     return true;
   }
 
-  function setAuthority(Authority newAuthority)
+  function setAuthority(AuthorityInterface newAuthority)
     public
     auth
     returns (bool)
@@ -72,7 +72,7 @@ contract Authorized is AuthorizedInterface {
 }
 
 
-contract WhitelistAuthorityInterface is Authority, AuthorizedInterface {
+contract WhitelistAuthorityInterface is AuthorityInterface, AuthorizedInterface {
   event SetCanCall(
     address indexed callerAddress,
     address indexed codeAddress,
