@@ -6,12 +6,12 @@ import {PackageDB} from "./PackageDB.sol";
 import {ReleaseDB} from "./ReleaseDB.sol";
 import {ReleaseValidator} from "./ReleaseValidator.sol";
 import {PackageRegistryInterface} from "./PackageRegistryInterface.sol";
-import {Authorized} from "./Authority.sol";
+import {Owned} from "./Owned.sol";
 
 
 /// @title Database contract for a package index.
 /// @author Tim Coulter <tim.coulter@consensys.net>, Piper Merriam <pipermerriam@gmail.com>
-contract PackageRegistry is Authorized, PackageRegistryInterface {
+contract PackageRegistry is Owned, PackageRegistryInterface {
   PackageDB private packageDb;
   ReleaseDB private releaseDb;
   ReleaseValidator private releaseValidator;
@@ -27,7 +27,7 @@ contract PackageRegistry is Authorized, PackageRegistryInterface {
   /// @param newPackageDb The address to set for the PackageDb.
   function setPackageDb(address newPackageDb)
     public
-    auth
+    isOwner
     returns (bool)
   {
     packageDb = PackageDB(newPackageDb);
@@ -38,7 +38,7 @@ contract PackageRegistry is Authorized, PackageRegistryInterface {
   /// @param newReleaseDb The address to set for the ReleaseDb.
   function setReleaseDb(address newReleaseDb)
     public
-    auth
+    isOwner
     returns (bool)
   {
     releaseDb = ReleaseDB(newReleaseDb);
@@ -49,7 +49,7 @@ contract PackageRegistry is Authorized, PackageRegistryInterface {
   /// @param newReleaseValidator The address to set for the ReleaseValidator.
   function setReleaseValidator(address newReleaseValidator)
     public
-    auth
+    isOwner
     returns (bool)
   {
     releaseValidator = ReleaseValidator(newReleaseValidator);
@@ -72,7 +72,7 @@ contract PackageRegistry is Authorized, PackageRegistryInterface {
     string manifestURI
   )
     public
-    auth
+    isOwner
     returns (bytes32 id)
   {
     require(address(packageDb) != 0x0,        "escape:PackageIndex:package-db-not-set");
@@ -121,33 +121,6 @@ contract PackageRegistry is Authorized, PackageRegistryInterface {
     emit PackageRelease(nameHash, releaseId);
 
     return releaseId;
-  }
-
-  /// @dev Transfers package ownership to the provider new owner address.
-  /// @notice Will transfer ownership of this package to the provided new owner address.
-  /// @param name Package name
-  /// @param newPackageOwner The address of the new owner.
-  function transferPackageOwner(string name, address newPackageOwner)
-    public
-    auth
-    returns (bool)
-  {
-    if (isPackageOwner(name, msg.sender)) {
-      // Only the package owner may transfer package ownership.
-      return false;
-    }
-
-    // Lookup the current owner
-    address packageOwner;
-    (packageOwner,,,) = getPackageData(name);
-
-    // Log the transfer
-    emit PackageTransfer(packageOwner, newPackageOwner);
-
-    // Update the owner.
-    packageDb.setPackageOwner(packageDb.hashName(name), newPackageOwner);
-
-    return true;
   }
 
   //
@@ -299,23 +272,5 @@ contract PackageRegistry is Authorized, PackageRegistryInterface {
     bytes32 nameHash = packageDb.hashName(name);
     bytes32 versionHash = releaseDb.hashVersion(version);
     return keccak256(abi.encodePacked(nameHash, versionHash));
-  }
-
-  //
-  // +----------------+
-  // |  Internal API  |
-  // +----------------+
-  //
-  /// @dev Returns boolean whether the provided address is the package owner
-  /// @param name The name of the package
-  /// @param _address The address to check
-  function isPackageOwner(string name, address _address)
-    internal
-    view
-    returns (bool)
-  {
-    address packageOwner;
-    (packageOwner,,,) = getPackageData(name);
-    return (packageOwner != _address);
   }
 }

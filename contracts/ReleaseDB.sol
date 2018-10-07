@@ -3,12 +3,12 @@ pragma experimental "v0.5.0";
 
 
 import {IndexedOrderedSetLib} from "./IndexedOrderedSetLib.sol";
-import {Authorized} from "./Authority.sol";
+import {Owned} from "./Owned.sol";
 
 
 /// @title Database contract for a package index.
 /// @author Tim Coulter <tim.coulter@consensys.net>, Piper Merriam <pipermerriam@gmail.com>
-contract ReleaseDB is Authorized {
+contract ReleaseDB is Owned {
   using IndexedOrderedSetLib for IndexedOrderedSetLib.IndexedOrderedSet;
 
   struct Release {
@@ -63,7 +63,7 @@ contract ReleaseDB is Authorized {
     string manifestURI
   )
     public
-    auth
+    isOwner
     returns (bool)
   {
     bytes32 releaseId = hashRelease(nameHash, versionHash);
@@ -102,7 +102,7 @@ contract ReleaseDB is Authorized {
   /// @param reason Explanation for why the removal happened.
   function removeRelease(bytes32 releaseId, string reason)
     public
-    auth
+    isOwner
     onlyIfReleaseExists(releaseId)
     returns (bool)
   {
@@ -130,7 +130,7 @@ contract ReleaseDB is Authorized {
   /// @param version Version string (ex: '1.0.0')
   function setVersion(string version)
     public
-    auth
+    isOwner
     returns (bytes32)
   {
     bytes32 versionHash = hashVersion(version);

@@ -32,9 +32,6 @@ contract ReleaseValidator {
     } else if (address(releaseDb) == 0x0){
       // releaseDb address is null
       revert("escape:ReleaseValidator:release-db-not-set");
-    } else if (!validateAuthorization(packageDb, callerAddress, name)) {
-      // package exists and msg.sender is not the owner not the package owner.
-      revert("escape:ReleaseValidator:caller-not-authorized");
     } else if (!validateIsNewRelease(packageDb, releaseDb, name, version)) {
       // this version has already been released.
       revert("escape:ReleaseValidator:version-exists");
@@ -49,33 +46,6 @@ contract ReleaseValidator {
       revert("escape:ReleaseValidator:invalid-release-version");
     }
     return true;
-  }
-
-  /// @dev Validate whether the callerAddress is authorized to make this release.
-  /// @param packageDb The address of the PackageDB
-  /// @param callerAddress The address which is attempting to create the release.
-  /// @param name The name of the package.
-  function validateAuthorization(
-    PackageDB packageDb,
-    address callerAddress,
-    string name
-  )
-    public
-    view
-    returns (bool)
-  {
-    bytes32 nameHash = packageDb.hashName(name);
-    if (!packageDb.packageExists(nameHash)) {
-      return true;
-    }
-    address packageOwner;
-
-    (packageOwner,,) = packageDb.getPackageData(nameHash);
-
-    if (packageOwner == callerAddress) {
-      return true;
-    }
-    return false;
   }
 
   /// @dev Validate that the version being released has not already been released.
