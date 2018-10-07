@@ -10,14 +10,12 @@ contract ReleaseValidator {
   /// @dev Runs validation on all of the data needed for releasing a package.  Returns success.
   /// @param packageDb The address of the PackageDB
   /// @param releaseDb The address of the ReleaseDB
-  /// @param callerAddress The address which is attempting to create the release.
   /// @param name The name of the package.
   /// @param version The version string of the package (ex: `1.0.0`)
   /// @param manifestURI The URI of the release manifest.
   function validateRelease(
     PackageDB packageDb,
     ReleaseDB releaseDb,
-    address callerAddress,
     string name,
     string version,
     string manifestURI

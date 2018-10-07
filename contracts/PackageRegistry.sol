@@ -93,25 +93,16 @@ contract PackageRegistry is Owned, PackageRegistryInterface {
     releaseValidator.validateRelease(
       packageDb,
       releaseDb,
-      msg.sender,
       name,
       version,
       manifestURI
     );
-
-    // Compute hashes
-    bool _packageExists = packageExists(name);
 
     // Both creates the package if it is new as well as updating the updatedAt
     // timestamp on the package.
     packageDb.setPackage(name);
 
     bytes32 nameHash = packageDb.hashName(name);
-
-    // If the package does not yet exist create it and set the owner
-    if (!_packageExists) {
-      packageDb.setPackageOwner(nameHash, msg.sender);
-    }
 
     // Create the release and add it to the list of package release hashes.
     releaseDb.setRelease(nameHash, versionHash, manifestURI);
@@ -219,7 +210,7 @@ contract PackageRegistry is Owned, PackageRegistryInterface {
     )
   {
     bytes32 nameHash = packageDb.hashName(name);
-    (packageOwner, createdAt, updatedAt) = packageDb.getPackageData(nameHash);
+    (createdAt, updatedAt) = packageDb.getPackageData(nameHash);
     numReleases = releaseDb.getNumReleasesForNameHash(nameHash);
     return (packageOwner, createdAt, numReleases, updatedAt);
   }
