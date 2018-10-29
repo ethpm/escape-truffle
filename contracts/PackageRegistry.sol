@@ -5,16 +5,20 @@ pragma experimental "v0.5.0";
 import {PackageDB} from "./PackageDB.sol";
 import {ReleaseDB} from "./ReleaseDB.sol";
 import {ReleaseValidator} from "./ReleaseValidator.sol";
-import {PackageIndexInterface} from "./PackageIndexInterface.sol";
+import {PackageRegistryInterface} from "./PackageRegistryInterface.sol";
 import {Authorized} from "./Authority.sol";
 
 
 /// @title Database contract for a package index.
 /// @author Tim Coulter <tim.coulter@consensys.net>, Piper Merriam <pipermerriam@gmail.com>
-contract PackageIndex is Authorized, PackageIndexInterface {
+contract PackageRegistry is Authorized, PackageRegistryInterface {
   PackageDB private packageDb;
   ReleaseDB private releaseDb;
   ReleaseValidator private releaseValidator;
+
+  // Events
+  event PackageRelease(bytes32 indexed nameHash, bytes32 indexed releaseId);
+  event PackageTransfer(address indexed oldOwner, address indexed newOwner);
 
   //
   // Administrative API
@@ -60,68 +64,28 @@ contract PackageIndex is Authorized, PackageIndexInterface {
   /// @dev Creates a a new release for the named package.  If this is the first release for the given package then this will also assign msg.sender as the owner of the package.  Returns success.
   /// @notice Will create a new release the given package with the given release information.
   /// @param name Package name
-  /// @param major The major portion of the semver version string.
-  /// @param minor The minor portion of the semver version string.
-  /// @param patch The patch portion of the semver version string.
-  /// @param preRelease The pre-release portion of the semver version string.  Use empty string if the version string has no pre-release portion.
-  /// @param build The build portion of the semver version string.  Use empty string if the version string has no build portion.
+  /// @param version Version string (ex: '1.0.0')
   /// @param manifestURI The URI for the release manifest for this release.
   function release(
     string name,
-    uint32 major,
-    uint32 minor,
-    uint32 patch,
-    string preRelease,
-    string build,
+    string version,
     string manifestURI
   )
     public
     auth
-    returns (bool)
+    returns (bytes32 id)
   {
     require(address(packageDb) != 0x0,        "escape:PackageIndex:package-db-not-set");
     require(address(releaseDb) != 0x0,        "escape:PackageIndex:release-db-not-set");
     require(address(releaseValidator) != 0x0, "escape:PackageIndex:release-validator-not-set");
 
-    return release(name, [major, minor, patch], preRelease, build, manifestURI);
-  }
-
-  /// @dev Creates a a new release for the named package.  If this is the first release for the given package then this will also assign msg.sender as the owner of the package.  Returns success.
-  /// @notice Will create a new release the given package with the given release information.
-  /// @param name Package name
-  /// @param majorMinorPatch The major/minor/patch portion of the version string.
-  /// @param preRelease The pre-release portion of the semver version string.  Use empty string if the version string has no pre-release portion.
-  /// @param build The build portion of the semver version string.  Use empty string if the version string has no build portion.
-  /// @param manifestURI The URI for the release manifest for this release.
-  function release(
-    string name,
-    uint32[3] majorMinorPatch,
-    string preRelease,
-    string build,
-    string manifestURI
-  )
-    internal
-    returns (bool)
-  {
-    bytes32 versionHash = releaseDb.hashVersion(
-      majorMinorPatch[0],
-      majorMinorPatch[1],
-      majorMinorPatch[2],
-      preRelease,
-      build
-    );
+    bytes32 versionHash = releaseDb.hashVersion(version);
 
     // If the version for this release is not in the version database, populate
     // it.  This must happen prior to validation to ensure that the version is
     // present in the releaseDb.
     if (!releaseDb.versionExists(versionHash)) {
-      releaseDb.setVersion(
-        majorMinorPatch[0],
-        majorMinorPatch[1],
-        majorMinorPatch[2],
-        preRelease,
-        build
-      );
+      releaseDb.setVersion(version);
     }
 
     // Run release validator. This method reverts with an error message string
@@ -131,9 +95,7 @@ contract PackageIndex is Authorized, PackageIndexInterface {
       releaseDb,
       msg.sender,
       name,
-      majorMinorPatch,
-      preRelease,
-      build,
+      version,
       manifestURI
     );
 
@@ -155,9 +117,10 @@ contract PackageIndex is Authorized, PackageIndexInterface {
     releaseDb.setRelease(nameHash, versionHash, manifestURI);
 
     // Log the release.
-    emit PackageRelease(nameHash, releaseDb.hashRelease(nameHash, versionHash));
+    bytes32 releaseId = releaseDb.hashRelease(nameHash, versionHash);
+    emit PackageRelease(nameHash, releaseId);
 
-    return true;
+    return releaseId;
   }
 
   /// @dev Transfers package ownership to the provider new owner address.
@@ -232,35 +195,18 @@ contract PackageIndex is Authorized, PackageIndexInterface {
 
   /// @dev Query the existence of a release at the provided version for the named package.  Returns boolean indicating whether such a release exists.
   /// @param name Package name
-  /// @param major The major portion of the semver version string.
-  /// @param minor The minor portion of the semver version string.
-  /// @param patch The patch portion of the semver version string.
-  /// @param preRelease The pre-release portion of the semver version string.  Use empty string if the version string has no pre-release portion.
-  /// @param build The build portion of the semver version string.  Use empty string if the version string has no build portion.
+  /// @param version Version string (ex: '1.0.0')
   function releaseExists(
     string name,
-    uint32 major,
-    uint32 minor,
-    uint32 patch,
-    string preRelease,
-    string build
+    string version
   )
     public
     view
     returns (bool)
   {
     bytes32 nameHash = packageDb.hashName(name);
-    bytes32 versionHash = releaseDb.hashVersion(major, minor, patch, preRelease, build);
+    bytes32 versionHash = releaseDb.hashVersion(version);
     return releaseDb.releaseExists(releaseDb.hashRelease(nameHash, versionHash));
-  }
-
-  /// @dev Returns the number of packages in the index
-  function getNumPackages()
-    public
-    view
-    returns (uint)
-  {
-    return packageDb.getNumPackages();
   }
 
   /// @dev Returns a slice of the array of all package hashes for the named package.
@@ -277,16 +223,6 @@ contract PackageIndex is Authorized, PackageIndexInterface {
     return packageDb.getAllPackageIds(_offset, limit);
   }
 
-  /// @dev Returns the name of the package at the provided index
-  /// @param idx The index of the name hash to lookup.
-  function getPackageName(uint idx)
-    public
-    view
-    returns (string)
-  {
-    return getPackageName(packageDb.getPackageNameHash(idx));
-  }
-
   /// @dev Retrieves the name for the given name hash.
   /// @param nameHash The name hash to lookup the name for.
   function getPackageName(bytes32 nameHash)
@@ -294,7 +230,7 @@ contract PackageIndex is Authorized, PackageIndexInterface {
     view
     returns (string)
   {
-    return PackageDB(packageDb).getPackageName(nameHash);
+    return packageDb.getPackageName(nameHash);
   }
 
   /// @dev Returns the package data.
@@ -316,50 +252,25 @@ contract PackageIndex is Authorized, PackageIndexInterface {
   }
 
   /// @dev Returns the release data for the release associated with the given release hash.
-  /// @param releaseHash The release hash.
-  function getReleaseData(bytes32 releaseHash)
+  /// @param releaseId The release hash.
+  function getReleaseData(bytes32 releaseId)
     public
     view
     returns (
-      uint32 major,
-      uint32 minor,
-      uint32 patch,
-      string preRelease,
-      string build,
-      string manifestURI,
-      uint createdAt,
-      uint updatedAt
+      string name,
+      string version,
+      string manifestURI
     )
   {
     bytes32 versionHash;
-    (,versionHash, createdAt, updatedAt) = releaseDb.getReleaseData(releaseHash);
-    (major, minor, patch) = releaseDb.getMajorMinorPatch(versionHash);
-    preRelease = getPreRelease(releaseHash);
-    build = getBuild(releaseHash);
-    manifestURI = getReleaseManifestURI(releaseHash);
-    return (major, minor, patch, preRelease, build, manifestURI, createdAt, updatedAt);
-  }
+    bytes32 nameHash;
+    (nameHash,versionHash, ,) = releaseDb.getReleaseData(releaseId);
 
-  /// @dev Returns the release hash at the provide index in the array of all release hashes.
-  /// @param idx The index of the release to retrieve.
-  function getReleaseHash(uint idx)
-    public
-    view
-    returns (bytes32)
-  {
-    return releaseDb.getReleaseHash(idx);
-  }
+    name = packageDb.getPackageName(nameHash);
+    version = releaseDb.getVersion(versionHash);
+    manifestURI = releaseDb.getManifestURI(releaseId);
 
-  /// @dev Returns the release hash at the provide index in the array of release hashes for the given package.
-  /// @param name Package name
-  /// @param releaseIdx The index of the release to retrieve.
-  function getReleaseHashForPackage(string name, uint releaseIdx)
-    public
-    view
-    returns (bytes32)
-  {
-    bytes32 nameHash = packageDb.hashName(name);
-    return releaseDb.getReleaseHashForNameHash(nameHash, releaseIdx);
+    return (name, version, manifestURI);
   }
 
   /// @dev Returns a slice of the array of all package hashes for the named package.
@@ -377,65 +288,18 @@ contract PackageIndex is Authorized, PackageIndexInterface {
     return releaseDb.getAllReleaseIds(nameHash, _offset, limit);
   }
 
-  /// @dev Returns total number of releases in the registry
-  function getNumReleases()
+  // @dev Returns release id that *would* be generated for a name and version pair on `release`.
+  // @param name Package name
+  // @param version Version string (ex: '1.0.0')
+  function generateReleaseId(string name, string version)
     public
     view
-    returns (uint)
+    returns (bytes32)
   {
-    return releaseDb.getNumReleases();
+    bytes32 nameHash = packageDb.hashName(name);
+    bytes32 versionHash = releaseDb.hashVersion(version);
+    return keccak256(abi.encodePacked(nameHash, versionHash));
   }
-
-  /// @dev Returns an array of all release hashes for the named package.
-  function getAllReleaseHashes()
-    public
-    view
-    returns (bytes32[])
-  {
-    return getReleaseHashes(0, getNumReleases());
-  }
-
-  /// @dev Returns a slice of the array of all release hashes for the named package.
-  /// @param offset The starting index for the slice.
-  /// @param numReleases The length of the slice
-  function getReleaseHashes(uint offset, uint numReleases)
-    public
-    view
-    returns (bytes32[])
-  {
-    bytes32[] memory releaseHashes = new bytes32[](numReleases);
-
-    for (uint i = offset; i < offset + numReleases; i++) {
-      releaseHashes[i] = releaseDb.getReleaseHash(i);
-    }
-
-    return releaseHashes;
-  }
-
-  /// @dev Returns the release manifest for the given release data
-  /// @param name Package name
-  /// @param major The major portion of the semver version string.
-  /// @param minor The minor portion of the semver version string.
-  /// @param patch The patch portion of the semver version string.
-  /// @param preRelease The pre-release portion of the semver version string.  Use empty string if the version string has no pre-release portion.
-  /// @param build The build portion of the semver version string.  Use empty string if the version string has no build portion.
-  function getReleaseManifestURI(
-    string name,
-    uint32 major,
-    uint32 minor,
-    uint32 patch,
-    string preRelease,
-    string build
-  )
-    public
-    view
-    returns (string)
-  {
-    bytes32 versionHash = releaseDb.hashVersion(major, minor, patch, preRelease, build);
-    bytes32 releaseHash = releaseDb.hashRelease(packageDb.hashName(name), versionHash);
-    return getReleaseManifestURI(releaseHash);
-  }
-
 
   //
   // +----------------+
@@ -453,35 +317,5 @@ contract PackageIndex is Authorized, PackageIndexInterface {
     address packageOwner;
     (packageOwner,,,) = getPackageData(name);
     return (packageOwner != _address);
-  }
-
-  /// @dev Retrieves the release manifest URI from the package db.
-  /// @param releaseHash The release hash to retrieve the URI from.
-  function getReleaseManifestURI(bytes32 releaseHash)
-    internal
-    view
-    returns (string)
-  {
-    return ReleaseDB(releaseDb).getManifestURI(releaseHash);
-  }
-
-  /// @dev Retrieves the pre-release string from the package db.
-  /// @param releaseHash The release hash to retrieve the string from.
-  function getPreRelease(bytes32 releaseHash)
-    internal
-    view
-    returns (string)
-  {
-    return ReleaseDB(releaseDb).getPreRelease(releaseHash);
-  }
-
-  /// @dev Retrieves the build string from the package db.
-  /// @param releaseHash The release hash to retrieve the string from.
-  function getBuild(bytes32 releaseHash)
-    internal
-    view
-    returns (string)
-  {
-    return ReleaseDB(releaseDb).getBuild(releaseHash);
   }
 }

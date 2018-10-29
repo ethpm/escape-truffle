@@ -1,7 +1,6 @@
 pragma solidity ^0.4.24;
 pragma experimental "v0.5.0";
 
-import {SemVersionLib} from "./SemVersionLib.sol";
 import {IndexedOrderedSetLib} from "./IndexedOrderedSetLib.sol";
 import {Authorized} from "./Authority.sol";
 
@@ -9,7 +8,6 @@ import {Authorized} from "./Authority.sol";
 /// @title Database contract for a package index package data.
 /// @author Tim Coulter <tim.coulter@consensys.net>, Piper Merriam <pipermerriam@gmail.com>
 contract PackageDB is Authorized {
-  using SemVersionLib for SemVersionLib.SemVersion;
   using IndexedOrderedSetLib for IndexedOrderedSetLib.IndexedOrderedSet;
 
   struct Package {

@@ -1,7 +1,7 @@
-const PackageIndex = artifacts.require('PackageIndex');
+const PackageRegistry = artifacts.require('PackageRegistry');
 
 module.exports = function(deployer) {
   if (!process.env.PRODUCTION) return;
 
-  deployer.deploy(PackageIndex);
+  deployer.deploy(PackageRegistry);
 };
