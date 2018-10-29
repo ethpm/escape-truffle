@@ -49,14 +49,14 @@ contract('ReleaseValidator', function(accounts){
     ){
       const nameHash = await packageDB.hashName(info[0])
       const versionHash = await releaseDB.hashVersion(info[1]);
-      const releaseHash = await releaseDB.hashRelease(nameHash, versionHash)
+      const releaseId = await releaseDB.hashRelease(nameHash, versionHash)
 
       assert( await packageRegistry.packageExists(info[0]) === false );
       await packageRegistry.release(...info);
       assert( await packageRegistry.packageExists(info[0]) === true );
 
       let packageData = await packageRegistry.getPackageData(info[0]);
-      let releaseData = await packageRegistry.getReleaseData(releaseHash);
+      let releaseData = await packageRegistry.getReleaseData(releaseId);
 
       assert(packageData.numReleases.toNumber() === 1);
       assert(releaseData.manifestURI === uri)
@@ -70,7 +70,7 @@ contract('ReleaseValidator', function(accounts){
       );
 
       packageData = await packageRegistry.getPackageData(info[0]);
-      releaseData = await packageRegistry.getReleaseData(releaseHash);
+      releaseData = await packageRegistry.getReleaseData(releaseId);
 
       assert(packageData.numReleases.toNumber() === 1);
       assert(releaseData.manifestURI === uri);
@@ -103,9 +103,8 @@ contract('ReleaseValidator', function(accounts){
         packageRegistry.release(...releases.zeroLengthManifest),
         'invalid-manifest-uri'
       );
-
       assert( await packageRegistry.packageExists('test') === false );
-    })
+    });
 
     it('should not re-release', async function(){
       await assertNotReRelease(
@@ -113,9 +112,39 @@ contract('ReleaseValidator', function(accounts){
         packageRegistry,
         packageDB,
         releaseDB,
-        'version-exists',
+        'version-previously-published',
       );
     });
+
+    it('should not re-release a version that has been removed from the ReleaseDB', async function(){
+      const info = ['test', '2.0.0', uri];
+
+      const nameHash = await packageDB.hashName(info[0])
+      const versionHash = await releaseDB.hashVersion(info[1]);
+      const releaseId = await releaseDB.hashRelease(nameHash, versionHash)
+
+      assert( await packageRegistry.releaseExists(info[0], info[1]) === false );
+      await packageRegistry.release(...info);
+      assert( await packageRegistry.releaseExists(info[0], info[1]) === true );
+
+      let packageData = await packageRegistry.getPackageData(info[0]);
+      let releaseData = await packageRegistry.getReleaseData(releaseId);
+
+      assert(packageData.numReleases.toNumber() === 1);
+      assert(releaseData.manifestURI === uri)
+
+      await releaseDB.removeRelease(releaseId, 'testing');
+      assert( await packageRegistry.releaseExists(info[0], info[1]) === false );
+
+      await assertFailure(
+        packageRegistry.release(...info),
+        'version-previously-published',
+      );
+
+      packageData = await packageRegistry.getPackageData(info[0]);
+      assert(packageData.numReleases.toNumber() === 0);
+    });
+
   });
 
   describe('PackageNames', function(){
@@ -314,5 +343,5 @@ contract('ReleaseValidator', function(accounts){
 
       assert( await packageRegistry.releaseExists(infoB[0], infoB[1]) === false );
     });
-  })
+  });
 });
