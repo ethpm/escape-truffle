@@ -235,6 +235,47 @@ contract ReleaseDB is Authorized {
     return _allReleaseHashes.get(idx);
   }
 
+  /// @dev Returns a slice of the array of all releases hashes for the named package.
+  /// @param offset The starting index for the slice.
+  /// @param limit  The length of the slice
+  function getAllReleaseIds(bytes32 nameHash, uint _offset, uint limit)
+    public
+    view
+    returns (
+      bytes32[] releaseIds,
+      uint offset
+    )
+  {
+    bytes32[] memory hashes;                                  // Release ids to return
+    uint cursor = _offset;                                    // Index counter to traverse DB array
+    uint remaining;                                           // Counter to collect `limit` packages
+    uint totalReleases = getNumReleasesForNameHash(nameHash); // Total number of packages in registry
+
+    // Is request within range?
+    if (cursor < totalReleases){
+
+      // Get total remaining records
+      remaining = totalReleases - cursor;
+
+      // Number of records to collect is lesser of `remaining` and `limit`
+      if (remaining > limit ){
+        remaining = limit;
+      }
+
+      // Allocate return array
+      hashes = new bytes32[](remaining);
+
+      // Collect records. (IndexedOrderedSet manages deletions.)
+      while(remaining > 0){
+        bytes32 hash = getReleaseHashForNameHash(nameHash, cursor);
+        hashes[remaining - 1] = hash;
+        remaining--;
+        cursor++;
+      }
+    }
+    return (hashes, cursor);
+  }
+
   /// @dev Get the total number of releases
   /// @param nameHash the name hash to lookup.
   function getNumReleasesForNameHash(bytes32 nameHash)
