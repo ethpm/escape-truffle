@@ -23,6 +23,7 @@ contract ReleaseDB is Authorized {
 
   // Release Data: (releaseHash => value)
   mapping (bytes32 => Release) _recordedReleases;
+  mapping (bytes32 => bool) _removedReleases;
   IndexedOrderedSetLib.IndexedOrderedSet _allReleaseHashes;
   mapping (bytes32 => IndexedOrderedSetLib.IndexedOrderedSet) _releaseHashesByNameHash;
 
@@ -160,6 +161,9 @@ contract ReleaseDB is Authorized {
     _allReleaseHashes.remove(releaseHash);
     _releaseHashesByNameHash[nameHash].remove(releaseHash);
 
+    // Add the release hash to the map of removed releases
+    _removedReleases[releaseHash] = true;
+
     // Log the removal.
     emit ReleaseDelete(releaseHash, reason);
 
@@ -260,6 +264,16 @@ contract ReleaseDB is Authorized {
     returns (bool)
   {
     return _recordedReleases[releaseHash].exists;
+  }
+
+  /// @dev Query the past existence of a release at the provided version for a package.  Returns boolean indicating whether such a release ever existed.
+  /// @param releaseHash The release hash to query.
+  function releaseExisted(bytes32 releaseHash)
+    public
+    view
+    returns (bool)
+  {
+    return _removedReleases[releaseHash];
   }
 
   /// @dev Query the existence of the provided version in the recorded versions.  Returns boolean indicating whether such a version exists.
