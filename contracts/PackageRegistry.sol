@@ -63,11 +63,11 @@ contract PackageRegistry is Authorized, PackageRegistryInterface {
   //
   /// @dev Creates a a new release for the named package.  If this is the first release for the given package then this will also assign msg.sender as the owner of the package.  Returns success.
   /// @notice Will create a new release the given package with the given release information.
-  /// @param name Package name
+  /// @param packageName Package name
   /// @param version Version string (ex: '1.0.0')
   /// @param manifestURI The URI for the release manifest for this release.
   function release(
-    string name,
+    string packageName,
     string version,
     string manifestURI
   )
@@ -94,19 +94,19 @@ contract PackageRegistry is Authorized, PackageRegistryInterface {
       packageDb,
       releaseDb,
       msg.sender,
-      name,
+      packageName,
       version,
       manifestURI
     );
 
     // Compute hashes
-    bool _packageExists = packageExists(name);
+    bool _packageExists = packageExists(packageName);
 
     // Both creates the package if it is new as well as updating the updatedAt
     // timestamp on the package.
-    packageDb.setPackage(name);
+    packageDb.setPackage(packageName);
 
-    bytes32 nameHash = packageDb.hashName(name);
+    bytes32 nameHash = packageDb.hashName(packageName);
 
     // If the package does not yet exist create it and set the owner
     if (!_packageExists) {
