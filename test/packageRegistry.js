@@ -29,7 +29,7 @@ contract('PackageRegistry', function(accounts){
     releaseData,
   ){
     const block = await web3.eth.getBlock(receipt.blockHash);
-
+	
     const nameHash = await packageDB.hashName(name)
     const versionHash = await releaseDB.hashVersion(version)
     const releaseHash = await releaseDB.hashRelease(nameHash, versionHash)
@@ -42,7 +42,7 @@ contract('PackageRegistry', function(accounts){
     assert( generatedId === releaseHash );
     assert( exists );
 
-    assert( releaseData.name === name);
+    assert( releaseData.packageName === name);
     assert( releaseData.version === version);
     assert( releaseData.manifestURI === manifestUri );
   }
@@ -338,21 +338,21 @@ contract('PackageRegistry', function(accounts){
 
         assert(Array.isArray(result.releaseIds));
         assert(result.releaseIds.length === 0);
-        assert(result.offset.toNumber() === 0)
+        assert(result.pointer.toNumber() === 0)
       });
 
-      it('returns ([],offset) when offset equals # of releases', async()=>{
+      it('returns ([],pointer) when pointer equals # of releases', async()=>{
         const limit = 20;
         const packageData = await packageRegistry.getPackageData('test-r');
         const numReleases = packageData.numReleases.toNumber();
         assert(numReleases === 3 );
 
-        const offset = numReleases;
-        const result = await packageRegistry.getAllReleaseIds('test-r', offset, limit);
+        const totalCount = numReleases;
+        const result = await packageRegistry.getAllReleaseIds('test-r', totalCount, limit);
 
         assert(Array.isArray(result.releaseIds));
         assert(result.releaseIds.length === 0);
-        assert(result.offset.toNumber() === offset)
+        assert(result.pointer.toNumber() === totalCount)
       });
 
       it('returns ([],0) when limit param is zero', async()=> {
@@ -360,7 +360,7 @@ contract('PackageRegistry', function(accounts){
 
         assert(Array.isArray(result.releaseIds));
         assert(result.releaseIds.length === 0);
-        assert(result.offset.toNumber() === 0)
+        assert(result.pointer.toNumber() === 0)
       });
 
       it('returns ([allReleaseIds], limit) when limit is greater than # of releases', async function(){
@@ -370,14 +370,14 @@ contract('PackageRegistry', function(accounts){
         const limit = packageData.numReleases.toNumber() + 1;
         const result = await packageRegistry.getAllReleaseIds('test-r', 0, limit);
 
-        assert(result.offset.toNumber() === packageData.numReleases.toNumber());
+        assert(result.pointer.toNumber() === packageData.numReleases.toNumber());
         assert(result.releaseIds.length === packageData.numReleases.toNumber());
         assert(result.releaseIds.includes(releaseHashA));
         assert(result.releaseIds.includes(releaseHashB));
         assert(result.releaseIds.includes(releaseHashC));
       });
 
-      it('returns releases and offset when limit is < # of releases', async function(){
+      it('returns releases and pointer when limit is < # of releases', async function(){
         const packageData = await packageRegistry.getPackageData('test-r');
         const numReleases = packageData.numReleases.toNumber();
         assert(numReleases === 3 );
@@ -387,19 +387,19 @@ contract('PackageRegistry', function(accounts){
 
         // Initial results (2)
         assert(resultA.releaseIds.length === limit);
-        assert(resultA.offset.toNumber() === limit);
+        assert(resultA.pointer.toNumber() === limit);
 
-        const resultB = await packageRegistry.getAllReleaseIds('test-r', resultA.offset, limit);
+        const resultB = await packageRegistry.getAllReleaseIds('test-r', resultA.pointer, limit);
 
         // Remaining results (1)
         assert(resultB.releaseIds.length === numReleases - limit);
-        assert(resultB.offset.toNumber() === numReleases);
+        assert(resultB.pointer.toNumber() === numReleases);
 
-        const resultC = await packageRegistry.getAllReleaseIds('test-r', resultB.offset, limit);
+        const resultC = await packageRegistry.getAllReleaseIds('test-r', resultB.pointer, limit);
 
         // Empty results, terminal index
         assert(resultC.releaseIds.length === 0);
-        assert(resultC.offset.toNumber() === numReleases);
+        assert(resultC.pointer.toNumber() === numReleases);
 
         let allIds = resultA.releaseIds.concat(resultB.releaseIds);
 
@@ -418,18 +418,18 @@ contract('PackageRegistry', function(accounts){
         await releaseDB.removeRelease(releaseHashB, 'because');
 
         const resultA = await packageRegistry.getAllReleaseIds('test-r', 0, limit);
-        const offsetA = resultA.offset.toNumber();
+        const pointer = resultA.pointer.toNumber();
 
         // Initial results (2)
         assert(resultA.releaseIds.length === limit - 1);
-        assert(offsetA === limit - 1);
+        assert(pointer === limit - 1);
         assert(!resultA.releaseIds.includes(releaseHashB));
 
-        const resultB = await packageRegistry.getAllReleaseIds('test-r', offsetA, limit);
+        const resultB = await packageRegistry.getAllReleaseIds('test-r', pointer, limit);
 
         // Empty results, terminal index
         assert(resultB.releaseIds.length === 0);
-        assert(resultB.offset.toNumber() === offsetA);
+        assert(resultB.pointer.toNumber() === pointer);
       });
     });
 
