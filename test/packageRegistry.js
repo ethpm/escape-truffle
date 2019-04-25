@@ -37,9 +37,11 @@ contract('PackageRegistry', function(accounts){
 
     const exists = await packageRegistry.releaseExists(name, version);
     const generatedId = await packageRegistry.generateReleaseId(name, version);
+    const getId = await packageRegistry.getReleaseId(name, version);
 
     assert( ids.releaseIds.includes(releaseHash) );
     assert( generatedId === releaseHash );
+    assert( getId === releaseHash );
     assert( exists );
 
     assert( releaseData.packageName === name);
@@ -332,13 +334,21 @@ contract('PackageRegistry', function(accounts){
         await packageRegistry.release(...releaseInfoC)
       })
 
+	  it('returns proper values for numPackageIds, numReleaseIds', async() => {
+	    const numPackageIds = await packageRegistry.numPackageIds();	
+	    const numReleaseIds = await packageRegistry.numReleaseIds('test-r');	
+
+		assert.equal(numPackageIds, 1);
+		assert.equal(numReleaseIds, 3);
+	  })
+
       it('returns ([],0) for a non-existent release', async() => {
         const limit = 20;
         const result = await packageRegistry.getAllReleaseIds('test-none', 0, limit);
 
         assert(Array.isArray(result.releaseIds));
         assert(result.releaseIds.length === 0);
-        assert(result.pointer.toNumber() === 0)
+        assert(result.pointer.toNumber() === 0);
       });
 
       it('returns ([],pointer) when pointer equals # of releases', async()=>{
