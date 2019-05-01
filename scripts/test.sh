@@ -49,6 +49,7 @@ start_client() {
       --dev \
       --dev.period 1 \
       --targetgaslimit '8000000' \
+      --allow-insecure-unlock \
       js ./scripts/geth-accounts.js \
       > /dev/null &
 
