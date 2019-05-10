@@ -29,7 +29,6 @@ contract('PackageRegistry', function(accounts){
     releaseData,
   ){
     const block = await web3.eth.getBlock(receipt.blockHash);
-	
     const nameHash = await packageDB.hashName(name)
     const versionHash = await releaseDB.hashVersion(version)
     const releaseHash = await releaseDB.hashRelease(nameHash, versionHash)
@@ -245,7 +244,6 @@ contract('PackageRegistry', function(accounts){
     })
 
     describe('releases', function(){
-
       it('should retrieve release by release id', async function(){
         const releaseInfoA = ['test', '1.2.3.r.s', 'ipfs://some-ipfs-uri']
         const releaseInfoB = ['test', '2.3.4.m.n', 'ipfs://some-other-ipfs-uri']
@@ -307,6 +305,21 @@ contract('PackageRegistry', function(accounts){
         assert( packageDataB.numReleases.toNumber() === 2 )
         assert( packageDataC.numReleases.toNumber() === 3 )
       });
+
+      it('returns proper values for nonexistent numPackageIds, numReleaseIds', async() => {
+        const nameHashA = await packageDB.hashName('test-a')
+        const releaseInfoA = ['test-a', '1.2.3.a.b', 'ipfs://a']
+        const versionHashA = await releaseDB.hashVersion(releaseInfoA[1])
+        const releaseHashA = await releaseDB.hashRelease(nameHashA, versionHashA)
+
+        const numNonExistentPackageIds = await packageRegistry.numPackageIds();	
+        const numNonExistentReleaseIds = await packageRegistry.numReleaseIds(releaseHashA);	
+        const getNonExistentReleaseId = await packageRegistry.getReleaseId(releaseInfoA[0], releaseInfoA[1])
+
+        assert.equal(numNonExistentPackageIds, 0)
+        assert.equal(numNonExistentReleaseIds, 0)
+        assert.equal(getNonExistentReleaseId, 0)
+      });
     });
 
     describe('getAllReleaseIds', function(){
@@ -332,15 +345,16 @@ contract('PackageRegistry', function(accounts){
         await packageRegistry.release(...releaseInfoA)
         await packageRegistry.release(...releaseInfoB)
         await packageRegistry.release(...releaseInfoC)
-      })
+      });
 
-	  it('returns proper values for numPackageIds, numReleaseIds', async() => {
-	    const numPackageIds = await packageRegistry.numPackageIds();	
-	    const numReleaseIds = await packageRegistry.numReleaseIds('test-r');	
+      it('returns proper values for valid numPackageIds, numReleaseIds', async() => {
+        const numPackageIds = await packageRegistry.numPackageIds();	
+        const numReleaseIds = await packageRegistry.numReleaseIds('test-r');	
 
-		assert.equal(numPackageIds, 1);
-		assert.equal(numReleaseIds, 3);
-	  })
+        assert.equal(numPackageIds, 1);
+        assert.equal(numReleaseIds, 3);
+      });
+
 
       it('returns ([],0) for a non-existent release', async() => {
         const limit = 20;

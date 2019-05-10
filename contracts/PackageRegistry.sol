@@ -310,7 +310,10 @@ contract PackageRegistry is Authorized, PackageRegistryInterface {
     returns (bytes32 releaseId)
   {
     releaseId = generateReleaseId(packageName, version);
-    require(releaseDb.releaseExists(releaseId), "escape:ReleaseDB:version-not-found");
+    bool _releaseExists = releaseDb.releaseExists(releaseId);
+    if (!_releaseExists) {
+      return 0;
+    }
     return releaseId;
   }
 
@@ -330,8 +333,11 @@ contract PackageRegistry is Authorized, PackageRegistryInterface {
     view
     returns (uint totalCount)
   {
+    bool _packageExists = packageExists(packageName);
+    if (!_packageExists) {
+      return 0;
+    }
     bytes32 nameHash = packageDb.hashName(packageName);
-    require(packageDb.packageExists(nameHash), "escape:PackageDB:package-not-found");
     return releaseDb.getNumReleasesForNameHash(nameHash);
   }
 
