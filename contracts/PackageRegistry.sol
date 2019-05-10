@@ -17,7 +17,7 @@ contract PackageRegistry is Authorized, PackageRegistryInterface {
   ReleaseValidator private releaseValidator;
 
   // Events
-  event PackageRelease(bytes32 indexed nameHash, bytes32 indexed releaseId);
+  event VersionRelease(string packageName, string version, string manifestURI);
   event PackageTransfer(address indexed oldOwner, address indexed newOwner);
 
   //
@@ -73,7 +73,7 @@ contract PackageRegistry is Authorized, PackageRegistryInterface {
   )
     public
     auth
-    returns (bytes32 id)
+    returns (bytes32 releaseId)
   {
     require(address(packageDb) != 0x0,        "escape:PackageIndex:package-db-not-set");
     require(address(releaseDb) != 0x0,        "escape:PackageIndex:release-db-not-set");
@@ -117,8 +117,8 @@ contract PackageRegistry is Authorized, PackageRegistryInterface {
     releaseDb.setRelease(nameHash, versionHash, manifestURI);
 
     // Log the release.
-    bytes32 releaseId = releaseDb.hashRelease(nameHash, versionHash);
-    emit PackageRelease(nameHash, releaseId);
+    releaseId = releaseDb.hashRelease(nameHash, versionHash);
+    emit VersionRelease(packageName, version, manifestURI);
 
     return releaseId;
   }
@@ -210,27 +210,27 @@ contract PackageRegistry is Authorized, PackageRegistryInterface {
   }
 
   /// @dev Returns a slice of the array of all package hashes for the named package.
-  /// @param _offset The starting index for the slice.
+  /// @param offset The starting index for the slice.
   /// @param limit  The length of the slice
-  function getAllPackageIds(uint _offset, uint limit)
+  function getAllPackageIds(uint offset, uint limit)
     public
     view
     returns(
       bytes32[] packageIds,
-      uint offset
+      uint pointer
     )
   {
-    return packageDb.getAllPackageIds(_offset, limit);
+    return packageDb.getAllPackageIds(offset, limit);
   }
 
   /// @dev Retrieves the name for the given name hash.
-  /// @param nameHash The name hash to lookup the name for.
-  function getPackageName(bytes32 nameHash)
+  /// @param packageId The name hash of package to lookup the name for.
+  function getPackageName(bytes32 packageId)
     public
     view
-    returns (string)
+    returns (string packageName)
   {
-    return packageDb.getPackageName(nameHash);
+    return packageDb.getPackageName(packageId);
   }
 
   /// @dev Returns the package data.
@@ -257,7 +257,7 @@ contract PackageRegistry is Authorized, PackageRegistryInterface {
     public
     view
     returns (
-      string name,
+      string packageName,
       string version,
       string manifestURI
     )
@@ -266,39 +266,79 @@ contract PackageRegistry is Authorized, PackageRegistryInterface {
     bytes32 nameHash;
     (nameHash,versionHash, ,) = releaseDb.getReleaseData(releaseId);
 
-    name = packageDb.getPackageName(nameHash);
+    packageName = packageDb.getPackageName(nameHash);
     version = releaseDb.getVersion(versionHash);
     manifestURI = releaseDb.getManifestURI(releaseId);
 
-    return (name, version, manifestURI);
+    return (packageName, version, manifestURI);
   }
 
   /// @dev Returns a slice of the array of all package hashes for the named package.
   /// @param offset The starting index for the slice.
   /// @param limit  The length of the slice
-  function getAllReleaseIds(string name, uint _offset, uint limit)
+  function getAllReleaseIds(string packageName, uint offset, uint limit)
     public
     view
     returns (
       bytes32[] releaseIds,
-      uint offset
+      uint pointer
     )
   {
-    bytes32 nameHash = packageDb.hashName(name);
-    return releaseDb.getAllReleaseIds(nameHash, _offset, limit);
+    bytes32 nameHash = packageDb.hashName(packageName);
+    return releaseDb.getAllReleaseIds(nameHash, offset, limit);
   }
 
-  // @dev Returns release id that *would* be generated for a name and version pair on `release`.
-  // @param name Package name
-  // @param version Version string (ex: '1.0.0')
-  function generateReleaseId(string name, string version)
+  /// @dev Returns release id that *would* be generated for a name and version pair on `release`.
+  /// @param packageName Package name
+  /// @param version Version string (ex: '1.0.0')
+  function generateReleaseId(string packageName, string version)
     public
     view
-    returns (bytes32)
+    returns (bytes32 releaseId)
   {
-    bytes32 nameHash = packageDb.hashName(name);
+    bytes32 nameHash = packageDb.hashName(packageName);
     bytes32 versionHash = releaseDb.hashVersion(version);
     return keccak256(abi.encodePacked(nameHash, versionHash));
+  }
+
+  /// @dev Returns the release id for a given name and version pair if present on registry.
+  /// @param packageName Package name
+  /// @param version Version string(ex: '1.0.0')
+  function getReleaseId(string packageName, string version)
+    public
+    view
+    returns (bytes32 releaseId)
+  {
+    releaseId = generateReleaseId(packageName, version);
+    bool _releaseExists = releaseDb.releaseExists(releaseId);
+    if (!_releaseExists) {
+      return 0;
+    }
+    return releaseId;
+  }
+
+  /// @dev Returns the number of packages stored on the registry
+  function numPackageIds()
+    public
+    view
+    returns (uint totalCount)
+  {
+    return packageDb.getNumPackages();
+  }
+
+  /// @dev Returns the number of releases for a given package name on the registry
+  /// @param packageName Package name
+  function numReleaseIds(string packageName)
+    public
+    view
+    returns (uint totalCount)
+  {
+    bool _packageExists = packageExists(packageName);
+    if (!_packageExists) {
+      return 0;
+    }
+    bytes32 nameHash = packageDb.hashName(packageName);
+    return releaseDb.getNumReleasesForNameHash(nameHash);
   }
 
   //
